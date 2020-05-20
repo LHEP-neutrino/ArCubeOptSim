@@ -53,12 +53,14 @@ int main(int argc, char **argv)
 	
 	bool bGdmlFile = false;
 	bool bPreinitMacroFile = false;
+	bool bOptMacroFile = false;
+	bool bVisMacroFile = false;
 	bool bMacroFile = false;
-	G4String hGdmlFileName, hPreinitMacroFileName, hMacroFileName, hOutFileName;
+	G4String hGdmlFileName, hPreinitMacroFileName, hMacroFileName, hOptMacroFileName, hVisMacroFileName, hOutFileName;
 	int iNbEventsToSimulate = 0;
 
 	// parse switches
-	while((c = getopt(argc,argv,"h:g:p:m:o:n:G")) != -1)
+	while((c = getopt(argc,argv,"h:g:p:m:o:q:n:v:G")) != -1)
 	{
 		switch(c)
 		{
@@ -82,10 +84,20 @@ int main(int argc, char **argv)
 				hOutFileName = optarg;
 				break;
 				
+			case 'q':
+				bOptMacroFile = true;
+				hOptMacroFileName = optarg;
+				break;
+				
 			case 'n':
 				hStream.clear(); hStream.str("");
 				hStream << optarg;
 				iNbEventsToSimulate = atoi(hStream.str().c_str());
+				break;
+				
+			case 'v':
+				bVisMacroFile = true;
+				hVisMacroFileName = optarg;
 				break;
 				
 			case 'G':
@@ -155,6 +167,11 @@ int main(int argc, char **argv)
 	//Initialize the RunManager
 	pRunManager->Initialize();
 	
+  if(bOptMacroFile){
+    G4String hCommand = "/control/execute " + hOptMacroFileName;
+    pUImanager->ApplyCommand(hCommand);
+  }
+  
 	if(bInteractive){
 		// Visualization Manager
 		pVisManager = new G4VisExecutive;
@@ -163,7 +180,10 @@ int main(int argc, char **argv)
 		//Let G4UIExecutive guess what is the best available UI
 		ui = new G4UIExecutive(1,argv);
 		if (ui->IsGUI() && bUseGui ){
-			pUImanager->ApplyCommand("/control/execute gui.mac");
+      if(bVisMacroFile){
+        G4String hCommand = "/control/execute " + hVisMacroFileName;
+        pUImanager->ApplyCommand(hCommand);
+      }
 			ui->SessionStart();
 			delete ui;
 		}else{
@@ -171,7 +191,7 @@ int main(int argc, char **argv)
 			pUIsession->SessionStart();
 			delete pUIsession;
 		}
-		
+    
 	}else{
 		if(bMacroFile)
 		{

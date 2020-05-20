@@ -122,9 +122,13 @@ G4VPhysicalVolume *DetConstrOptPh::Construct()
 			ScanVols(fWorld);
 		}
 		
-		BuildDefaultOptSurf();
-		BuildDefaultLogSurfaces();
-		SetDefaultOptProperties();
+		OptPropManager::verbosity oldverb = fOptPropManager->GetVerbosity();
+		fOptPropManager->SetVerbosity( (OptPropManager::verbosity)fVerbose );
+		//BuildDefaultOptSurf();
+		//BuildDefaultLogSurfaces();
+		//SetDefaultOptProperties();
+		fOptPropManager->SetVerbosity( oldverb );
+		
 	}
 	
 	if(fVerbose>=DetConstrOptPh::kInfo) G4cout << "Info --> DetConstrOptPh::Construct(): Finished construction "<<G4endl;
@@ -271,11 +275,7 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 	//  Interface between EJ280 WLS and Mirror  //
 	// -----------------------------------------//
 	
-	fOptPropManager->BuildLogicalBorderSurface("EJ2802Mirror_logsurf", "volWLS_PV", "volMirror_PV", "EJ2802ESR_optsurf");
-	//fOptPropManager->BuildLogicalBorderSurface("EJ2802OptDet_logsurf", "volWLS_PV", "volOpticalDet_PV", "EJ2802ESR_optsurf");
-	//fOptPropManager->BuildLogicalBorderSurface("EJ2802SiPMMask_logsurf", "volWLS_PV", "volSiPM_Mask_PV", "EJ2802ESR_optsurf");
-	//fOptPropManager->BuildLogicalBorderSurface("EJ2802ArCLight_logsurf", "volWLS_PV", "volArCLight_PV", "EJ2802ESR_optsurf");
-	//fOptPropManager->BuildLogicalBorderSurface("EJ2802LAr_logsurf", "volWLS_PV", "volLAr_PV", "EJ2802ESR_optsurf");
+	fOptPropManager->BuildLogicalBorderSurface("EJ2802ESR_logsurf", "volWLS_PV", "volMirror_PV", "EJ2802ESR_optsurf");
 	
 	
 	
@@ -290,17 +290,18 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 	//fOptPropManager->BuildLogicalBorderSurface("EJ2802SiPM3_logsurf", "volWLS_PV", "volSiPM_3_PV", "EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("EJ2802SiPM4_logsurf", "volWLS_PV", "volSiPM_4_PV", "EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("EJ2802SiPM5_logsurf", "volWLS_PV", "volSiPM_5_PV", "EJ2802SiPM_optsurf");
-	
+
+
+
 	// -----------------------------------------//
 	//  Interface between Fiber and LAr  //
 	// -----------------------------------------//
 	
 	// LogSurface between Fibers and LAr (using same as EJ280 to ESR)
-	//fOptPropManager->BuildLogicalBorderSurface("Fib2LCM_logsurf","volFiber_PV","volLCM_PV","EJ2802ESR_optsurf");
-	//fOptPropManager->BuildLogicalBorderSurface("Fib2LCM_logsurf","volFiber_PV","volLCM_PV","EJ2802ESR_optsurf");
+	fOptPropManager->BuildLogicalBorderSurface("Fib2LCM_logsurf","volFiber_PV","volLCM_PV","EJ2802ESR_optsurf");
 	
 	// LogSurface between Fibers and SiPMs
-	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM_logsurf","volFiber_PV","volSiPM_LCM_PV","EJ2802SiPM_optsurf");
+	fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM_logsurf","volFiber_PV","volSiPM_LCM_PV","EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM0_logsurf","volFiber_PV","volSiPM_LCM_0_PV","EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM1_logsurf","volFiber_PV","volSiPM_LCM_1_PV","EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM2_logsurf","volFiber_PV","volSiPM_LCM_2_PV","EJ2802SiPM_optsurf");
@@ -318,7 +319,7 @@ void DetConstrOptPh::SetDefaultOptProperties()
 {
 	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties(): Entering the function."<<G4endl;
 	
-	if(!fOptPropManager){
+  if(!fOptPropManager){
 		G4Exception("DetConstrOptPh::DefaultOptProperties()","Geom.002", FatalException,"\"OptPropManager\" pointer is null.");
 	}
 	
@@ -328,7 +329,7 @@ void DetConstrOptPh::SetDefaultOptProperties()
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void DetConstrOptPh::PrintVolumeCoordinates(G4String hVolName)
+void DetConstrOptPh::PrintVolumeCoordinates(const G4String& hVolName)
 {
 	if(hVolName==G4String("")){
 		G4cout << "\nERROR --> DetConstrOptPh::PrintVolumeCoordinates(G4String hVolName): Physical volume name not set!!!" << G4endl;
@@ -349,10 +350,10 @@ void DetConstrOptPh::PrintVolumeCoordinates(G4String hVolName)
 	}
 	
 	if(vPhysVols.size()==0){
-		G4cout << "Physical Volume \"" << hVolName << "\" not found!!!" << G4endl;
+		G4cout << "Physical Volume <" << hVolName << "> not found!!!" << G4endl;
 		return;
 	}else{
-		G4cout << "There are " << vPhysVols.size() << " instances of the physical volume \"" << hVolName << "\"" << G4endl;
+		G4cout << "There are " << vPhysVols.size() << " instances of the physical volume <" << hVolName << ">" << G4endl;
 	}
 	
 	G4cout << G4endl << G4endl;
@@ -382,17 +383,38 @@ void DetConstrOptPh::PrintVolumeCoordinates(G4String hVolName)
 					pAncPhysVol = pPhysVolStore->at(i);
 				}
 			}
-			G4cout << "Shift of physical volume \"" << pPhysVol->GetName() << "\" with respect to \"" << pAncPhysVol->GetName() << "\" =  " << pPhysVol->GetTranslation()/mm << " mm" << G4endl;
+			G4cout << "Shift of physical volume <" << pPhysVol->GetName() << "> with respect to <" << pAncPhysVol->GetName() << "> =  " << pPhysVol->GetTranslation()/mm << " mm" << G4endl;
 			pPhysVol = pAncPhysVol;
 			ShiftGlob = ShiftGlob + pPhysVol->GetTranslation();
 		}
 		
-		G4cout << "\nGlobal shift of physical volume \"" << hVolName << "\" (inst. " << iVol << ") =  " << ShiftGlob/mm << " mm" << G4endl;
+		G4cout << "\nGlobal shift of physical volume <" << hVolName << "> (inst. " << iVol << ") =  " << ShiftGlob/mm << " mm" << G4endl;
 		
 	}
 	
 	return;
 }
+
+
+void DetConstrOptPh::PrintVolumeInfo(const G4String& VolName)
+{
+	if(fPVolsMap.find(VolName)==fPVolsMap.end()){
+		G4cout << "\nPhysical volume <" << VolName << "> not present in the volumes map!" << G4endl;
+		return;
+	}
+	
+	G4cout << "Found " << (fPVolsMap[VolName]).size() << " instances of the volume <" << VolName << ">" << G4endl;
+	
+	
+	if(fPVolsRecour.find(VolName)==fPVolsRecour.end()){
+		G4cout << "Physical volume <" << VolName << "> not present in the map of recourrences!" << G4endl;
+		return;
+	}
+	
+	G4cout << "The physical volume <" << VolName << "> was found " << fPVolsRecour[VolName] << " times in the tree of physical volumes" << G4endl;
+	
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -412,7 +434,7 @@ void DetConstrOptPh::PrintListOfPhysVols()
 	for(G4int ivol=0; ivol<nvols; ivol++){
 		G4LogicalVolume *pMotherVol = pPhysVolStore->at(ivol)->GetMotherLogical();
 		if(pMotherVol){
-			G4cout << "PV: " << pPhysVolStore->at(ivol)->GetName();
+			G4cout << "PV: " << pPhysVolStore->at(ivol)->GetName() << " (CpNm: " << pPhysVolStore->at(ivol)->GetCopyNo() << ")";
 			if( pPhysVolStore->at(ivol)->IsReplicated() && pPhysVolStore->at(ivol)->IsParameterised()){
 				G4cout << " (repl, param)";
 			}else{
@@ -496,6 +518,13 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 	}else{
 		((*volsmap)[mvol->GetName()]).insert(mvol);
 	}
+	
+	if( fPVolsRecour.find(mvol->GetName()) == fPVolsRecour.end() ){
+		fPVolsRecour[mvol->GetName()] = 1;
+	}else{
+		fPVolsRecour[mvol->GetName()] += 1;
+	}
+	
 	
 	G4int nDVols = mvol->GetLogicalVolume()->GetNoDaughters();
 	

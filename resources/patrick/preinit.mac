@@ -1,3 +1,2 @@
 /argoncube/detector/optical/verbosity 1
 /argoncube/detector/setTpbThick 0.001 mm
-/argoncube/detector/optical/loadOptSett resources/patrick/optProp.json

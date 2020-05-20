@@ -61,10 +61,6 @@ public:
 	//The first column should be the energy photon (not the wavelenght) and the second column the lenght (in m)
 	void SetMaterialRayleighLenght(const G4String& materialname, const G4String& asciifilename);
 
-	//loads the reflectivity from a 2 column ascii file and gives it to a surface if this exists
-	//The first column should be the energy photon (not the wavelenght) and the second column the index
-	void SetSurfReflectivity(const G4String& logsurfname, const G4String& asciifilename);
-
 	//loads the photon detection efficiency from a 2 column ascii file and gives it to a material if this exists
 	//The first column should be the energy photon (not the wavelenght) and the second column the efficiency
 	void SetMaterialEfficiency(const G4String& materialname, const G4String& asciifilename);
@@ -82,8 +78,8 @@ public:
 	void SetMaterialWLSDelay(const G4String& materialname, const G4String& asciifilename);
 	
 	
-	void SetMaterialRindex(const G4String& materialname, const G4int Nentries, const G4double* wavelenghts, const G4double* rindexes);
-	void SetMaterialRindex(const G4String& materialname, const std::vector<G4double>& wavelenghts, const std::vector<G4double>& rindexes);
+	void SetMaterialRindex(const G4String& materialname, const G4int Nentries, const G4double* wavelenghts, const G4double* rindeces);
+	void SetMaterialRindex(const G4String& materialname, const std::vector<G4double>& wavelenghts, const std::vector<G4double>& rindeces);
 	
 	
 	void SetMaterialAbsLenght(const G4String& materialname, const G4int Nentries, const G4double* wavelenghts, const G4double* abslenghts);
@@ -92,10 +88,6 @@ public:
 	
 	void SetMaterialRayleighLenght(const G4String& materialname, const G4int Nentries, const G4double* wavelenghts, const G4double* rayleighlenghts);
 	void SetMaterialRayleighLenght(const G4String& materialname, const std::vector<G4double>& wavelenghts, const std::vector<G4double>& rayleighlenghts);
-	
-	
-	void SetSurfReflectivity(const G4String& logsurfname, const G4int Nentries, const G4double* wavelenghts, const G4double* reflectivities);
-	void SetSurfReflectivity(const G4String& logsurfname, const std::vector<G4double>& wavelenghts, const std::vector<G4double>& reflectivities);
 	
 	
 	void SetMaterialEfficiency(const G4String& materialname, const G4int Nentries, const G4double* wavelenghts, const G4double* efficiencies);
@@ -119,6 +111,8 @@ public:
 	void SetSurfType(const G4String& logsurfname, const G4String& type);
 	void SetSurfFinish(const G4String& logsurfname, const G4String& finish);
 	void SetSurfSigmaAlpha(const G4String& logsurfname, const G4double& s_a);
+	void SetSurfReflectivity(const G4String& logsurfname, const G4int Nentries, const G4double* wavelenghts, const G4double* reflectivities);
+	void SetSurfReflectivity(const G4String& logsurfname, const std::vector<G4double>& wavelenghts, const std::vector<G4double>& reflectivities);
 	void SetSurfPropFromFile(const G4String& logsurfname, const G4String& filename, const G4String& propertyname);
 	
 	void BuildOpticalSurface(const G4String& optsurfname, const G4String& model, const G4String& type, const G4String& finish );
@@ -132,7 +126,7 @@ public:
 	
 	//Builds the logical surface given the names of the PVs.
 	//If no name for the optical surface is given it will build the logical surface without that. --> Do not do it as can generate big issues not immediately recognisable!!!
-	G4int BuildLogicalBorderSurface(const G4String& logsurfname, const G4String& physvol1, const G4String& physvol2, const G4String& optsurfname=G4String(""));
+	int BuildLogicalBorderSurface(const G4String& logsurfname, const G4String& physvol1, const G4String& physvol2, const G4String& optsurfname=G4String(""));
 	
 	
 	void SetOpticalSurface(const G4String& logsurfname, const G4String& optsurfname);
@@ -168,20 +162,29 @@ private:
 	void setoptsurf(const json keyval);
 	
 	//Modifies the properties of an already existing G4LogicalBorderSurface. If necessary accesses to its G4OpticalSurface to apply the properties
-	void setbordersurf(const json keyval);
+	void setlogbordersurf(const json keyval);
 	
 	//Modifies the properties of an already existing G4LogicalSkinSurface. If necessary accesses to its G4OpticalSurface to apply the properties
-	void setskinsurf(const json keyval);
+	void setlogskinsurf(const json keyval);
 	
 	//Builds a new G4OpticalSurface if it doesn't already exist (check by name). If it exists doesn't do anything
 	void buildoptsurf(const json keyval);
 	
 	//Builds a new G4LogicalBorderSurface if it doesn't already exist (check by name). If it exists doesn't do anything. In the process an already instanced G4OpticalSurface must be given to the surface, otherwise this object won't be created.
-	void buildbordersurface(const json keyval);
+	void buildlogbordersurf(const json keyval);
 	
 	//Builds a new G4LogicalSkinSurface if it doesn't already exist (check by name). If it exists doesn't do anything. In the process an already instanced G4OpticalSurface must be given to the surface, otherwise this object won't be created.
-	void buildskinsurf(const json keyval);
+	void buildlogskinsurf(const json keyval);
 	
+	
+	//Private versions of functions to build/set logical surfaces, should be only used with homogeneous lists of logical surfaces (same name)
+	void SetSurfModel(const std::set<G4LogicalSurface* >* logsurflist, const G4String& model);
+	void SetSurfType(const std::set<G4LogicalSurface* >* logsurflist, const G4String& type);
+	void SetSurfFinish(const std::set<G4LogicalSurface* >* logsurflist, const G4String& finish);
+	void SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* logsurflist, const G4double& s_a);
+	void SetSurfPropFromFile(const std::set<G4LogicalSurface* >* logsurflist, const G4String& filename, const G4String& propertyname);
+	
+	int BuildLogicalBorderSurface(const G4String& logsurfname, const std::vector<G4VPhysicalVolume*>& vol1_vec, const std::vector<G4VPhysicalVolume*>& vol2_vec, const G4OpticalSurface* optsurf );
 	
 	
 	//Map from the key (a string obj) to the corresponding function

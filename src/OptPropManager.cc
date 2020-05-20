@@ -105,11 +105,11 @@ OptPropManager::OptPropManager()
 	
 	json_proc_tab["setmatprop"] = &OptPropManager::setmatprop;
 	json_proc_tab["setoptsurf"] = &OptPropManager::setoptsurf;
-	json_proc_tab["setbordersurf"] = &OptPropManager::setbordersurf;
-	json_proc_tab["setskinsurf"] = &OptPropManager::setskinsurf;
+	json_proc_tab["setlogbordersurf"] = &OptPropManager::setlogbordersurf;
+	json_proc_tab["setlogskinsurf"] = &OptPropManager::setlogskinsurf;
 	json_proc_tab["buildoptsurf"] = &OptPropManager::buildoptsurf;
-	json_proc_tab["buildbordersurface"] = &OptPropManager::buildbordersurface;
-	json_proc_tab["buildskinsurf"] = &OptPropManager::buildskinsurf;
+	json_proc_tab["buildlogbordersurf"] = &OptPropManager::buildlogbordersurf;
+	json_proc_tab["buildlogskinsurf"] = &OptPropManager::buildlogskinsurf;
 	
 }
 
@@ -145,6 +145,7 @@ void OptPropManager::ProcessJsonFile(const G4String& jsonfilename)
 			
 			
 			for (json::iterator it = jsonObj.at("commands").begin(); it != jsonObj.at("commands").end(); it++){
+
 				bool validcmd = true;
 				cmdname = "";
 				
@@ -279,41 +280,70 @@ void OptPropManager::ReadValuesFromFile(const G4String& filename, std::vector<G4
 	
 	std::ifstream infile(filename.c_str());
 	
-	if(!infile) return;
+	if(!infile){
+		std::cout << "\nERROR --> OptPropManager::ReadValuesFromFile(...): Cannot find or open in read mode the file <" << filename << ">\n" << std::endl;
+		return;
+	}
 	
 	std::string str;
 	std::stringstream ss_tmp;
 	
-	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::ReadValuesFromFile(...): Reading values from file <" << filename << ">:" << std::endl;
+	}
+	int iLine =0;
+	G4double ph_en_d;
+	G4double val_d;
 	while(getline(infile,str)){
-		
-    if(fVerbose>=OptPropManager::kDebug){
-      std::cout << "\tDebug --> OptPropManager::ReadValuesFromFile(...): processing line <" << str << ">." << std::endl;
-    }
+		iLine++;
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "   Line: " << iLine;
+		}
 		
 		ss_tmp.clear(); ss_tmp.str("");
 		ss_tmp << str;
 		
 		ss_tmp >> str;
-    
-    if(fVerbose>=OptPropManager::kDebug){
-      std::cout << "\tDebug --> OptPropManager::ReadValuesFromFile(...): processing line <" << str << ">." << std::endl;
-    }
-		
-		G4double ph_en_d = std::stod(str);
-		
-		if(!ss_tmp){//There is only one value while the file format is defined with 2 columns
+		if(ss_tmp){
+			ph_en_d = std::stod(str);
+			if(fVerbose>=OptPropManager::kDebug) std::cout << "; en: " << ph_en_d;
+		}else{
+			if(fVerbose>=OptPropManager::kDebug) std::cout << "; corrupted!" << std::endl;
 			ph_en.resize(0);
 			vals.resize(0);
 			return;
 		}
+		
 		ss_tmp >> str;
-		G4double val_d = std::stod(str);
+		if(ss_tmp){//There is only one value while the file format is defined with 2 columns
+			val_d = std::stod(str);
+			if(fVerbose>=OptPropManager::kDebug) std::cout << "; value: " << val_d << std::endl;
+		}else{
+			if(fVerbose>=OptPropManager::kDebug) std::cout << "; corrupted!" << std::endl;
+			ph_en.resize(0);
+			vals.resize(0);
+			return;
+		}
+		
+		
+		/*
+		ph_en_d = std::stod(str);
+		
+		
+		ss_tmp >> str;
+		val_d = std::stod(str);
+		
+		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "; en: " << ph_en_d << "; value: " << val_d << std::endl;
+		}
+		*/
 		
 		ph_en.push_back(ph_en_d);
 		vals.push_back(val_d);
 	}
 	
+	if(fVerbose>=OptPropManager::kDebug) std::cout << std::endl;
 }
 
 
@@ -349,10 +379,9 @@ void OptPropManager::setmatprop(const json keyval)
 		json propObj = keyval.at("propfile");
 	
 		std::vector<G4double> en_vec(0), val_vec(0);
-		
-    if(fVerbose>=OptPropManager::kDebug){
-      std::cout << "Debug --> OptPropManager::setmatprop(...): starting iterator." << std::endl;
-    }
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setmatprop(...): starting iterator over properties." << std::endl;
+		}
 		
 		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
 			if(!it.value().is_string()){
@@ -363,24 +392,19 @@ void OptPropManager::setmatprop(const json keyval)
 			en_vec.clear(); en_vec.resize(0);
 			val_vec.clear(); val_vec.resize(0);
 			
-      if(fVerbose>=OptPropManager::kDebug){
-        std::cout << "\tDebug --> OptPropManager::setmatprop(...): read values from file <" << it.value() << ">." << std::endl;
-      }
-		
+			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setmatprop(...): Setting property " << it.key() << " for \"" << mat->GetName() << "\" from file \"" << it.value().get<std::string>() << "\"" << std::endl;
+			}
+			
 			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
 			
 			if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
-			
-        if(fVerbose>=OptPropManager::kDebug){
-          std::cout << "\tDebug --> OptPropManager::setmatprop(...): en_vec.size: " << en_vec.size() << ", val_vec.size: " << val_vec.size() << "." << std::endl;
-        }
-		
+				std::cout << "\nERROR --> OptPropManager::setmatprop(...): Wrong or zero length vectors after reading property file <" << it.value().get<std::string>() << ">. Cannot set material property <" << it.key() << "> for material <" << mat->GetName() << ">\n" << std::endl;
 				continue;
 			}
 			
-			if(fVerbose>=OptPropManager::kInfo){
-				std::cout << "Info --> OptPropManager::setmatprop(...): Setting property " << it.key() << " for \"" << mat->GetName() << "\" from file \"" << it.value().get<std::string>() << "\"" << std::endl;
-			}
+			
 			
 			G4MaterialPropertiesTable* propTab = mat->GetMaterialPropertiesTable();
 			
@@ -411,44 +435,67 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	//Requirements are that the optical surface exist, otherwise return with an error
 	if( !keyval.contains("surfname") ){
-		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): the json object doesn't contain the \"surfname\" key. Cannot change settings of an optical surface without knowing its name!" << std::endl;
+		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): the json object doesn't contain the <surfname> key. Cannot change settings of an optical surface without knowing its name!" << std::endl;
 		return;
 	}
 	
 	if( !keyval.at("surfname").is_string() ){
-		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): The \"surfname\" key must be a string!" << std::endl;
+		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): The json value of the <surfname> key is not of json string type!" << std::endl;
+		return;
+	}
+	
+	std::string surfname = keyval.at("surfname").get<std::string>();
+	
+	G4OpticalSurface* optsurf = FindOptSurf( surfname );
+	
+	if(!optsurf){
+		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): Cannot find the optical surface <"<< surfname <<"> in table of the instanced optical surfaces! You have to build a new one with the json command <buildoptsurf>.\n" << std::endl;
 		return;
 	}
 	
 	
-	G4OpticalSurface* optsurf = FindOptSurf(keyval.at("surfname").get<std::string>());
-	
-	if(!optsurf){
-		std::cout << "\nERROR --> OptPropManager::setoptsurf(...): Cannot find the optical surface \""<< keyval.at("surfname").get<std::string>() <<"\" in table of the instanced optical surfaces!" << std::endl;
-		return;
+	G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
+	if(!propTab){
+		if(fVerbose>=OptPropManager::kDetails){
+			std::cout << "Detail --> OptPropManager::setoptsurf(...): Optical surface <" << surfname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
+		}
+		propTab = new G4MaterialPropertiesTable();
+		optsurf->SetMaterialPropertiesTable(propTab);
 	}
 	
 	
 	if(keyval.contains("model")){
 		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying model <" << keyval.at("model").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("type")){
 		if( keyval.at("type").is_string() && (OptSurfTypeMap.find(keyval.at("type").get<std::string>())!=OptSurfTypeMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying surface type <" << keyval.at("type").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("finish")){
 		if( keyval.at("finish").is_string() && (OptSurfFinishMap.find(keyval.at("finish").get<std::string>())!=OptSurfFinishMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying surface finish <" << keyval.at("finish").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("sigma_alpha")){
 		if( keyval.at("sigma_alpha").is_number_float() ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying value <sigma_alpha> = " << keyval.at("sigma_alpha").get<double>() << " to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetSigmaAlpha( keyval.at("sigma_alpha").get<G4double>() );
 		}
 	}
@@ -456,39 +503,37 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	if( keyval.contains("propfile") && (keyval.at("propfile").is_object()) ){
 		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setoptsurf(...): entering into <propfile> section for the <" << surfname << "> optical surface." << std::endl;
+		}
+		
 		json propObj = keyval.at("propfile");
 		
 		std::vector<G4double> en_vec(0), val_vec(0);
 		
 		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
 			if(!it.value().is_string()){
-				std::cout << "\nERROR --> OptPropManager::setoptsurf(...): The field corresponding to the property " << it.key() << " is not a string!" << std::endl;
+				std::cout << "\nERROR --> OptPropManager::setoptsurf(...): The field corresponding to the property " << it.key() << " is not a json string type!" << std::endl;
 				continue;
 			}
 			
 			en_vec.clear(); en_vec.resize(0);
 			val_vec.clear(); val_vec.resize(0);
 			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting property  <" << it.key() << "> from file <" << it.value().get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
+			}
 			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
 			
 			if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
+				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): Wrong dimensions of vectors after the readout of the file <" << it.value().get<std::string>() << ">. Cannot set the property <" << it.key() << "> for the <" << surfname << "> optical surface!\n" << std::endl;
 				continue;
 			}
 			
-			if(fVerbose>=OptPropManager::kInfo){
-				std::cout << "Info --> OptPropManager::setoptsurf(...): Setting property " << it.key() << " for \"" << optsurf->GetName() << "\" from file \"" << it.value().get<std::string>() << "\"" << std::endl;
-			}
-			
-			
-			G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
-			
-			if(!propTab){
-				propTab = new G4MaterialPropertiesTable();
-				optsurf->SetMaterialPropertiesTable(propTab);
-			}
-			
-			
 			if(propTab->GetProperty( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::buildoptsurf(...): Property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
+				}
 				propTab->RemoveProperty( it.key().c_str() );
 			}
 			propTab->AddProperty( it.key().c_str() ,(G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
@@ -504,21 +549,21 @@ void OptPropManager::setoptsurf(const json keyval)
 }
 
 
-void OptPropManager::setbordersurf(const json keyval)
+void OptPropManager::setlogbordersurf(const json keyval)
 {
 	if(fVerbose>=OptPropManager::kDebug){
-		std::cout << "Debug --> OptPropManager::setbordersurf(...): start of routine." << std::endl;
+		std::cout << "Debug --> OptPropManager::setlogbordersurf(...): start of routine." << std::endl;
 	}
 	
 	
 	//Requirements are that the logical border surface exists, otherwise return with an error
 	if( !keyval.contains("surfname") ){
-		G4cout << "\nERROR --> OptPropManager::setbordersurf(...): the json object doesn't contain the <surfname> key. Cannot change settings of a logical border surface without knowing its name!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): the json object doesn't contain the <surfname> key. Cannot change settings of a logical border surface without knowing its name!\n" << std::endl;
 		return;
 	}
 	
 	if( !keyval.at("surfname").is_string() ){
-		G4cout << "\nERROR --> OptPropManager::setbordersurf(...): The <surfname> key must be a string!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): The <surfname> key must be a string!\n" << std::endl;
 		return;
 	}
 	
@@ -527,89 +572,172 @@ void OptPropManager::setbordersurf(const json keyval)
 	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
 	
 	if(!logsurflist){
-		G4cout << "\nERROR --> OptPropManager::setbordersurf(...): Cannot find the logical surface <"<< logsurfname <<"> in the table of the instanced logical border surfaces!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): Cannot find the logical surface <"<< logsurfname <<"> in the table of the instanced logical border surfaces!\n" << std::endl;
 		return;
 	}
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Found "<< logsurflist->size() << " logical border surfaces named <"<< logsurfname << ">" << std::endl;
+	}
 	
-	
+	G4OpticalSurface *optsurf = NULL;
+	std::string optsurfname = "";
 	if( keyval.contains("optsurf") ){
 		if( keyval.at("optsurf").is_string() ){
 			
-			G4OpticalSurface *optsurf = FindOptSurf( keyval.at("optsurf").get<std::string>() );
+			optsurfname = keyval.at("optsurf").get<std::string>();
+			optsurf = FindOptSurf( optsurfname );
+			if(!optsurf->GetMaterialPropertiesTable()){
+				optsurf->SetMaterialPropertiesTable( new G4MaterialPropertiesTable() );
+			}
 			
 			if(optsurf){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Assigning optical surface <"<< optsurfname << "> to the logical border surfaces named <"<< logsurfname << ">" << std::endl;
+				}
 				std::set<G4LogicalSurface* >::iterator iT;
 				for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT){
 					(*iT)->SetSurfaceProperty(optsurf);
 				}
 				
 			}else{
-				G4cout << "\nWARNING --> OptPropManager::setbordersurf(...): Could not find the optical surface <" << keyval.at("optsurf").get<std::string>() << ">. The optical surface of the <" << logsurfname << "> logical surface(s) will not be changed." << G4endl;
+				std::cout << "\nWARNING --> OptPropManager::setlogbordersurf(...): Could not find the optical surface <" << keyval.at("optsurf").get<std::string>() << ">. The optical surface of the <" << logsurfname << "> logical surface(s) will not be changed." << std::endl;
 			}
 			
 		}else{
-			G4cout << "\nERROR --> OptPropManager::setbordersurf(...): The <optsurf> key must be a string!\n" << G4endl;
+			std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): The <optsurf> key must be a string!\n" << std::endl;
 		}
 	}
 	
 	
 	if(keyval.contains("model")){
 		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
-			SetSurfModel( logsurfname, keyval.at("model").get<std::string>());
-			//optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
+			if(optsurf){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: applying model <" << keyval.at("model").get<std::string>() << "> to the optical surface <"<< optsurfname << ">" << std::endl;
+				}
+				optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
+			}else{
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying model <" << keyval.at("model").get<std::string>() << ">" << std::endl;
+				}
+				SetSurfModel(logsurflist, keyval.at("model").get<std::string>() );
+			}
 		}
 	}
 	
 	if(keyval.contains("type")){
 		if( keyval.at("type").is_string() && (OptSurfTypeMap.find(keyval.at("type").get<std::string>())!=OptSurfTypeMap.end()) ){
-			SetSurfType( logsurfname, keyval.at("type").get<std::string>() );
-			//optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
+			if(optsurf){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: applying type <" << keyval.at("type").get<std::string>() << "> to the optical surface <"<< optsurfname << ">" << std::endl;
+				}
+				optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
+			}else{
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying type <" << keyval.at("type").get<std::string>() << ">" << std::endl;
+				}
+				SetSurfType( logsurflist, keyval.at("type").get<std::string>() );
+			}
 		}
 	}
 	
 	if(keyval.contains("finish")){
 		if( keyval.at("finish").is_string() && (OptSurfFinishMap.find(keyval.at("finish").get<std::string>())!=OptSurfFinishMap.end()) ){
-			SetSurfFinish( logsurfname, keyval.at("finish").get<std::string>() );
-			//optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
+			
+			if(optsurf){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: applying finish <" << keyval.at("finish").get<std::string>() << "> to the optical surface <"<< optsurfname << ">" << std::endl;
+				}
+				optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
+			}else{
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying finish <" << keyval.at("finish").get<std::string>() << ">" << std::endl;
+				}
+				SetSurfFinish( logsurflist, keyval.at("finish").get<std::string>() );
+			}
 		}
 	}
 	
 	if(keyval.contains("sigma_alpha")){
 		if( keyval.at("sigma_alpha").is_number_float() ){
-			SetSurfSigmaAlpha( logsurfname, keyval.at("sigma_alpha").get<double>() );
-			//optsurf->SetSigmaAlpha( keyval.at("sigma_alpha").get<double>() );
+			if(optsurf){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: applying sigma_alpha value of <" << keyval.at("sigma_alpha").get<double>() << "> to the optical surface <"<< optsurfname << ">" << std::endl;
+				}
+				optsurf->SetSigmaAlpha( OptSurfFinishMap.at(keyval.at("sigma_alpha").get<double>()) );
+			}else{
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying sigma_alpha value of <" << keyval.at("sigma_alpha").get<double>() << ">" << std::endl;
+				}
+				SetSurfSigmaAlpha( logsurflist, keyval.at("sigma_alpha").get<double>() );
+			}
 		}
 	}
 	
 	
 	if( keyval.contains("propfile") && (keyval.at("propfile").is_object()) ){
 		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setlogbordersurf(...): entering into <propfile> section for the <" << logsurfname << "> logical border surfaces." << std::endl;
+		}
+		
 		json propObj = keyval.at("propfile");
 		
 		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
 			if(!it.value().is_string()){
-				std::cout << "\nERROR --> OptPropManager::setbordersurf(...): The field corresponding to the property <" << it.key() << "> is not a string!" << std::endl;
+				std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): The field corresponding to the property <" << it.key() << "> is not a json string type!" << std::endl;
 				continue;
 			}
 			
+			std::string propertyname = it.key();
+			std::string propertyfilename = it.value().get<std::string>();
 			
 			if(fVerbose>=OptPropManager::kDetails){
-				G4cout << "Detail --> OptPropManager::setbordersurf(...): Setting property <" << it.key() << "> for logical surface(s) named <" << logsurfname << "> from file <" << it.value().get<std::string>() << ">" << G4endl;
+				std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting property <" << propertyname << "> for logical surface(s) named <" << logsurfname << "> from file <" << propertyfilename << ">" << std::endl;
 			}
 			
-			SetSurfPropFromFile(logsurfname, it.value().get<std::string>(), it.key() );
+			if(optsurf){
+				std::vector<G4double> en_vec(0), val_vec(0);
+				
+				ReadValuesFromFile( propertyfilename, en_vec, val_vec );
+				
+				if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
+					std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): Wrong size of the vectors read from file <" << propertyfilename << ">. The property <" << propertyname << "> will not be set for the logical surfaces named <" << logsurfname << ">!\n" << std::endl;
+					return;
+				}
+				
+				G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
+				if(!propTab){
+					propTab = new G4MaterialPropertiesTable();
+					optsurf->SetMaterialPropertiesTable(propTab);
+				}
+				
+				if(propTab->GetProperty( propertyname.c_str() )){
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::setlogbordersurf(...): Property <" << propertyname << "> already present for in the list of properties of the <" << optsurf->GetName() << "> optical surface. Removing from and re-adding to it." << std::endl;
+					}
+					propTab->RemoveProperty( propertyname.c_str() );
+				}
+				propTab->AddProperty( propertyname.c_str(), (G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
+			}else{
+				
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying property <" << propertyname << "> from file <" << propertyfilename << ">" << std::endl;
+				}
+				
+				SetSurfPropFromFile(logsurflist, propertyfilename, propertyname );
+			}
 		}
-		
 	}
 	
 	
 	if(fVerbose>=OptPropManager::kDebug){
-		std::cout << "Debug --> OptPropManager::setbordersurf(...): end of routine." << std::endl;
+		std::cout << "Debug --> OptPropManager::setlogbordersurf(...): end of routine." << std::endl;
 	}
 }
 
 
-void OptPropManager::setskinsurf(const json keyval)
+void OptPropManager::setlogskinsurf(const json keyval)
 {
 	//Not implemented yet
 }
@@ -633,36 +761,56 @@ void OptPropManager::buildoptsurf(const json keyval)
 		return;
 	}
 	
-	G4OpticalSurface* optsurf = FindOptSurf(keyval.at("surfname").get<std::string>());
+	std::string surfname = keyval.at("surfname").get<std::string>();
+	
+	G4OpticalSurface* optsurf = FindOptSurf(surfname);
 	
 	if(optsurf){
-		std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): The optical surface \"" << keyval.at("surfname").get<std::string>() << "\" already exists!" << std::endl;
+		std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): The optical surface <" << surfname << "> already exists! Use the json command <setoptsurface> for changing the properties of this surface.\n" << std::endl;
 		return;
 	}
 	
 	
-	optsurf = new G4OpticalSurface( keyval.at("surfname").get<std::string>() );
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Detail --> OptPropManager::buildoptsurf(...): Building new optical surface with name <" << surfname << ">" << std::endl;
+	}
+	optsurf = new G4OpticalSurface( surfname) ;
+	optsurf->SetMaterialPropertiesTable(new G4MaterialPropertiesTable());
+	G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
+	
 	
 	if(keyval.contains("model")){
 		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Applying model <" << keyval.at("model").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("type")){
 		if( keyval.at("type").is_string() && (OptSurfTypeMap.find(keyval.at("type").get<std::string>())!=OptSurfTypeMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Applying surface type <" << keyval.at("type").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("finish")){
 		if( keyval.at("finish").is_string() && (OptSurfFinishMap.find(keyval.at("finish").get<std::string>())!=OptSurfFinishMap.end()) ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Applying surface finish <" << keyval.at("finish").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
 		}
 	}
 	
 	if(keyval.contains("sigma_alpha")){
 		if( keyval.at("sigma_alpha").is_number_float() ){
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Applying value <sigma_alpha> = " << keyval.at("sigma_alpha").get<double>() << " to the <" << surfname << "> optical surface." << std::endl;
+			}
 			optsurf->SetSigmaAlpha( keyval.at("sigma_alpha").get<double>() );
 		}
 	}
@@ -670,40 +818,44 @@ void OptPropManager::buildoptsurf(const json keyval)
 	
 	if( keyval.contains("propfile") && (keyval.at("propfile").is_object()) ){
 		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::buildoptsurf(...): entering into <propfile> section for the <" << surfname << "> optical surface." << std::endl;
+		}
+		
 		json propObj = keyval.at("propfile");
 		
 		std::vector<G4double> en_vec(0), val_vec(0);
 		
+		
 		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
+			
 			if(!it.value().is_string()){
-				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): The field corresponding to the property " << it.key() << " is not a string!" << std::endl;
+				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): The field corresponding to the property " << it.key() << " is not a json string type!\n" << std::endl;
 				continue;
 			}
 			
 			en_vec.clear(); en_vec.resize(0);
 			val_vec.clear(); val_vec.resize(0);
 			
+			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting property  <" << it.key() << "> from file <" << it.value().get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
+			}
 			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
 			
 			if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
+				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): Wrong dimensions of vectors after the readout of the file <" << it.value().get<std::string>() << ">. Cannot set the property <" << it.key() << "> for the <" << surfname << "> optical surface!\n" << std::endl;
 				continue;
 			}
 			
-			if(fVerbose>=OptPropManager::kInfo){
-				std::cout << "Info --> OptPropManager::buildoptsurf(...): Setting property " << it.key() << " for \"" << optsurf->GetName() << "\" from file \"" << it.value().get<std::string>() << "\"" << std::endl;
-			}
-			
-			G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
-			
-			if(!propTab){
-				propTab = new G4MaterialPropertiesTable();
-				optsurf->SetMaterialPropertiesTable(propTab);
-			}
 			
 			if(propTab->GetProperty( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::buildoptsurf(...): Property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
+				}
 				propTab->RemoveProperty( it.key().c_str() );
 			}
-			propTab->AddProperty( it.key().c_str() ,(G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
+			propTab->AddProperty( it.key().c_str() ,(G4double*)(&en_vec.at(0)), (G4double*)(&val_vec.at(0)), en_vec.size() );
 		}
 		
 	}
@@ -711,71 +863,74 @@ void OptPropManager::buildoptsurf(const json keyval)
 	
 	
 	if(fVerbose>=OptPropManager::kDebug){
-		G4cout << "Debug --> OptPropManager::buildoptsurf(...): end of routine." << G4endl;
+		std::cout << "Debug --> OptPropManager::buildoptsurf(...): end of routine." << std::endl;
 	}
 }
 
 
-void OptPropManager::buildbordersurface(const json keyval)
+void OptPropManager::buildlogbordersurf(const json keyval)
 {
 	if(fVerbose>=OptPropManager::kDebug){
-		G4cout << "Debug --> OptPropManager::buildbordersurface(...): start of routine." << G4endl;
+		std::cout << "Debug --> OptPropManager::buildlogbordersurf(...): start of routine." << std::endl;
 	}
 	
 	
 	//Requirements are that the logical border surface does not exist, otherwise return with an error
 	if( !keyval.contains("surfname") ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): the json object doesn't contain the <surfname> key. Cannot change settings of alogical border surface without knowing its name!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): the json object doesn't contain the <surfname> key. Cannot change settings of alogical border surface without knowing its name!\n" << std::endl;
 		return;
 	}
 	
 	if( !keyval.at("surfname").is_string() ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <surfname> key must be a string!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <surfname> key must be a json string type!\n" << std::endl;
 		return;
 	}
 	
+	std::string logsurfname = keyval.at("surfname").get<std::string>();
 	
 	if( !keyval.contains("optsurf") ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <optsurf> key is mandatory! The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <optsurf> key is mandatory! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	if( !keyval.at("optsurf").is_string() ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <optsurf> key must be a string!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <optsurf> key must be a string!\n" << std::endl;
 		return;
 	}
 	
+	std::string optsurfname = keyval.at("optsurf").get<std::string>();
 	
-	G4OpticalSurface *optsurf = FindOptSurf( keyval.at("optsurf").get<std::string>() );
+	
+	G4OpticalSurface *optsurf = FindOptSurf( optsurfname );
 	
 	if(!optsurf){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): Could not find the optical surface <" << keyval.at("optsurf").get<std::string>() << ">. The optical surface must be built before than the logical surface that uses it. The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): Could not find the optical surface <" << optsurfname << ">. The optical surface must be built before than the logical surface that uses it. The logical border surfaces <" << logsurfname << "> will not be built.\n" << std::endl;
 	}
 	
 	
 	if( !keyval.contains("vol1") ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol1> key is mandatory to build a new logical border surface! The surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol1> key is mandatory to build a new logical border surface! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 	}
 	
 	if( !keyval.at("vol1").is_string() ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol1> key must be a json string type! The surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol1> key must be a json string type! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	
 	if( !keyval.contains("vol2") ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol2> key is mandatory to build a new logical border surface! The surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol2> key is mandatory to build a new logical border surface! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	if( !keyval.at("vol2").is_string() ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol2> key must be a json string type! The surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol2> key must be a json string type! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	
 	if( keyval.at("vol1").get<std::string>() == keyval.at("vol2").get<std::string>() ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol1> and <vol2> are the same. A logical border surface can be built only between 2 different physical volumes!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol1> and <vol2> are the same. A logical border surface can be built only between 2 different physical volumes!\n" << std::endl;
 		return;
 	}
 	
@@ -783,12 +938,12 @@ void OptPropManager::buildbordersurface(const json keyval)
 	const std::vector<G4VPhysicalVolume* > *vol_vec1 = FindPhysVol(keyval.at("vol1").get<std::string>());
 	
 	if(!vol_vec1){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...):Could not find the <vol1> physical volume with name <" << keyval.at("vol1").get<std::string>() << ">. The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...):Could not find the <vol1> physical volume with name <" << keyval.at("vol1").get<std::string>() << ">. The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	if( (!vol_vec1->size()) ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...):The <vol1> physical volume with name <" << keyval.at("vol1").get<std::string>() << "> corresponds to an empty list! This is an unexpected behaviour. The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...):The <vol1> physical volume with name <" << keyval.at("vol1").get<std::string>() << "> corresponds to an empty list! This is an unexpected behaviour. The logical border surfaces <" << logsurfname << "> will not be built.\n" << std::endl;
 		return;
 	}
 	
@@ -796,116 +951,43 @@ void OptPropManager::buildbordersurface(const json keyval)
 	const std::vector<G4VPhysicalVolume* > *vol_vec2 = FindPhysVol(keyval.at("vol2").get<std::string>());
 	
 	if(!vol_vec2){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...):Could not find the <vol2> physical volume with name <" << keyval.at("vol2").get<std::string>() << ">. The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...):Could not find the <vol2> physical volume with name <" << keyval.at("vol2").get<std::string>() << ">. The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
 		return;
 	}
 	
 	if( !(vol_vec2->size()) ){
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The <vol2> physical volume with name <" << keyval.at("vol2").get<std::string>() << "> corresponds to an empty list! This is an unexpected behaviour. The logical border surface <" << keyval.at("surfname").get<std::string>() << "> will not be built.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol2> physical volume with name <" << keyval.at("vol2").get<std::string>() << "> corresponds to an empty list! This is an unexpected behaviour. The logical border surfaces <" << logsurfname << "> will not be built.\n" << std::endl;
 		return;
 	}
 	
 	
 	
-	//G4LogicalBorderSurface *logsurf = new G4LogicalBorderSurface( keyval.at("surfname").get<std::string>(), vol1, vol2, optsurf );
-	G4int nLBS = BuildLogicalBorderSurface(keyval.at("surfname").get<std::string>(), keyval.at("vol1").get<std::string>(), keyval.at("vol2").get<std::string>(), optsurf->GetName());
+	int nLBS = BuildLogicalBorderSurface(logsurfname, (*vol_vec1), (*vol_vec2), optsurf);
 	if(nLBS<=0){
 		
-		G4cout << "\nERROR --> OptPropManager::buildbordersurface(...): The logical surface <" << keyval.at("surfname").get<std::string>() << "> could not be made!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The logical border surfaces <" << keyval.at("surfname").get<std::string>() << "> could not be built!\n" << std::endl;
 		
 	}else{
 		if(fVerbose>=OptPropManager::kDetails){
-			G4cout << "Detail --> OptPropManager::buildbordersurface(...): built " << nLBS << " instances of the logical surface <" << keyval.at("surfname").get<std::string>() << "> between volumes <" << keyval.at("vol1").get<std::string>() << "> and <" << keyval.at("vol2").get<std::string>() << ">, with optical surface <" << optsurf->GetName() << ">." << G4endl;
+			std::cout << "Detail --> OptPropManager::buildlogbordersurf(...): built " << nLBS << " logical border surfaces named <" << logsurfname << "> between vol1 <" << keyval.at("vol1").get<std::string>() << "> and vol2 <" << keyval.at("vol2").get<std::string>() << "> by using the optical surface <" << optsurfname << ">." << std::endl;
 		}
-		if(fVerbose>=OptPropManager::kInfo){
-			G4cout << "Info --> OptPropManager::buildbordersurface(...): built logical surface <" << keyval.at("surfname").get<std::string>() << ">." << G4endl;
-		}
-	}
-	
-	
-	if(keyval.contains("model")){
-		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
-			optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
-		}
-	}
-	
-	if(keyval.contains("type")){
-		if( keyval.at("type").is_string() && (OptSurfTypeMap.find(keyval.at("type").get<std::string>())!=OptSurfTypeMap.end()) ){
-			optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
-		}
-	}
-	
-	if(keyval.contains("finish")){
-		if( keyval.at("finish").is_string() && (OptSurfFinishMap.find(keyval.at("finish").get<std::string>())!=OptSurfFinishMap.end()) ){
-			optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
-		}
-	}
-	
-	if(keyval.contains("sigma_alpha")){
-		if( keyval.at("sigma_alpha").is_number_float() ){
-			optsurf->SetSigmaAlpha( keyval.at("sigma_alpha").get<double>() );
-		}
-	}
-	
-	
-	if( keyval.contains("propfile") && (keyval.at("propfile").is_object()) ){
-		
-		json propObj = keyval.at("propfile");
-		
-		std::vector<G4double> en_vec(0), val_vec(0);
-		
-		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
-			if(!it.value().is_string()){
-				G4cout << "\nWARNING --> OptPropManager::buildbordersurface(...): The field corresponding to the property <" << it.key() << "> is not a string!\n" << G4endl;
-				continue;
-			}
-			
-			en_vec.resize(0);
-			val_vec.resize(0);
-			
-			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
-			
-			if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
-				G4cout << "\nWARNING --> OptPropManager::buildbordersurface(...): Wrong dimensions of the vectors built from the property file <" << it.value().get<std::string>() << ">. The field corresponding to the property <" << it.key() << "> is not a string!\n" << G4endl;
-				continue;
-			}
-			
-			if(fVerbose>=OptPropManager::kInfo){
-				G4cout << "Info --> OptPropManager::buildbordersurface(...): Setting property <" << it.key() << "> for <" << optsurf->GetName() << "> from file <" << it.value().get<std::string>() << ">" << G4endl;
-			}
-			
-			G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
-			
-			if(!propTab){
-				propTab = new G4MaterialPropertiesTable();
-				optsurf->SetMaterialPropertiesTable(propTab);
-			}
-			
-			if(propTab->GetProperty( it.key().c_str() )){
-				propTab->RemoveProperty( it.key().c_str() );
-			}
-			propTab->AddProperty( it.key().c_str() ,(G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
-		}
-		
 	}
 	
 	
 	
 	if(fVerbose>=OptPropManager::kDebug){
-		std::cout << "Debug --> OptPropManager::buildbordersurface(...): end of routine." << std::endl;
+		std::cout << "Debug --> OptPropManager::buildlogbordersurf(...): end of routine." << std::endl;
 	}
 }
 
 
-void OptPropManager::buildskinsurf(const json keyval)
+void OptPropManager::buildlogskinsurf(const json keyval)
 {
 	//Not implemented yet
 }
 
 
-
-
-void OptPropManager::SetSurfSigmaAlpha(const G4String& logsurfname, const G4double& s_a)
+void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const G4int Nentries, const G4double* photonenergies, const G4double* reflectivities)
 {
 	const G4LogicalBorderSurfaceTable* surftab = G4LogicalBorderSurface::GetSurfaceTable();
 	
@@ -922,18 +1004,31 @@ void OptPropManager::SetSurfSigmaAlpha(const G4String& logsurfname, const G4doub
 		if(Surface){
 			G4OpticalSurface* OpticalSurface = dynamic_cast <G4OpticalSurface*> (Surface->GetSurfaceProperty());
 			if(OpticalSurface){
-				OpticalSurface->SetSigmaAlpha(s_a);
+				G4MaterialPropertiesTable* propTab = OpticalSurface->GetMaterialPropertiesTable();
+				
+				if(!propTab){
+					propTab = new G4MaterialPropertiesTable();
+					OpticalSurface->SetMaterialPropertiesTable(propTab);
+				}
+				
+				if(propTab->GetProperty("REFLECTIVITY")){
+					propTab->RemoveProperty("REFLECTIVITY");
+				}
+				
+				propTab->AddProperty("REFLECTIVITY",(G4double*)photonenergies,(G4double*)reflectivities,Nentries);
 			}else{
-				G4cout << "WARNING --> OptPropManager::SetSurfSigmaAlpha(...): The G4LogicalBorder surface \"" << logsurfname << "\" returned null pointer to its G4OpticalSurface (maybe not yet set). The surface roughness cannot be set." << G4endl;
+				std::cout << "WARNING --> OptPropManager::SetSurfReflectivity(...): The G4LogicalBorder surface \"" << logsurfname << "\" returned null pointer to its G4OpticalSurface (maybe not yet set). The surface roughness cannot be set." << std::endl;
 			}
 		}else{
-			G4cout << "WARNING --> OptPropManager::SetSurfSigmaAlpha(...): The G4LogicalBorder surface \"" << logsurfname << "\" has not yet been created. The surface roughness cannot be set." << G4endl;
+			std::cout << "WARNING --> OptPropManager::SetSurfReflectivity(...): The G4LogicalBorder surface \"" << logsurfname << "\" has not yet been created. The surface roughness cannot be set." << std::endl;
 		}
 	}
 }
 
-
-
+void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const std::vector<G4double>& photonenergies, const std::vector<G4double>& reflectivities)
+{
+  if(photonenergies.size()==reflectivities.size()) OptPropManager::SetSurfReflectivity(logsurfname, photonenergies.size(), &photonenergies.at(0), &reflectivities.at(0));
+}
 
 
 
@@ -1174,96 +1269,111 @@ void OptPropManager::SetMaterialWLSDelay(const G4String& materialname, const std
 
 
 
-void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const G4int Nentries, const G4double* photonenergies, const G4double* reflectivities)
-{
-	const G4LogicalBorderSurfaceTable* surftab = G4LogicalBorderSurface::GetSurfaceTable();
-	
-	if(surftab){
-		G4LogicalSurface* Surface = NULL;
-		for(size_t iSurf=0; iSurf<surftab->size(); iSurf++){
-			G4String name = surftab->at(iSurf)->GetName();
-			//std::cout << name << std::endl;
-			
-			if(name == logsurfname){
-				Surface = surftab->at(iSurf);
-			}
-		}
-		
-		if(Surface){
-			G4OpticalSurface* OpticalSurface = dynamic_cast <G4OpticalSurface*> (Surface->GetSurfaceProperty());
-			
-			if(OpticalSurface){
-				G4MaterialPropertiesTable* propTab = OpticalSurface->GetMaterialPropertiesTable();
-				
-				if(!propTab){
-					propTab = new G4MaterialPropertiesTable();
-					OpticalSurface->SetMaterialPropertiesTable(propTab);
-				}
-				
-				if(propTab->GetProperty("REFLECTIVITY")){
-					propTab->RemoveProperty("REFLECTIVITY");
-				}
-				
-				propTab->AddProperty("REFLECTIVITY",(G4double*)photonenergies,(G4double*)reflectivities,Nentries);
-			}else{
-				G4cout << "WARNING --> OptPropManager::SetSurfReflectivity(...): The G4LogicalBorder surface \"" << logsurfname << "\" has null pointer to its G4OpticalSurface (maybe not assigned yet). The REFLECTIVITY property cannot be applied." << G4endl;
-			}
-		}else{
-			G4cout << "WARNING --> OptPropManager::SetSurfReflectivity(...): The G4LogicalBorder surface \"" << logsurfname << "\" has not yet been created. The REFLECTIVITY property cannot be applied." << G4endl;
-		}
-	}
-}
-
-void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const std::vector<G4double>& photonenergies, const std::vector<G4double>& reflectivities)
-{
-	if(photonenergies.size()==reflectivities.size()) OptPropManager::SetSurfReflectivity(logsurfname, photonenergies.size(), &photonenergies.at(0), &reflectivities.at(0));
-}
-
-
 void OptPropManager::SetSurfModel(const G4String& logsurfname, const G4String& model)
 {
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfModel(const G4String& logsurfname, ...): Entering the function." << std::endl;
+	}
+	
 	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
 	
 	if(!logsurflist){
-		G4cout << "\nERROR --> OptPropManager::SetSurfModel(...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << std::endl;
 		return;
 	}
 	
 	if(!(logsurflist->size())){
-		G4cout << "\nERROR --> OptPropManager::SetSurfModel(...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << std::endl;
 		return;
 	}
 	
 	
 	if(OptSurfModelMap.find(model)==OptSurfModelMap.end()){
-		G4cout << "\nERROR --> OptPropManager::SetSurfModel(...): The model <" << model << "> is not in the list of known models and can not be applied to logical surface(s) <" << logsurfname << ">.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(...): The model <" << model << "> is not in the list of known models and can not be applied to logical surface(s) <" << logsurfname << ">.\n" << std::endl;
+		return;
+	}
+	
+	SetSurfModel(logsurflist, model);
+	
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfModel(const G4String& logsurfname, ...): Exiting the function." << std::endl;
+	}
+}
+
+void OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* logsurflist, const G4String& model)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
 		return;
 	}
 	
 	
-	G4int nFound=0;
+	if(OptSurfModelMap.find(model)==OptSurfModelMap.end()){
+		std::cout << "\nERROR --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): The model <" << model << "> is not in the list of known models and can not be applied to the list of logical surfaces in input.\n" << std::endl;
+		return;
+	}
 	
-	std::set<G4OpticalSurface*> oldoptsurf;
 	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
-	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT){
-		G4OpticalSurface *optsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
-		
-		if(optsurf){
-			if(oldoptsurf.find( optsurf )==oldoptsurf.end()){
-				oldoptsurf.insert( optsurf );
-				optsurf->SetModel( OptSurfModelMap[model] );
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	
+	int iSurf = 0;
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): Applying model <" << model << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				lastoptsurf->SetModel( OptSurfModelMap.at(model) );
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign model to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
 			}
-			nFound++;
 		}else{
-			G4cout << "WARNING --> OptPropManager::SetSurfModel(...): The logical surface <" << logsurfname << "> instance at <" << (*iT) << "> has no pointer (null) of the optical surface. The surface model <" << model << "> can not be applied to this surface instance." << G4endl;
+			if(!(*iT)->GetSurfaceProperty()){
+				std::cout << "\nERROR --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign model to this logical surface instance. Add to it an optical surface  before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the model to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (fro pointer) to the one processed before. Applying anyway the model <" << model << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					lastoptsurf->SetModel( OptSurfModelMap.at(model) );
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* , ...): Surface model <" << model << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
+			}
 		}
 	}
 	
-	if((nFound>0) && fVerbose>=OptPropManager::kDetails){
-		G4cout << "Detail --> OptPropManager::SetSurfModel(...): Model <" << model << "> applied to " << nFound << " out of " << logsurflist->size() << " instances of <" << logsurfname << "> logical surface." << G4endl;
-	}else if(nFound==0){
-		G4cout << "WARNING --> OptPropManager::SetSurfModel(...): The model <" << model << "> was not applied to any instance of <" << logsurfname << "> logical surface" << G4endl;
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >*, ...): Applied model <" << model << "> to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
 	}
 }
 
@@ -1271,48 +1381,108 @@ void OptPropManager::SetSurfModel(const G4String& logsurfname, const G4String& m
 
 void OptPropManager::SetSurfType(const G4String& logsurfname, const G4String& type)
 {
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfType(const G4String&, ...): Entering the function." << std::endl;
+	}
+	
 	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
 	
 	if(!logsurflist){
-		G4cout << "\nERROR --> OptPropManager::SetSurfType(...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << std::endl;
 		return;
 	}
 	
 	if(!(logsurflist->size())){
-		G4cout << "\nERROR --> OptPropManager::SetSurfType(...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << std::endl;
 		return;
 	}
 	
 	
 	if(OptSurfTypeMap.find(type)==OptSurfTypeMap.end()){
-		G4cout << "\nERROR --> OptPropManager::SetSurfType(...): The type <" << type << "> is not in the list of known surface types and can not be applied to the logical surface(s) <" << logsurfname << ">.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(...): The type <" << type << "> is not in the list of known surface types and can not be applied to the logical surface(s) <" << logsurfname << ">.\n" << std::endl;
+		return;
+	}
+	
+	SetSurfType(logsurflist, type);
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfType(const G4String&, ...): Exiting the function." << std::endl;
+	}
+}
+
+void OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* logsurflist, const G4String& type)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
 		return;
 	}
 	
 	
-	G4int nFound = 0;
+	if(OptSurfTypeMap.find(type)==OptSurfTypeMap.end()){
+		std::cout << "\nERROR --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): The type <" << type << "> is not in the list of known types and can not be applied to the logical surfaces.\n" << std::endl;
+		return;
+	}
 	
-	std::set<G4OpticalSurface*> oldoptsurf;
 	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
-	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT){
-		G4OpticalSurface *optsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
-		
-		if(optsurf){
-			if(oldoptsurf.find( optsurf )==oldoptsurf.end()){
-				oldoptsurf.insert( optsurf );
-				optsurf->SetType( OptSurfTypeMap[type] );
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	
+	int iSurf = 0;
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): Applying type <" << type << "> to logical surfaces <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				lastoptsurf->SetType( OptSurfTypeMap.at(type) );
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign type to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
 			}
-			nFound++;
 		}else{
-			G4cout << "WARNING --> OptPropManager::SetSurfType(...): The logical surface <" << logsurfname << "> instance at <" << (*iT) << "> has no pointer (null) of the optical surface. The surface type <" << type << "> can not be applied to this surface instance." << G4endl;
+			if(!(*iT)->GetSurfaceProperty()){
+				std::cout << "\nERROR --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign type to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the type to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (from pointer) to the one processed before. Applying anyway the type <" << type << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					lastoptsurf->SetType( OptSurfTypeMap.at(type) );
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* , ...): Surface type <" << type << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
+			}
 		}
 	}
 	
-	if((nFound>0) && fVerbose>=OptPropManager::kDetails){
-		G4cout << "Detail --> OptPropManager::SetSurfType(...): Type <" << type << "> applied to " << nFound << " out of " << logsurflist->size() << " instances of <" << logsurfname << "> logical surface." << G4endl;
-	}else if(nFound==0){
-		G4cout << "WARNING --> OptPropManager::SetSurfType(...): The type <" << type << "> was not applied to any instance of <" << logsurfname << "> logical surface" << G4endl;
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >*, ...): Applied type <" << type << "> to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
 	}
 }
 
@@ -1320,108 +1490,353 @@ void OptPropManager::SetSurfType(const G4String& logsurfname, const G4String& ty
 
 void OptPropManager::SetSurfFinish(const G4String& logsurfname, const G4String& finish)
 {
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfFinish(const G4String&, ...): Entering the function." << std::endl;
+	}
+	
 	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
 	
 	if(!logsurflist){
-		G4cout << "\nERROR --> OptPropManager::SetSurfFinish(...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const G4String&, ...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << std::endl;
 		return;
 	}
 	
 	if(!(logsurflist->size())){
-		G4cout << "\nERROR --> OptPropManager::SetSurfFinish(...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const G4String&, ...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << std::endl;
 		return;
 	}
 	
 	
 	if(OptSurfFinishMap.find(finish)==OptSurfFinishMap.end()){
-		G4cout << "\nERROR --> OptPropManager::SetSurfFinish(...): The finish <" << finish << "> is not in the list of known surface finishes and can not be applied to the logical surface(s) <" << logsurfname << ">.\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const G4String&, ...): The finish <" << finish << "> is not in the list of known surface finishes and can not be applied to the logical surface(s) <" << logsurfname << ">.\n" << std::endl;
 		return;
 	}
 	
 	
-	G4int nFound = 0;
+	SetSurfFinish(logsurflist, finish);
 	
-	std::set<G4OpticalSurface*> oldoptsurf;
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfFinish(const G4String&, ...): Exiting the function." << std::endl;
+	}
+}
+
+void OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* logsurflist, const G4String& finish)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
 	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
+		return;
+	}
+	
+	
+	if(OptSurfFinishMap.find(finish)==OptSurfFinishMap.end()){
+		std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): The finish <" << finish << "> is not in the list of known types and can not be applied to the logical surfaces.\n" << std::endl;
+		return;
+	}
+	
+	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
-	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT){
-		G4OpticalSurface *optsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
-		
-		if(optsurf){
-			if(oldoptsurf.find( optsurf )==oldoptsurf.end()){
-				oldoptsurf.insert( optsurf );
-				optsurf->SetFinish( OptSurfFinishMap[finish] );
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	
+	int iSurf = 0;
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): Applying finish <" << finish << "> to logical surfaces <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				lastoptsurf->SetFinish( OptSurfFinishMap.at(finish) );
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign finish to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
 			}
-			nFound++;
 		}else{
-			G4cout << "WARNING --> OptPropManager::SetSurfFinish(...): The logical surface <" << logsurfname << "> instance at <" << (*iT) << "> has no pointer (null) of the optical surface. The surface finish <" << finish << "> can not be applied to this surface instance." << G4endl;
+			if(!(*iT)->GetSurfaceProperty()){
+				std::cout << "\nERROR --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign type to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the type to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (from pointer) to the one processed before. Applying anyway the finish <" << finish << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					lastoptsurf->SetFinish( OptSurfFinishMap.at(finish) );
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* , ...): Surface finish <" << finish << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
+			}
 		}
 	}
 	
-	if((nFound>0) && fVerbose>=OptPropManager::kDetails){
-		G4cout << "Detail --> OptPropManager::SetSurfFinish(...): Finish <" << finish << "> applied to " << nFound << " out of " << logsurflist->size() << " instances of <" << logsurfname << "> logical surface." << G4endl;
-	}else if(nFound==0){
-		G4cout << "WARNING --> OptPropManager::SetSurfFinish(...): The finish <" << finish << "> was not applied to any instance of <" << logsurfname << "> logical surface" << G4endl;
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >*, ...): Applied finish <" << finish << "> to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
 	}
 }
 
 
+
+void OptPropManager::SetSurfSigmaAlpha(const G4String& logsurfname, const G4double& s_a)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const G4String&, ...): Entering the function." << std::endl;
+	}
+	
+	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
+	
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const G4String&, ...): Cannot find the logical surface(s) named <" << logsurfname << "> in the table of the instanced logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const G4String&, ...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << std::endl;
+		return;
+	}
+	
+	
+	SetSurfSigmaAlpha(logsurflist, s_a);
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const G4String&, ...): Exiting the function." << std::endl;
+	}
+}
+
+
+void OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* logsurflist, const G4double& s_a)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
+		return;
+	}
+	
+	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
+	std::set<G4LogicalSurface* >::iterator iT;
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	
+	int iSurf = 0;
+	
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): Applying sigma_alpha value of <" << s_a << "> to logical surfaces <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				lastoptsurf->SetSigmaAlpha(s_a);
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign sigma_alpha value to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}
+		}else{
+			if(!(*iT)->GetSurfaceProperty()){
+				std::cout << "\nERROR --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot assign sigma_alpha value to this logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the sigma_alpha value to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (from pointer) to the one processed before. Applying anyway the sigma_alpha value of <" << s_a << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					lastoptsurf->SetSigmaAlpha(s_a);
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* , ...): Surface sigma_alpha value of <" << s_a << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
+			}
+		}
+	}
+	
+	
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >*, ...): Applied sigma_alpha value of <" << s_a << "> to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
+	}
+}
+
+
+
 void OptPropManager::SetSurfPropFromFile(const G4String& logsurfname, const G4String& filename, const G4String& propertyname)
 {
-	std::vector<G4double> en_vec(0), val_vec(0);
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const G4String& logsurfname, ...): Entering the function." << std::endl;
+	}
+	
 	
 	std::set<G4LogicalSurface* > *logsurflist = FindLogSurf(logsurfname);
 	
 	if(!logsurflist){
-		G4cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(...): Cannot find the logical surface(s) named <"<< logsurfname <<"> in the table of the instanced logical surfaces!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const G4String& logsurfname, ...): Cannot find the logical surfaces named <"<< logsurfname <<"> in the table of the instanced logical surfaces!\n" << std::endl;
 		return;
 	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const G4String& logsurfname, ...): The list of logical surface(s) named <" << logsurfname << "> is empty!\n" << std::endl;
+		return;
+	}
+	
+	SetSurfPropFromFile( logsurflist, filename, propertyname );
+	
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const G4String& logsurfname, ...): Exiting the function." << std::endl;
+	}
+}
+
+
+
+void OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* logsurflist, const G4String& filename, const G4String& propertyname)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
+		return;
+	}
+	
+	
+	std::vector<G4double> en_vec(0), val_vec(0);
 	
 	ReadValuesFromFile( filename, en_vec, val_vec );
 	
 	
 	if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
-		G4cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(...): Wrong size of the vectors read from file <"<< filename <<">. The property <" << propertyname << "> will not be set for the surface(s) named <" << logsurfname << ">!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Wrong size of the vectors read from file <"<< filename <<">. The property <" << propertyname << "> will not be set for the logical surfaces in the input list!\n" << std::endl;
 		return;
 	}
 	
-	std::set<G4OpticalSurface*> oldsurfs;
-	G4OpticalSurface* optsurf = NULL;
 	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
-	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT){
-		optsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
-		
-		if(optsurf){
-			
-			if(oldsurfs.find(optsurf)!=oldsurfs.end()){
-				//The property for this optical surface has already been changed
-				continue;
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	int iSurf = 0;
+	
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Applying property <" << propertyname << "> to logical surfaces <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				
+				G4MaterialPropertiesTable* propTab = lastoptsurf->GetMaterialPropertiesTable();if(!propTab){
+					propTab = new G4MaterialPropertiesTable();
+					lastoptsurf->SetMaterialPropertiesTable(propTab);
+				}
+				
+				if(propTab->GetProperty( propertyname.c_str() )){
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Property <" << propertyname << "> already present for logical surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << "). Removing from and re-adding to it." << std::endl;
+					}
+					propTab->RemoveProperty( propertyname.c_str() );
+				}
+				propTab->AddProperty( propertyname.c_str(), (G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot set property <" << propertyname << "> logical surface instance. Add to it an optical surface before!\n" << std::endl;
 			}
-			
-			oldsurfs.insert(optsurf);
-			
-			G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
-			
-			if(!propTab){
-				propTab = new G4MaterialPropertiesTable();
-				optsurf->SetMaterialPropertiesTable(propTab);
+		}else{
+			if(!(*iT)->GetSurfaceProperty()){
+				std::cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot apply the property <" << propertyname << "> to logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the property <" << propertyname << "> to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (from pointer) to the one processed before. Applying anyway the property <" << propertyname << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					
+					G4MaterialPropertiesTable* propTab = lastoptsurf->GetMaterialPropertiesTable();if(!propTab){
+						propTab = new G4MaterialPropertiesTable();
+						lastoptsurf->SetMaterialPropertiesTable(propTab);
+					}
+					
+					if(propTab->GetProperty( propertyname.c_str() )){
+						if(fVerbose>=OptPropManager::kDebug){
+							std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Property <" << propertyname << "> already present for logical surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << "). Removing from and re-adding to it." << std::endl;
+						}
+						propTab->RemoveProperty( propertyname.c_str() );
+					}
+					propTab->AddProperty( propertyname.c_str(), (G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* , ...): Surface property <" << propertyname << "> to logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
 			}
-			
-			if(propTab->GetProperty( propertyname.c_str() )){
-				propTab->RemoveProperty( propertyname.c_str() );
-			}
-			propTab->AddProperty( propertyname.c_str() ,(G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
-			
-		}else{//The logical surface has no optical surface set which is very bad!!!
-			
-			G4cout << "\nERROR --> OptPropManager::SetSurfPropFromFile(...): The logical surface <" << logsurfname << "> instance at <" << (*iT) <<  "> has no optical surface pointer! Cannot apply the property <" << propertyname << "> for this logical surface instance\n" << G4endl;
-			
 		}
 	}
+	
+	
+	
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >*, ...): Applied property <" << propertyname << "> to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
+	}
 }
-
-
 
 
 void OptPropManager::BuildOpticalSurface(const G4String& optsurfname, const G4String& model, const G4String& type, const G4String& finish )
@@ -1429,29 +1844,43 @@ void OptPropManager::BuildOpticalSurface(const G4String& optsurfname, const G4St
 	G4SurfacePropertyTable *surftab = (G4SurfacePropertyTable*)G4OpticalSurface::GetSurfacePropertyTable();
 	size_t nOptSurf = G4OpticalSurface::GetNumberOfSurfaceProperties();
 	
-	if( (!surftab) ) return; //This is a big problem as it is a static class member!!!
-	
-	if(OptSurfModelMap.find(model)==OptSurfModelMap.end()) return;
-	
-	if(OptSurfTypeMap.find(type)==OptSurfTypeMap.end()) return;
-	
-	if(OptSurfFinishMap.find(finish)==OptSurfFinishMap.end()) return;
-	
-	//Check if it alredy exists. If it does do not proceed to the creation of this surface as this might overwrite another optical surface used by some logical surface
-	for(size_t iSurf=0; iSurf<nOptSurf; iSurf++){
-		if( (surftab->at(iSurf)->GetName())==optsurfname ) return;
+	if( (!surftab) ){
+		//This is a big problem as it is a static class member!!!
+		std::cout << "\nERROR --> OptPropManager::BuildOpticalSurface(...): Null pointer for the static table of the optical surfaces!\n" << std::endl;
+		return; 
 	}
 	
-	G4OpticalSurface *optsurf = new G4OpticalSurface(optsurfname, OptSurfModelMap[model], OptSurfFinishMap[finish], OptSurfTypeMap[type]);
+	if(OptSurfModelMap.find(model)==OptSurfModelMap.end()){
+		std::cout << "\nERROR --> OptPropManager::BuildOpticalSurface(...): The model <" << model << "> is not a known model for optical surfaces! The surface <" << optsurfname << "> will not be built!\n" << std::endl;
+		return;
+	}
+	
+	if(OptSurfTypeMap.find(type)==OptSurfTypeMap.end()){
+		std::cout << "\nERROR --> OptPropManager::BuildOpticalSurface(...): The type <" << type << "> is not a known type for optical surfaces! The surface <" << optsurfname << "> will not be built!\n" << std::endl;
+		return;
+	}
+	
+	if(OptSurfFinishMap.find(finish)==OptSurfFinishMap.end()){
+		std::cout << "\nERROR --> OptPropManager::BuildOpticalSurface(...): The finish <" << finish << "> is not a known finish for optical surfaces! The surface <" << optsurfname << "> will not be built!\n" << std::endl;
+		return;
+	}
+	
+	//Check if it alredy exists. If it does do not proceed to the creation of this surface as this might overwrite another optical surface used by some logical surface
+	G4OpticalSurface *optsurf = FindOptSurf(optsurfname);
+	if( optsurf ){
+		std::cout << "\nERROR --> OptPropManager::BuildOpticalSurface(...): The surface <" << optsurfname << "> already exists! Try to change the settings to this optical surface instead of building a new one.\n" << std::endl;
+		return;
+	}
+	
+	optsurf = new G4OpticalSurface(optsurfname, OptSurfModelMap[model], OptSurfFinishMap[finish], OptSurfTypeMap[type]);
+	optsurf->SetMaterialPropertiesTable( new G4MaterialPropertiesTable() );
 }
 
 
 
-G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const G4String& physvol1, const G4String& physvol2, const G4String& optsurfname )
+int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const G4String& physvol1, const G4String& physvol2, const G4String& optsurfname )
 {
 	//All the procedure should avoid that two logical surfaces with the same name can be created by mistake
-	
-	G4int iSurf=0;
 	
 	G4PhysicalVolumeStore *pPhysVolStore = G4PhysicalVolumeStore::GetInstance();
 	
@@ -1469,7 +1898,7 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 	
 	
 	if( pv_map->find(physvol1)==pv_map->end() ){
-		G4cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The physical volume <" << physvol1 << "> does not exists in the list of volumes. The logical surface <" << logsurfname << "> can not be created.\n" << G4endl;
+		std::cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The physical volume <" << physvol1 << "> does not exists in the list of volumes. The logical surface <" << logsurfname << "> can not be created.\n" << std::endl;
 		return -4;
 	}else{
 		//const std::string vname = physvol1.data();
@@ -1478,7 +1907,7 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 	}
 	
 	if( pv_map->find(physvol2)==pv_map->end() ){
-		G4cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The physical volume <" << physvol2 << "> does not exists in the list of volumes. The logical surface <" << logsurfname << "> can not be created.\n" << G4endl;
+		std::cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The physical volume <" << physvol2 << "> does not exists in the list of volumes. The logical surface <" << logsurfname << "> can not be created.\n" << std::endl;
 		return -5;
 	}else{
 		//const std::string vname = physvol2.data();
@@ -1486,21 +1915,9 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 		//vol2_vec = (*pv_map)[ vname ];
 	}
 	
-	size_t nVols1 = vol1_vec.size();
-	if(nVols1==0){
-		G4cout << "\nERROR --> OptPropManager::BuildLogicalBorderSurface(...): The list of physical volumes with name <" << physvol1 << "> is empty!!! The logical surface <" << logsurfname << "> will not be created.\n" << G4endl;
-		return -6;
-	}
-	
-	size_t nVols2 = vol2_vec.size();
-	if(nVols2==0){
-		G4cout << "\nERROR --> OptPropManager::BuildLogicalBorderSurface(...): The list of physical volumes with name <" << physvol2 << "> is empty!!! The logical surface <" << logsurfname << "> will not be created.\n" << G4endl;
-		return -7;
-	}
-	
 	
 	G4SurfacePropertyTable *optsurftab = (G4SurfacePropertyTable*)G4OpticalSurface::GetSurfacePropertyTable();
-	if( (!optsurftab) ) return -8; //This is a big problem as it is a static class member
+	if( (!optsurftab) ) return -6; //This is a big problem as it is a static class member
 	
 	
 	//Check if the optical surface already exists
@@ -1512,18 +1929,40 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 		}
 		
 		if(!optsurf){
-			G4cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The optical surface <" << optsurfname << "> could not be found in the table of all optical surfaces. A dummy surface with the given name will be created for building the logical surface <" << logsurfname << ">.\n" << G4endl;
+			std::cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The optical surface <" << optsurfname << "> could not be found in the table of all optical surfaces. A dummy surface with the given name will be created for building the logical surface <" << logsurfname << ">.\n" << std::endl;
 		}
 		
 		optsurf = new G4OpticalSurface(optsurfname);
-		
+		optsurf->SetMaterialPropertiesTable( new G4MaterialPropertiesTable() );
 	}
 	
+	return BuildLogicalBorderSurface(logsurfname, vol1_vec, vol2_vec, optsurf);
+	
+}
+
+
+int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const std::vector<G4VPhysicalVolume*>& vol1_vec, const std::vector<G4VPhysicalVolume*>& vol2_vec, const G4OpticalSurface* optsurf )
+{
+	//All the procedure should avoid that two logical surfaces with the same name can be created by mistake
+	
+	G4int iSurf=0;
+	
+	size_t nVols1 = vol1_vec.size();
+	if(nVols1==0){
+		std::cout << "\nERROR --> OptPropManager::BuildLogicalBorderSurface(...): The vector of physical volumes <vol1_vec> is empty!!! The logical surface <" << logsurfname << "> will not be built.\n" << std::endl;
+		return -7;
+	}
+	
+	size_t nVols2 = vol2_vec.size();
+	if(nVols2==0){
+		std::cout << "\nERROR --> OptPropManager::BuildLogicalBorderSurface(...): The vector of physical volumes <vol2_vec>" << " is empty!!! The logical surface <" << logsurfname << "> will not be built.\n" << std::endl;
+		return -8;
+	}
 	
 	if(!optsurf){
-		G4cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The logical surface <" << logsurfname << "> will be built without an optical surface (null pointer). This might produce run-time crashes and/or wrong behaviour of the simulation!\n" << G4endl;
+		std::cout << "\nERROR --> OptPropManager::BuildLogicalBorderSurface(...): Passed a null pointer as optical surface. The logical border surfaces <" << logsurfname << "> will not be built.\n" << std::endl;
+		return -9;
 	}
-	
 	
 	
 	for(size_t iVol1 = 0; iVol1<nVols1; iVol1++){
@@ -1536,17 +1975,17 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 			
 			if(logsurf){
 				
-				G4cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The logical surface between volume <" << vol1->GetName() << "> at address" << vol1 << " and volume <" << vol2->GetName() << "> at address" << vol2 << " already exists with name <" << logsurf->GetName() << ">. Renaming it as <" << logsurfname << ">" << G4endl;
+				std::cout << "\nWARNING --> OptPropManager::BuildLogicalBorderSurface(...): The logical surface between volume <" << vol1->GetName() << "> at address" << vol1 << " and volume <" << vol2->GetName() << "> at address" << vol2 << " already exists with name <" << logsurf->GetName() << ">. Renaming it as <" << logsurfname << ">" << std::endl;
 				if(optsurf){
-					G4cout << " and assigning the surface <" << optsurf->GetName() << "> to it.\n" << G4endl;
+					std::cout << " and assigning the surface <" << optsurf->GetName() << "> to it.\n" << std::endl;
 				}else{
-					G4cout << ".\n" << G4endl;
+					std::cout << ".\n" << std::endl;
 				}
 				
 				DeRegisterLogSurf(logsurf);
 				
 				logsurf->SetName(logsurfname);
-				logsurf->SetSurfaceProperty(optsurf);
+				logsurf->SetSurfaceProperty( (G4OpticalSurface*)optsurf );
 				
 				RegisterLogSurf(logsurf);
 				
@@ -1555,9 +1994,9 @@ G4int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, con
 			}else{
 				
 				if(fVerbose >= OptPropManager::kInfo){
-					G4cout << "\Info --> OptPropManager::BuildLogicalBorderSurface(...): building logical surface <" << logsurfname << ">." << G4endl;
+					std::cout << "Info --> OptPropManager::BuildLogicalBorderSurface(...): building logical surface <" << logsurfname << ">." << std::endl;
 				}
-				RegisterLogSurf( new G4LogicalBorderSurface(logsurfname, vol1, vol2, optsurf) );
+				RegisterLogSurf( new G4LogicalBorderSurface(logsurfname, vol1, vol2, (G4OpticalSurface*)optsurf) );
 				
 				iSurf++;
 			}

@@ -284,9 +284,7 @@ void AnalysisManagerOptPh::BeginOfEvent(const G4Event *pEvent)
 			fEventData->fPrimary_Xmom->at(iPrim) = momVec.at(iPrim).x();
 			fEventData->fPrimary_Ymom->at(iPrim) = momVec.at(iPrim).y();
 			fEventData->fPrimary_Zmom->at(iPrim) = momVec.at(iPrim).z();
-		}
-
-		for(unsigned iPrim=0; iPrim<polVec.size(); iPrim++){
+			
 			fEventData->fPrimary_Xpol->at(iPrim) = polVec.at(iPrim).x();
 			fEventData->fPrimary_Ypol->at(iPrim) = polVec.at(iPrim).y();
 			fEventData->fPrimary_Zpol->at(iPrim) = polVec.at(iPrim).z();

@@ -68,7 +68,8 @@ public:
 	
 	inline const PVmap* GetVolsMap() const {return (const PVmap*)(&fPVolsMap);}
 	
-	void PrintVolumeCoordinates(G4String VolName);
+	void PrintVolumeCoordinates(const G4String& VolName);
+	void PrintVolumeInfo(const G4String& VolName);
 	
 	void PrintListOfPhysVols();
 	void PrintListOfLogVols();
@@ -100,6 +101,7 @@ private:
 	DetConstrOptPh::verbosity fVerbose;
 	
 	PVmap fPVolsMap;
+	std::map<std::string, int > fPVolsRecour; //How many time it is found in the tree
 	
 	const G4SurfacePropertyTable *fOptSurfTab;
 		
