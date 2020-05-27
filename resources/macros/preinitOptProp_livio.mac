@@ -1,2 +1,4 @@
-/argoncube/detector/optical/verbosity 1
+/argoncube/detector/optical/verbosity 3
+#/argoncube/analysis/SaveData 1
+#/argoncube/analysis/DefOptSD 'volSiPM_Sens_PV[0]' 'volSiPM_Sens_PV[1]' 'volSiPM_Sens_PV[2]' 'volSiPM_Sens_PV[3]' 'volSiPM_Sens_PV[4]' 'volSiPM_Sens_PV[5]'
 /argoncube/detector/setTpbThick 0.001 mm

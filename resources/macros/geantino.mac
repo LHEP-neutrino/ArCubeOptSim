@@ -5,8 +5,8 @@
 
 /argoncube/gun/particle geantino
 /argoncube/gun/angtype direction
-/argoncube/gun/direction 0 0 1
-/argoncube/gun/position 0 0 0 mm
+/argoncube/gun/direction 1 1 1
+/argoncube/gun/position 0 0 10 mm
 
 /run/beamOn 1
 
