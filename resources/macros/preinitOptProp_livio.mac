@@ -1,2 +1,2 @@
-/argoncube/detector/optical/verbosity 3
-/argoncube/detector/setTpbThick 0.005 mm
+/argoncube/detector/optical/verbosity 1
+/argoncube/detector/setTpbThick 0.001 mm
