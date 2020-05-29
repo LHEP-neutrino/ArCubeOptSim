@@ -1,7 +1,7 @@
-/control/verbose 2
-/run/verbose 2
-/event/verbose 2
-/tracking/verbose 2
+#/control/verbose 2
+#/run/verbose 2
+#/event/verbose 2
+/tracking/verbose 4
 
 /argoncube/detector/optical/loadOptSett resources/patrick/optProp_ArCli_only.json
 
@@ -10,7 +10,7 @@
 /argoncube/gun/angtype direction
 /argoncube/gun/direction -1 -1 -1
 /argoncube/gun/polarization 1 0 0
-/argoncube/gun/position 0 0 10 mm
-/argoncube/gun/primaryNb 5
+/argoncube/gun/position 0 0 0 mm
+/argoncube/gun/primaryNb 1
 
 /run/beamOn 1
