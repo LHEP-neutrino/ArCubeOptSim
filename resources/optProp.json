@@ -5,9 +5,9 @@
       "obj": {
         "matname": "LAr",
         "propfile": {
-          "RINDEX": "resources/patrick/datafiles/lar_rindex.dat",
-          "ABSLENGTH": "resources/patrick/datafiles/lar_abslength.dat",
-          "RAYLEIGH": "resources/patrick/datafiles/lar_rayleigh.dat"
+          "RINDEX": "resources/datafiles/RINDEX_LAr.dat",
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_LAr.dat",
+          "RAYLEIGH": "resources/datafiles/RAYLEIGH_LAr.dat"
         }
       }
     },
@@ -16,7 +16,11 @@
       "obj": {
         "matname": "TPB",
         "propfile": {
-          "RINDEX": "resources/patrick/datafiles/tpb_rindex.dat"
+          "RINDEX": "resources/datafiles/RINDEX_TPB.dat",
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_TPB.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_TPB.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_TPB.dat",
+          "WLSTIMECONSTANT": "resources/datafiles/WLSTIMECONSTANT_TPB.dat"
         }
       }
     },
@@ -25,7 +29,7 @@
       "obj": {
         "matname": "EJ280WLS",
         "propfile": {
-          "RINDEX": "resources/patrick/datafiles/ej280_rindex.dat"
+          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat"
         }
       }
     },
@@ -34,7 +38,7 @@
       "obj": {
         "matname": "ESR",
         "propfile": {
-          "RINDEX": "resources/patrick/datafiles/esr_rindex.dat"
+          "RINDEX": "resources/datafiles/RINDEX_ESR.dat"
         }
       }
     },
@@ -76,7 +80,7 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/patrick/datafiles/ej2802tpb_reflectivity.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802TPB.dat"
         }
       }
     },
@@ -88,7 +92,7 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/patrick/datafiles/ej2802lar_reflectivity.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802LAr.dat"
         }
       }
     },
@@ -100,7 +104,7 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/patrick/datafiles/ej2802esr_reflectivity.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat"
         }
       }
     },
@@ -112,7 +116,7 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/patrick/datafiles/ej2802sipm_reflectivity.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802SiPM.dat"
         }
       }
     },

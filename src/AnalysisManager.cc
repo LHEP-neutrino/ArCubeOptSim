@@ -153,8 +153,8 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	if(fSave < AnalysisManagerOptPh::kSdSteps) fTree->Branch("hit_time", "vector<Double_t>", &fEventData->fTime);//Fill at step stage
 	
 	//Extended information of hits related data
-	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_trackid", "vector<Int_t>", &fEventData->fTrackId);//Fill at step stage
-	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_partgen", "vector<Int_t>", &fEventData->fPartGener);//Fill at step stage
+	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_trackid", "vector<Long64_t>", &fEventData->fTrackId);//Fill at step stage
+	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_partgen", "vector<Long64_t>", &fEventData->fPartGener);//Fill at step stage
 	
 	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_xpos", "vector<Double_t>", &fEventData->fXpos);//Fill at step stage
 	if(fSave == AnalysisManagerOptPh::kHitsExt) fTree->Branch("hit_ypos", "vector<Double_t>", &fEventData->fYpos);//Fill at step stage
@@ -170,14 +170,14 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	
 	//Full step mode
 	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("totsteps", &fEventData->fNbTotHits, "totsteps/I");//Fill at step stage
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("vol_index", "vector<long>", &fEventData->fVolIndex);//Fill at step stage
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("vol_copy", "vector<long>", &fEventData->fHitVolId);//ID of the touchable volume//Fill at step stage
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("vol_index", "vector<Long64_t>", &fEventData->fVolIndex);//Fill at step stage
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("vol_copy", "vector<Long64_t>", &fEventData->fHitVolId);//ID of the touchable volume//Fill at step stage
 	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("time", "vector<Double_t>", &fEventData->fTime);//Fill at step stage
 	
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("trackid", "vector<Int_t>", &fEventData->fTrackId);//Fill at end of Event
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("partgener", "vector<Int_t>", &fEventData->fPartGener);//Fill at end of Event
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("parentid", "vector<Int_t>", &fEventData->fParentId);//Fill at end of Event
-	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("firstparentid", "vector<Int_t>", &fEventData->fFirstParentId);//Fill at end of Event
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("trackid", "vector<Long64_t>", &fEventData->fTrackId);//Fill at end of Event
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("partgener", "vector<Long64_t>", &fEventData->fPartGener);//Fill at end of Event
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("parentid", "vector<Long64_t>", &fEventData->fParentId);//Fill at end of Event
+	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("firstparentid", "vector<Long64_t>", &fEventData->fFirstParentId);//Fill at end of Event
 	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("creatproc", "vector<Int_t>", &fEventData->fCreatProc);//Fill at end of Event
 	if(fSave >= AnalysisManagerOptPh::kSdSteps) fTree->Branch("deposproc", "vector<Int_t>", &fEventData->fDepProc);//Fill at step stage
 	
@@ -414,7 +414,7 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep)
 	
 	
 	//Here start to get stuff to be saved
-	fNbTotHits += 1; //This is the number of the total recorded steps in "stepping analisys mode"
+	fEventData->fNbTotHits += 1; //This is the number of the total recorded steps in "stepping analisys mode"
 	
 	//This should be replaced with a unique ID of the physical volume (or the touchable)... how?
 	//fEventData->fVolName->push_back( vol->GetName() );

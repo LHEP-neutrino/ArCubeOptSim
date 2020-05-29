@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
 	stringstream hStream;
 	
-	bool bInteractive = true;
+	bool bInteractive = false;
 	bool bVisualize = false;
 	bool bVrmlVisualize = false;
 	bool bOpenGlVisualize = false;
@@ -53,14 +53,13 @@ int main(int argc, char **argv)
 	
 	bool bGdmlFile = false;
 	bool bPreinitMacroFile = false;
-	bool bOptMacroFile = false;
 	bool bVisMacroFile = false;
 	bool bMacroFile = false;
-	G4String hGdmlFileName, hPreinitMacroFileName, hMacroFileName, hOptMacroFileName, hVisMacroFileName, hOutFileName;
+	G4String hGdmlFileName, hPreinitMacroFileName, hMacroFileName, hVisMacroFileName, hOutFileName;
 	int iNbEventsToSimulate = 0;
 
 	// parse switches
-	while((c = getopt(argc,argv,"h:g:p:m:o:q:n:v:G")) != -1)
+	while((c = getopt(argc,argv,"g:p:m:o:n:v:iGh")) != -1)
 	{
 		switch(c)
 		{
@@ -77,16 +76,14 @@ int main(int argc, char **argv)
 			case 'm':
 				bMacroFile = true;
 				hMacroFileName = optarg;
-				if(bInteractive) bInteractive=false;
 				break;
 				
 			case 'o':
 				hOutFileName = optarg;
 				break;
 				
-			case 'q':
-				bOptMacroFile = true;
-				hOptMacroFileName = optarg;
+			case 'i':
+				bInteractive = true;
 				break;
 				
 			case 'n':
@@ -102,7 +99,12 @@ int main(int argc, char **argv)
 				
 			case 'G':
 				bUseGui=true;
+				bInteractive=true;
 				break;
+			
+			case 'h':
+				usage();
+				return 0;
 				
 			default:
 				usage();
@@ -167,11 +169,6 @@ int main(int argc, char **argv)
 	//Initialize the RunManager
 	pRunManager->Initialize();
 	
-  if(bOptMacroFile){
-    G4String hCommand = "/control/execute " + hOptMacroFileName;
-    pUImanager->ApplyCommand(hCommand);
-  }
-  
 	if(bInteractive){
 		// Visualization Manager
 		pVisManager = new G4VisExecutive;
@@ -180,18 +177,28 @@ int main(int argc, char **argv)
 		//Let G4UIExecutive guess what is the best available UI
 		ui = new G4UIExecutive(1,argv);
 		if (ui->IsGUI() && bUseGui ){
-      if(bVisMacroFile){
-        G4String hCommand = "/control/execute " + hVisMacroFileName;
-        pUImanager->ApplyCommand(hCommand);
-      }
+			if(bVisMacroFile){
+				G4String hCommand = "/control/execute " + hVisMacroFileName;
+				pUImanager->ApplyCommand(hCommand);
+			}
+			if(bMacroFile)
+			{
+				G4String hCommand = "/control/execute " + hMacroFileName;
+				pUImanager->ApplyCommand(hCommand);
+			}
 			ui->SessionStart();
 			delete ui;
 		}else{
 			pUIsession = new G4UIterminal(new G4UItcsh);
+			if(bMacroFile)
+			{
+				G4String hCommand = "/control/execute " + hMacroFileName;
+				pUImanager->ApplyCommand(hCommand);
+			}
 			pUIsession->SessionStart();
 			delete pUIsession;
 		}
-    
+		
 	}else{
 		if(bMacroFile)
 		{
