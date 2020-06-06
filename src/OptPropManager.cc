@@ -1,6 +1,9 @@
 #ifndef OPT_PROP_MANAGER_CC
 #define OPT_PROP_MANAGER_CC
 
+#include "globals.hh"
+#include "G4SystemOfUnits.hh"
+
 #include "OptPropManager.hh"
 #include "DetConstr.hh"
 
@@ -339,7 +342,7 @@ void OptPropManager::ReadValuesFromFile(const G4String& filename, std::vector<G4
 		}
 		*/
 		
-		ph_en.push_back(ph_en_d);
+		ph_en.push_back(ph_en_d*eV);
 		vals.push_back(val_d);
 	}
 	
@@ -365,11 +368,11 @@ void OptPropManager::setmatprop(const json keyval)
 		return;
 	}
 	
-	
-	G4Material* mat = FindMaterial(keyval.at("matname").get<std::string>());
+	std::string matname = keyval.at("matname").get<std::string>();
+	G4Material* mat = FindMaterial(matname);
 	
 	if(!mat){
-		std::cout << "\nERROR --> OptPropManager::setmatprop(...): Cannot find the material \""<< keyval.at("matname") <<"\" in table of the instanced materials!" << std::endl;
+		std::cout << "\nERROR --> OptPropManager::setmatprop(...): Cannot find the material <" << matname << "> in table of the instanced materials!" << std::endl;
 		return;
 	}
 	
@@ -385,7 +388,7 @@ void OptPropManager::setmatprop(const json keyval)
 		
 		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
 			if(!it.value().is_string()){
-				std::cout << "\nERROR --> OptPropManager::setmatprop(...): The field corresponding to the property " << it.key() << " is not a string!" << std::endl;
+				std::cout << "\nERROR --> OptPropManager::setmatprop(...): The field corresponding to the property <" << it.key() << "> is not a string!" << std::endl;
 				continue;
 			}
 			
@@ -393,8 +396,8 @@ void OptPropManager::setmatprop(const json keyval)
 			val_vec.clear(); val_vec.resize(0);
 			
 			
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::setmatprop(...): Setting property " << it.key() << " for \"" << mat->GetName() << "\" from file \"" << it.value().get<std::string>() << "\"" << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setmatprop(...): Setting property " << it.key() << " for <" << matname << "> from file <" << it.value().get<std::string>() << ">" << std::endl;
 			}
 			
 			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
@@ -409,16 +412,70 @@ void OptPropManager::setmatprop(const json keyval)
 			G4MaterialPropertiesTable* propTab = mat->GetMaterialPropertiesTable();
 			
 			if(!propTab){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setmatprop(...): Material <" << matname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
+				}
 				propTab = new G4MaterialPropertiesTable();
 				mat->SetMaterialPropertiesTable(propTab);
 			}
 			
 			if(propTab->GetProperty( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setmatprop(...): Property <" << it.key() << "> already present in the table for the material <" << matname << ">. Removing and re-adding to it." << std::endl;
+				}
 				propTab->RemoveProperty( it.key().c_str() );
 			}
 			propTab->AddProperty( it.key().c_str() ,(G4double*)&en_vec.at(0), (G4double*)&val_vec.at(0), en_vec.size() );
 		}
 	}
+	
+	
+	
+	if( keyval.contains("constprop") && (keyval.at("constprop").is_object()) ){
+		json propObj = keyval.at("constprop");
+		
+		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setmatprop(...): starting iterator over const properties for material <" << matname << ">." << std::endl;
+		}
+		
+		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
+			
+			if(!it.value().is_number_float()){
+				std::cout << "\nERROR --> OptPropManager::setmatprop(...): The field corresponding to the constant property <" << it.key() << "> for material <" << matname << "> is not a float number json type!" << std::endl;
+				continue;
+			}
+			
+			
+			
+			G4double value = it.value().get<G4double>();
+			
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setmatprop(...): setting const property <" << it.key() << ">=" << value << " for material <" << matname << ">." << std::endl;
+			}
+			
+			G4MaterialPropertiesTable* propTab = mat->GetMaterialPropertiesTable();
+			
+			if(!propTab){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setoptsurf(...): Material <" << matname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
+				}
+				propTab = new G4MaterialPropertiesTable();
+				mat->SetMaterialPropertiesTable(propTab);
+			}
+			
+			if(propTab->ConstPropertyExists( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setmatprop(...): Constant property <" << it.key() << "> already present in the table for the material <" << matname << ">. Removing and re-adding to it." << std::endl;
+				}
+				propTab->RemoveConstProperty( it.key().c_str() );
+			}
+			propTab->AddConstProperty( it.key().c_str() ,value );
+			
+		}
+	}
+	
+	
 	
 	if(fVerbose>=OptPropManager::kDebug){
 		std::cout << "Debug --> OptPropManager::setmatprop(...): end of routine." << std::endl;
@@ -455,6 +512,7 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	
 	G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
+	
 	if(!propTab){
 		if(fVerbose>=OptPropManager::kDetails){
 			std::cout << "Detail --> OptPropManager::setoptsurf(...): Optical surface <" << surfname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
@@ -466,8 +524,8 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	if(keyval.contains("model")){
 		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying model <" << keyval.at("model").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setoptsurf(...): Applying model <" << keyval.at("model").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
 			}
 			optsurf->SetModel( OptSurfModelMap.at(keyval.at("model").get<std::string>()) );
 		}
@@ -475,8 +533,8 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	if(keyval.contains("type")){
 		if( keyval.at("type").is_string() && (OptSurfTypeMap.find(keyval.at("type").get<std::string>())!=OptSurfTypeMap.end()) ){
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying surface type <" << keyval.at("type").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setoptsurf(...): Applying surface type <" << keyval.at("type").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
 			}
 			optsurf->SetType( OptSurfTypeMap.at(keyval.at("type").get<std::string>()) );
 		}
@@ -484,8 +542,8 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	if(keyval.contains("finish")){
 		if( keyval.at("finish").is_string() && (OptSurfFinishMap.find(keyval.at("finish").get<std::string>())!=OptSurfFinishMap.end()) ){
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying surface finish <" << keyval.at("finish").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setoptsurf(...): Applying surface finish <" << keyval.at("finish").get<std::string>() << "> to the <" << surfname << "> optical surface." << std::endl;
 			}
 			optsurf->SetFinish( OptSurfFinishMap.at(keyval.at("finish").get<std::string>()) );
 		}
@@ -493,8 +551,8 @@ void OptPropManager::setoptsurf(const json keyval)
 	
 	if(keyval.contains("sigma_alpha")){
 		if( keyval.at("sigma_alpha").is_number_float() ){
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::setoptsurf(...): Applying value <sigma_alpha> = " << keyval.at("sigma_alpha").get<double>() << " to the <" << surfname << "> optical surface." << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setoptsurf(...): Applying value <sigma_alpha> = " << keyval.at("sigma_alpha").get<double>() << " to the <" << surfname << "> optical surface." << std::endl;
 			}
 			optsurf->SetSigmaAlpha( keyval.at("sigma_alpha").get<G4double>() );
 		}
@@ -520,19 +578,19 @@ void OptPropManager::setoptsurf(const json keyval)
 			en_vec.clear(); en_vec.resize(0);
 			val_vec.clear(); val_vec.resize(0);
 			
-			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting property  <" << it.key() << "> from file <" << it.value().get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
+			if(fVerbose>=OptPropManager::kInfo){
+				std::cout << "Info --> OptPropManager::setoptsurf(...): Setting property  <" << it.key() << "> from file <" << it.value().get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
 			}
 			ReadValuesFromFile( it.value().get<std::string>(), en_vec, val_vec );
 			
 			if( (en_vec.size()==0) || (val_vec.size()==0) || (en_vec.size()!=val_vec.size()) ){
-				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): Wrong dimensions of vectors after the readout of the file <" << it.value().get<std::string>() << ">. Cannot set the property <" << it.key() << "> for the <" << surfname << "> optical surface!\n" << std::endl;
+				std::cout << "\nERROR --> OptPropManager::setoptsurf(...): Wrong dimensions of vectors after the readout of the file <" << it.value().get<std::string>() << ">. Cannot set the property <" << it.key() << "> for the <" << surfname << "> optical surface!\n" << std::endl;
 				continue;
 			}
 			
 			if(propTab->GetProperty( it.key().c_str() )){
-				if(fVerbose>=OptPropManager::kDebug){
-					std::cout << "Debug --> OptPropManager::buildoptsurf(...): Property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setoptsurf(...): Property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
 				}
 				propTab->RemoveProperty( it.key().c_str() );
 			}
@@ -541,6 +599,49 @@ void OptPropManager::setoptsurf(const json keyval)
 		
 	}
 	
+	
+	
+	if( keyval.contains("constprop") && (keyval.at("constprop").is_object()) ){
+		json propObj = keyval.at("constprop");
+		
+		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setoptsurf(...): starting iterator over const properties for for the <" << surfname << "> optical surface." << std::endl;
+		}
+		
+		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
+			
+			if(!it.value().is_number_float()){
+				std::cout << "\nERROR --> OptPropManager::setoptsurf(...): The field corresponding to the constant property <" << it.key() << "> for the <" << surfname << "> optical surface is not a float number json type!" << std::endl;
+				continue;
+			}
+			
+			
+			
+			G4double value = it.value().get<G4double>();
+			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setoptsurf(...): setting const property <" << it.key() << ">=" << value << " for material <" << surfname << ">." << std::endl;
+			}
+			
+			if(!propTab){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setoptsurf(...): Optical surface <" << surfname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
+				}
+				propTab = new G4MaterialPropertiesTable();
+				optsurf->SetMaterialPropertiesTable(propTab);
+			}
+			
+			if(propTab->ConstPropertyExists( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setoptsurf(...): Constant property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
+				}
+				propTab->RemoveConstProperty( it.key().c_str() );
+			}
+			propTab->AddConstProperty( it.key().c_str() ,value );
+			
+		}
+	}
 	
 	
 	if(fVerbose>=OptPropManager::kDebug){
@@ -600,7 +701,7 @@ void OptPropManager::setlogbordersurf(const json keyval)
 				}
 				
 			}else{
-				std::cout << "\nWARNING --> OptPropManager::setlogbordersurf(...): Could not find the optical surface <" << keyval.at("optsurf").get<std::string>() << ">. The optical surface of the <" << logsurfname << "> logical surface(s) will not be changed." << std::endl;
+				std::cout << "\nWARNING --> OptPropManager::setlogbordersurf(...): Could not find the optical surface <" << optsurfname << ">. The optical surface of the <" << logsurfname << "> logical surface(s) will not be changed." << std::endl;
 			}
 			
 		}else{
@@ -714,7 +815,7 @@ void OptPropManager::setlogbordersurf(const json keyval)
 				
 				if(propTab->GetProperty( propertyname.c_str() )){
 					if(fVerbose>=OptPropManager::kDebug){
-						std::cout << "Debug --> OptPropManager::setlogbordersurf(...): Property <" << propertyname << "> already present for in the list of properties of the <" << optsurf->GetName() << "> optical surface. Removing from and re-adding to it." << std::endl;
+						std::cout << "Debug --> OptPropManager::setlogbordersurf(...): Property <" << propertyname << "> already present for in the list of properties of the <" << optsurfname << "> optical surface. Removing from and re-adding to it." << std::endl;
 					}
 					propTab->RemoveProperty( propertyname.c_str() );
 				}
@@ -726,6 +827,61 @@ void OptPropManager::setlogbordersurf(const json keyval)
 				}
 				
 				SetSurfPropFromFile(logsurflist, propertyfilename, propertyname );
+			}
+		}
+	}
+	
+	
+	if( keyval.contains("constprop") && (keyval.at("constprop").is_object()) ){
+		json propObj = keyval.at("constprop");
+		
+		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::setlogbordersurf(...): starting iterating over constant properties for the logical border surface(s) <" << logsurfname << ">." << std::endl;
+		}
+		
+		
+		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
+			
+			if(!it.value().is_number_float()){
+				std::cout << "\nERROR --> OptPropManager::setlogbordersurf(...): The field corresponding to the constant property <" << it.key() << "> for the logical border surface(s) <" << logsurfname << "> is not a float number json type!" << std::endl;
+				continue;
+			}
+			
+			
+			G4double value = it.value().get<G4double>();
+			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting constant property <" << it.key() << ">=" << value << " for logical surface(s) <" << logsurfname << ">." << std::endl;
+			}
+			
+			if(optsurf){
+				
+				G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
+				
+				if(!propTab){
+					if(fVerbose>=OptPropManager::kDetails){
+						std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Optical surface <" << optsurfname << "> does not have a properties table (null pointer). Instancing and assigning a new one." << std::endl;
+					}
+					propTab = new G4MaterialPropertiesTable();
+					optsurf->SetMaterialPropertiesTable(propTab);
+				}
+				
+				if(propTab->ConstPropertyExists( it.key().c_str() )){
+					if(fVerbose>=OptPropManager::kDetails){
+						std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Constant property <" << it.key() << "> already present in the table for the <" << optsurfname << "> optical surface. Removing and re-adding to it." << std::endl;
+					}
+					propTab->RemoveConstProperty( it.key().c_str() );
+				}
+				propTab->AddConstProperty( it.key().c_str() ,value );
+				
+				
+			}else{
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying constant property <" << it.key() << ">=" << value << std::endl;
+				}
+				
+				SetSurfConstProp(logsurflist, value, it.key() );
 			}
 		}
 	}
@@ -862,6 +1018,39 @@ void OptPropManager::buildoptsurf(const json keyval)
 	
 	
 	
+	if( keyval.contains("constprop") && (keyval.at("constprop").is_object()) ){
+		json propObj = keyval.at("constprop");
+		
+		
+		if(fVerbose>=OptPropManager::kDebug){
+			std::cout << "Debug --> OptPropManager::buildoptsurf(...): starting iterator over const properties for for the <" << surfname << "> optical surface." << std::endl;
+		}
+		
+		for (json::iterator it = propObj.begin(); it != propObj.end(); ++it){
+			
+			if(!it.value().is_number_float()){
+				std::cout << "\nERROR --> OptPropManager::buildoptsurf(...): The field corresponding to the constant property <" << it.key() << "> for the <" << surfname << "> optical surface is not a float number json type!" << std::endl;
+				continue;
+			}
+			
+			
+			G4double value = it.value().get<G4double>();
+			
+			if(fVerbose>=OptPropManager::kDetails){
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting constant property <" << it.key() << ">=" << value << " for material <" << surfname << ">." << std::endl;
+			}
+			
+			if(propTab->ConstPropertyExists( it.key().c_str() )){
+				if(fVerbose>=OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::setoptsurf(...): Constant property <" << it.key() << "> already present in the table for the <" << surfname << "> optical surface. Removing and re-adding to it." << std::endl;
+				}
+				propTab->RemoveConstProperty( it.key().c_str() );
+			}
+			propTab->AddConstProperty( it.key().c_str(), value );
+		}
+	}
+	
+	
 	if(fVerbose>=OptPropManager::kDebug){
 		std::cout << "Debug --> OptPropManager::buildoptsurf(...): end of routine." << std::endl;
 	}
@@ -968,8 +1157,8 @@ void OptPropManager::buildlogbordersurf(const json keyval)
 		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The logical border surfaces <" << keyval.at("surfname").get<std::string>() << "> could not be built!\n" << std::endl;
 		
 	}else{
-		if(fVerbose>=OptPropManager::kDetails){
-			std::cout << "Detail --> OptPropManager::buildlogbordersurf(...): built " << nLBS << " logical border surfaces named <" << logsurfname << "> between vol1 <" << keyval.at("vol1").get<std::string>() << "> and vol2 <" << keyval.at("vol2").get<std::string>() << "> by using the optical surface <" << optsurfname << ">." << std::endl;
+		if(fVerbose>=OptPropManager::kInfo){
+			std::cout << "Info --> OptPropManager::buildlogbordersurf(...): built " << nLBS << " logical border surfaces named <" << logsurfname << "> between vol1 <" << keyval.at("vol1").get<std::string>() << "> and vol2 <" << keyval.at("vol2").get<std::string>() << "> by using the optical surface <" << optsurfname << ">." << std::endl;
 		}
 	}
 	
@@ -1839,6 +2028,109 @@ void OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* log
 }
 
 
+void OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* logsurflist, const G4double& value, const G4String& constpropname)
+{
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >*, ...): Entering the function." << std::endl;
+	}
+	
+	if(!logsurflist){
+		std::cout << "\nERROR --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Null pointer to the list of logical surfaces!\n" << std::endl;
+		return;
+	}
+	
+	if(!(logsurflist->size())){
+		std::cout << "\nERROR --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): The list of logical surfaces is empty!\n" << std::endl;
+		return;
+	}
+	
+	
+	
+	G4OpticalSurface *lastoptsurf = NULL;
+	std::string firstsurfname, lastsurfname;
+	std::set<G4LogicalSurface* >::iterator iT;
+	int nSurfs = logsurflist->size();
+	int nAppl = 0;
+	int iSurf = 0;
+	
+	for(iT=logsurflist->begin(); iT!=logsurflist->end(); ++iT, iSurf++){
+		
+		if(iSurf==0){
+			firstsurfname = (*iT)->GetName();
+			lastsurfname = firstsurfname;
+			lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+			if(lastoptsurf){
+				if(fVerbose>=OptPropManager::kDebug){
+					std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Applying constant property <" << constpropname << "> to logical surface(s) <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ")." << std::endl;
+				}
+				
+				G4MaterialPropertiesTable* propTab = lastoptsurf->GetMaterialPropertiesTable();
+				if(!propTab){
+					propTab = new G4MaterialPropertiesTable();
+					lastoptsurf->SetMaterialPropertiesTable(propTab);
+				}
+				
+				if(propTab->ConstPropertyExists( constpropname.c_str() )){
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Constant property <" << constpropname << "> already present for logical surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << "). Removing from and re-adding to it." << std::endl;
+					}
+					propTab->RemoveConstProperty( constpropname.c_str() );
+				}
+				propTab->AddConstProperty( constpropname.c_str(), value );
+				nAppl++;
+			}else{
+				std::cout << "\nERROR --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot set the constant property <" << constpropname << "> to the logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}
+		}else{
+			if( !(*iT)->GetSurfaceProperty() ){
+				std::cout << "\nERROR --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): logical surface <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") has no optical surface assigned. Cannot apply the constant property <" << constpropname << "> to logical surface instance. Add to it an optical surface before!\n" << std::endl;
+			}else{
+				std::string logsurfname = (*iT)->GetName();
+				if(logsurfname != lastsurfname){
+					std::cout << "WARNING --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Change of name from <" << lastsurfname << "> to <" << logsurfname << "> for logical surface (list element " << iSurf << " at " << (*iT) << "). This function is supposed to apply the constant property <" << constpropname << "> to a set of logical surfaces with the same name. Unexpected behaviours of the simulation might occur!" << std::endl;
+					lastsurfname = logsurfname;
+				}
+				if( lastoptsurf != ((*iT)->GetSurfaceProperty()) ){
+					std::cout << "WARNING --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): logical border surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << ") has an assigned optical surface different (from pointer) to the one processed before. Applying anyway the constant property <" << constpropname << "> to this optical surface!" << std::endl;
+					lastoptsurf = dynamic_cast<G4OpticalSurface*>((*iT)->GetSurfaceProperty());
+					
+					G4MaterialPropertiesTable* propTab = lastoptsurf->GetMaterialPropertiesTable();
+					if(!propTab){
+						propTab = new G4MaterialPropertiesTable();
+						lastoptsurf->SetMaterialPropertiesTable(propTab);
+					}
+					
+					if(propTab->ConstPropertyExists( constpropname.c_str() )){
+						if(fVerbose>=OptPropManager::kDebug){
+							std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Constant property <" << constpropname << "> already present for logical surface <" << lastsurfname << "> (list element " << iSurf << " at " << (*iT) << "). Removing from and re-adding to it." << std::endl;
+						}
+						propTab->RemoveConstProperty( constpropname.c_str() );
+					}
+					propTab->AddConstProperty( constpropname.c_str(), value );
+				}else{
+					if(fVerbose>=OptPropManager::kDebug){
+						std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* , ...): Surface constant property <" << constpropname << "> to logical surface(s) <" << (*iT)->GetName() << "> (list element " << iSurf << " at " << (*iT) << ") was already applied at the previous iteration. NO NEED to actually apply it for this logical surface instance." << std::endl;
+					}
+				}
+				nAppl++;
+			}
+		}
+	}
+	
+	
+	
+	if(fVerbose>=OptPropManager::kDetails){
+		std::cout << "Details --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >*, ...): Applied constant property <" << constpropname << ">=" << value << " to " << nAppl << " out of " << nSurfs << " logical surfaces named <" << firstsurfname << "> (if list was homogeneous)." << std::endl;
+	}
+	
+	
+	
+	if(fVerbose>=OptPropManager::kDebug){
+		std::cout << "Debug --> OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >*, ...): Exiting the function." << std::endl;
+	}
+}
+
+
 void OptPropManager::BuildOpticalSurface(const G4String& optsurfname, const G4String& model, const G4String& type, const G4String& finish )
 {
 	G4SurfacePropertyTable *surftab = (G4SurfacePropertyTable*)G4OpticalSurface::GetSurfacePropertyTable();
@@ -1993,8 +2285,8 @@ int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const
 				
 			}else{
 				
-				if(fVerbose >= OptPropManager::kInfo){
-					std::cout << "Info --> OptPropManager::BuildLogicalBorderSurface(...): building logical surface <" << logsurfname << ">." << std::endl;
+				if(fVerbose >= OptPropManager::kDetails){
+					std::cout << "Detail --> OptPropManager::BuildLogicalBorderSurface(...): building logical surface <" << logsurfname << ">." << std::endl;
 				}
 				RegisterLogSurf( new G4LogicalBorderSurface(logsurfname, vol1, vol2, (G4OpticalSurface*)optsurf) );
 				

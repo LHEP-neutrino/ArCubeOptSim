@@ -1,1 +1,12 @@
+/argoncube/analysis/stepsDebug 0
+/tracking/verbose 1
+#/argoncube/analysis/DefOptSD volTPB_PV
 /argoncube/detector/optical/loadOptSett resources/optProp.json
+/control/execute resources/macros/vis.mac
+/argoncube/gun/particle opticalphoton
+#/argoncube/gun/angtype direction
+#/argoncube/gun/direction 0 0 1
+#/argoncube/gun/polarization 0 1 0
+#/argoncube/gun/position 0 -50 309 mm
+#/argoncube/gun/primaryNb 1
+/run/beamOn 1

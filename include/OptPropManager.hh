@@ -183,6 +183,7 @@ private:
 	void SetSurfFinish(const std::set<G4LogicalSurface* >* logsurflist, const G4String& finish);
 	void SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* logsurflist, const G4double& s_a);
 	void SetSurfPropFromFile(const std::set<G4LogicalSurface* >* logsurflist, const G4String& filename, const G4String& propertyname);
+	void SetSurfConstProp(const std::set<G4LogicalSurface* >* logsurflist, const G4double& value, const G4String& constpropname);
 	
 	int BuildLogicalBorderSurface(const G4String& logsurfname, const std::vector<G4VPhysicalVolume*>& vol1_vec, const std::vector<G4VPhysicalVolume*>& vol2_vec, const G4OpticalSurface* optsurf );
 	
