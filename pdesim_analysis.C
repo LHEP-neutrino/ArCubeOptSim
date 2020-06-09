@@ -7,7 +7,7 @@
 #include <set>
 #include <cmath>
 
-#include <stdio>
+//#include <stdio>
 //#include <stdint.h>
 //#include <string>
 //#include <stdlib>
@@ -28,13 +28,13 @@ void pdesim_analysis() {
    Int_t neve = tr->GetEntries();
    
    Int_t eventid;
-   Float_t prim_Xpos;
-   Float_t prim_Ypos;
-   Float_t prim_Zpos;
+   Double_t prim_Xpos;
+   Double_t prim_Ypos;
+   Double_t prim_Zpos;
    Int_t totsteps;
-   vector<Long64_t> trackid;
-   vector<Long64_t> parentid;
-   vector<Long64_t> firstparentid;
+   vector<Long64_t> *trackid;
+   vector<Long64_t> *parentid;
+   vector<Long64_t> *firstparentid;
    vector<Int_t> evhits (neve,0);
      
   tr->SetBranchAddress("eventid",&eventid); //ev number
@@ -48,14 +48,10 @@ void pdesim_analysis() {
   
    for (Long64_t i=0;i<10; i++) {
       tr->GetEntry(i);
-      evlen = trackid.size();
+      Long64_t evlen = trackid->size();
 	  for (Long64_t j=0;j<evlen; j++) {
-		  std::cout << "trackid" << *trackid[j] << "parentid" << *parentid[j] << "firstparentid" << *firstparentid[j] << std::endl
+		  std::cout << "trackid" << (*trackid)[j] << "parentid" << (*parentid)[j] << "firstparentid" << (*firstparentid)[j] << std::endl;
 	  }
    }
-   newtree->Print();
-   newtree->AutoSave();
-   delete oldfile;
-   delete newfile;
 }
 
