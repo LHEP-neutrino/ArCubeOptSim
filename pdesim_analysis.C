@@ -35,6 +35,7 @@ void pdesim_analysis() {
    vector<Long64_t> trackid;
    vector<Long64_t> parentid;
    vector<Long64_t> firstparentid;
+   vector<Int_t> evhits (neve,0);
      
   tr->SetBranchAddress("eventid",&eventid); //ev number
   tr->SetBranchAddress("prim_Xpos",&prim_Xpos);
@@ -45,9 +46,12 @@ void pdesim_analysis() {
   tr->SetBranchAddress("parentid",&parentid);
   tr->SetBranchAddress("firstparentid",&firstparentid);
   
-   for (Long64_t i=0;i<nentries; i++) {
+   for (Long64_t i=0;i<10; i++) {
       tr->GetEntry(i);
-      if (run==runnr) newtree->Fill();
+      evlen = trackid.size();
+	  for (Long64_t j=0;j<evlen; j++) {
+		  std::cout << "trackid" << *trackid[j] << "parentid" << *parentid[j] << "firstparentid" << *firstparentid[j] << std::endl
+	  }
    }
    newtree->Print();
    newtree->AutoSave();
