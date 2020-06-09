@@ -81,7 +81,6 @@
         "model": "unified",
         "type": "dielectric_dielectric",
         "finish": "polished",
-        "sigma_alpha": 0.1,
 	"propfile": {
 	   "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_TPB2EJ280.dat",
 	   "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_TPB2EJ280.dat"
