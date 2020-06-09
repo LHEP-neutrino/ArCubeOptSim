@@ -1,7 +1,7 @@
 #/control/verbose 2
 #/run/verbose 2
-/event/verbose 2
-/tracking/verbose 2
+#/event/verbose 2
+#/tracking/verbose 2
 
 /argoncube/detector/optical/loadOptSett resources/optProp_ArCLight_only.json
 
@@ -20,7 +20,7 @@
 /argoncube/gun/halfy 155 mm
 /argoncube/gun/halfz 1 mm
 /argoncube/gun/confine volTPB_PV
-/argoncube/gun/primaryNb 1
+/argoncube/gun/primaryNb 1000
 
 #/argoncube/gun/particle opticalphoton
 #/argoncube/gun/angtype direction
@@ -29,4 +29,4 @@
 #/argoncube/gun/position 0 81.4 0 mm
 #/argoncube/gun/primaryNb 1
 
-/run/beamOn 1
+/run/beamOn 1000
