@@ -259,6 +259,9 @@ void AnalysisManagerOptPh::BeginOfEvent(const G4Event *pEvent)
 	*/
 	
 	fEventData->Reset(fNbPrim);
+	fTrackParentIDsMap.clear();
+	fTrackGenerationMap.clear(); 
+	fFirstParentIDMap.clear();
 	
 	//Primary particles information
 	//Volume id.......
@@ -305,8 +308,8 @@ void AnalysisManagerOptPh::BeginOfEvent(const G4Event *pEvent)
 void AnalysisManagerOptPh::EndOfEvent(const G4Event *pEvent)
 {
 	if(fSave>AnalysisManagerOptPh::kOff){
-		std::map<int, int>::iterator iT;
-		int nTracks = fTrackParentIDsMap.size();
+		std::set<int>::iterator iT;
+		int nTracks = fTrackIDs.size();
 		fEventData->fPartGener->resize(nTracks);
 		fEventData->fFirstParentId->resize(nTracks);
 		fEventData->fCreatProc->resize(nTracks);
@@ -314,7 +317,7 @@ void AnalysisManagerOptPh::EndOfEvent(const G4Event *pEvent)
 		if(nTracks>0){
 			int iTrack=0;
 			
-			for(iT=fTrackParentIDsMap.begin(); iT!=fTrackParentIDsMap.end(); ++iT){
+			for(iT=fTrackIDs.begin(); iT!=fTrackIDs.end(); ++iT){
 				int trackid = iT->first;
 				int parentid = iT->second;
 				if(parentid!=0){
@@ -417,6 +420,15 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep)
 	}
 	
 	
+	if( fTrackParentIDsMap.find(trackid) == fTrackParentIDsMap.end() ){
+		//This code is executed only the first time that the specific track is found
+		fTrackParentIDsMap[trackid] = track->GetParentID();
+		if(track->GetParentID()==0){
+			fTrackGenerationMap[trackid] = 1;
+			fFirstParentIDMap[trackid] = trackid;
+		}
+	}
+	
 	//Check whether the particle is in one of the sensitive volumes defined by the user
 	if( (fSave<kAll) && (fOptPhSenDetVolPtrs.find(Vol)==fOptPhSenDetVolPtrs.end()) ){
 		return; //There isn't anything to save here
@@ -438,7 +450,8 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep)
 	if(fSave>=kHitsExt){
 		int trackid = track->GetTrackID();
 		if( fProcTable && (fTrackParentIDsMap.find(trackid) == fTrackParentIDsMap.end()) ){
-			
+		
+		/*	
 			//This code is executed only the first time that the specific track is found
 			int parentid = track->GetParentID();
 			fTrackParentIDsMap[trackid] = parentid;
@@ -447,7 +460,8 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep)
 				fTrackGenerationMap[trackid] = 1;
 				fFirstParentIDMap[trackid] = trackid;
 			}
-			
+		*/	
+			fTrackIDs.insert(trackid);
 			if(fSave>=kSdSteps){
 				if(!track->GetCreatorProcess()){//It's a primary track
 					fTrackCreatProc[trackid] = 0;
