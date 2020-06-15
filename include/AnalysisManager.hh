@@ -19,6 +19,7 @@
 class G4Run;
 class G4Event;
 class G4Step;
+class G4SteppingManager;
 
 class EventDataOptPh;
 class PrimaryGeneratorActionOptPh;
@@ -50,7 +51,9 @@ public:
 	void EndOfRun(const G4Run *pRun); 
 	void BeginOfEvent(const G4Event *pEvent); 
 	void EndOfEvent(const G4Event *pEvent); 
-	void Step(const G4Step *pStep);	
+	void Step(const G4Step *pStep, const G4SteppingManager* pStepMan);	
+	
+	void SetRanSeed(G4int hRanSeed) { fRanSeed = hRanSeed; };
 	
 	void DefineOptPhSensDet(G4String volList);
 	void SetSaveData(AnalysisManagerOptPh::datasave save){ fSave=save; };
@@ -72,8 +75,17 @@ public:
 	
 private:
 	
+	//This function takes care of making the look-up tables for physical volumes at the start of the run
+	void MakeVolMaps();
+	
+	//This function tries to make physical volumes with consecutive indexing if at the same tree level
+	//It behaves very differently from the same function in the detector construction
+	void ScanVols(const G4LogicalVolume* LogVol, int& volindex);
+	
 	int FindVolumeIndex( const G4VPhysicalVolume* aVolume );
 	
+	//This method should determine the unique touchable copy corresponding to a physical volume by means of the touchable history (the geometry tree)
+	int FindVolId(G4TouchableHandle& touch);
 	
 	//This actually returns the process position in the table of processes (it is a vector)
 	int FindProcessIndex( const G4VProcess* aProcess );
@@ -84,15 +96,28 @@ private:
 	//Makes the list of all physical volumes and produces a json file like dictionary usable in analysis phase. Method executed at the start of the run. Only the volumes defined by the user are taken into account if the saving level is high enough. In the case that kAll is the defined saving mode the entire list of physical volumes is considered
 	std::string BuildPysVolDict();
 	
+	//The same as before but only for the volumes that are sensitive volumes
+	std::string BuildSDvolDict();
+	
 	
 private:
+	
+	//Structure to hold data of primary particles at their first step (momentum energy polarization)
+	typedef struct priminfo{
+		G4double en;
+		G4ParticleMomentum momVec;
+		G4ThreeVector polVec;
+	}priminfo;
+	
+	
+	G4int fRanSeed;
 	
 	PrimaryGeneratorActionOptPh *fPrimaryGeneratorAction;
 	AnalysisOptPhMessenger *fMessenger;
 	EventDataOptPh *fEventData;
 	
 	G4Navigator* fNav;
-	
+	//G4TouchableHandle fTouchableHandle;
 	
 	TFile *fTreeFile;
 	TTree *fTree;
@@ -120,20 +145,38 @@ private:
 	
 	Long64_t fNbTotHits;
 	
-	std::set<G4String> fOptPhSenDetVolNames;
+	
+	std::map<G4VPhysicalVolume*, int> fPhysVolMap; //Map of all the existing physics volumes
+	std::map<int, G4String> fPhysVolNamesMap; //Map of all the existing physics volumes: link their number to their name
+	std::map<G4VPhysicalVolume*, int> fPhysVolUniqueMap; //This is to save in the TTree a unique index corresponding to a phys vol name
+	std::map<int, G4String> fPhysVolUniqueNamesMap; //This is to make the correspondence of the volume index saved in the TTree to the name of phys volume in the json dictionary
+	
+	std::map<G4VPhysicalVolume*, int> fPhysVolCpnmMap; //Map of all the existing physics volumes by copy number
+	std::map<G4VPhysicalVolume*, int> fOptPhSenDetVolPtrsMap; //Index of each physical volume
+	
 	std::set<G4VPhysicalVolume*> fOptPhSenDetVolPtrs;
 	
-	std::map<G4VPhysicalVolume*, int> fOptPhSenDetVolPtrsMap; //ID of each physical volume
-	std::map<int, G4String> fOptPhPhysVolsMap;
 	
+	
+	std::map<int, G4String> fOptPhPhysVolsMap;
 	
 	std::map<int, G4String> fOptPhProcessesMap;
 	
-	std::set<int> fTrackIDs; //Storage of the tracks IDs seen during an event
+	
+	
+	std::set<int> fTrackIDs; //Storage of the tracks IDs seen during an event when they are saved
 	std::map<int, int> fTrackParentIDsMap; //Here for each track ID (first entry, key) there is the ID of the parent track
 	std::map<int, int> fTrackGenerationMap; //Here for each track ID (first entry, key) there is the track generation level
 	std::map<int, int> fFirstParentIDMap; //Here for each track ID (first entry, key) there is the track ID of the first parent (0 in case it is a primary track)
 	std::map<int, int> fTrackCreatProc; //Here for each track ID (first entry, key) there is the process ID of the creation process (0 in casse of primary track)
+	
+	
+	//Stuff used to reduce the number of calls at stepping level
+	int fLastTrackId; //Track ID of the last step
+	G4VPhysicalVolume* fLastPhysVol; //Pointer of the physical volume seen at the last step.
+	int fLastVolIdx;
+	int fLastCopyNum;
+	int fLastVolId;
 };
 
 #endif

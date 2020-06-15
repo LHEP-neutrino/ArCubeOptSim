@@ -418,7 +418,7 @@ void DetConstrOptPh::PrintVolumeInfo(const G4String& VolName)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void DetConstrOptPh::PrintListOfPhysVols()
+void DetConstrOptPh::PrintListOfPhysVols() const
 {
 	if(!fWorld) return;
 	
@@ -458,7 +458,7 @@ void DetConstrOptPh::PrintListOfPhysVols()
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void DetConstrOptPh::PrintListOfLogVols()
+void DetConstrOptPh::PrintListOfLogVols() const
 {
 	if(!fWorld) return;
 	
@@ -529,11 +529,11 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 	G4int nDVols = mvol->GetLogicalVolume()->GetNoDaughters();
 	
 	if(fVerbose>=DetConstrOptPh::kDetails){
-		G4cout << "Detail --> Scanning dauters of volume <" << mvol->GetName() << ">:" << G4endl;
+		std::cout << "Detail --> Scanning dauters of volume <" << mvol->GetName() << ">:" << std::endl;
 		
 		std::map<std::string, G4int> vols_map;
 		
-		for(G4int iVol=0; iVol<nDVols; iVol++){
+		for(int iVol=0; iVol<nDVols; iVol++){
 			G4VPhysicalVolume* dVol = mvol->GetLogicalVolume()->GetDaughter(iVol);
 			
 			if(dVol){
@@ -547,13 +547,13 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 		}
 	
 		if(vols_map.size()==0){
-			G4cout << "  No daughter volumes.\n" << G4endl;
+			std::cout << "  No daughter volumes.\n" << std::endl;
 		}else{
 			std::map<std::string, int>::iterator it1;
 			for(it1=vols_map.begin(); it1!=vols_map.end(); ++it1){
-				G4cout << "  Volume <" << it1->first << ">, copies: " << it1->second << G4endl;
+				std::cout << "  Volume <" << it1->first << ">, copies: " << it1->second << std::endl;
 			}
-			G4cout << G4endl;
+			std::cout << std::endl;
 		}
 	}
 	
@@ -563,7 +563,7 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 	}
 	
 	if(isRootVol){
-		//Only in this case I copy all the found 
+		//Only in this case I copy all the founds 
 		std::map<G4String, std::set<G4VPhysicalVolume*> >::iterator mpIt;
 		for(mpIt=volsmap->begin(); mpIt!=volsmap->end(); ++mpIt){
 			fPVolsMap[mpIt->first] = std::vector<G4VPhysicalVolume*>( (mpIt->second).begin(), (mpIt->second).end() );

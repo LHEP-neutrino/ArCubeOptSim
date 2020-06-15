@@ -38,6 +38,7 @@ private:
 
 	G4UIdirectory *fAnalysisDir;
 	
+	G4UIcmdWithAnInteger *fRandSeedCmd;
 	G4UIcmdWithAnInteger *fVerboseCmd;
 	G4UIcmdWithAnInteger *fPrintModuloCmd;
 	G4UIcmdWithABool *fStepDebugCmd;

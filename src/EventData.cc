@@ -6,7 +6,7 @@ EventDataOptPh::EventDataOptPh()
 	fEventId = -1;
 	//fPrimaryVolume = new vector<int>;
 	
-	fPrimEn = new vector<double>;
+	fPrimEn = new vector<Double_t>;
 	
 	fPrimaryVolumeIndex=-1;
 	fPrimaryVolumeCopyNum=-1;
@@ -22,14 +22,16 @@ EventDataOptPh::EventDataOptPh()
 	
 	fNbTotHits = -1;
 	
-	fVolIndex = new vector<Long64_t>;
-	fHitVolId = new vector<Long64_t>;
+	fVolIndex = new vector<Int_t>;
+	fHitVolCopyNum = new vector<Int_t>;
+	fHitVolId = new vector<Int_t>;
 	fTime = new vector<Double_t>;
 	
-	fTrackId = new vector<Long64_t>;
-	fPartGener = new vector<Long64_t>;
+	fTrackId = new vector<Int_t>;
+	fPrimary_Id = new vector<Int_t>;
+	fPartGener = new vector<Int_t>;
 	
-	fParentId = new vector<Long64_t>;
+	fParentId = new vector<Int_t>;
 	
 	fXpos = new vector<Double_t>;
 	fYpos = new vector<Double_t>;
@@ -44,7 +46,7 @@ EventDataOptPh::EventDataOptPh()
 	fZpol = new vector<Double_t>;
 	
 	fCreatProc = new vector<Int_t>;
-	fFirstParentId = new vector<Long64_t>;
+	fFirstParentId = new vector<Int_t>;
 	fDepProc = new vector<Int_t>;
 }
 
@@ -64,10 +66,13 @@ EventDataOptPh::~EventDataOptPh()
 	delete fPrimary_Zpol;
 	
 	delete fVolIndex;
+	delete fHitVolCopyNum;
 	delete fHitVolId;
 	delete fTime;
 	
 	delete fTrackId;
+	delete fPrimary_Id;
+	
 	delete fPartGener;
 	
 	delete fParentId;
@@ -90,26 +95,29 @@ EventDataOptPh::~EventDataOptPh()
 }
 
 
-void EventDataOptPh::Reset(int primNum)
+void EventDataOptPh::Reset()
 {
 	fEventId = -1;
 	
-	fPrimEn->assign(primNum,0);
+	fPrimEn->resize(0);
 	
 	fPrimaryVolumeIndex=-1;
 	fPrimaryVolumeCopyNum=-1;
 	
-	fPrimary_Xmom->assign(primNum,0);
-	fPrimary_Ymom->assign(primNum,0);
-	fPrimary_Zmom->assign(primNum,0);
+	fPrimary_Xmom->resize(0);
+	fPrimary_Ymom->resize(0);
+	fPrimary_Zmom->resize(0);
 	
-	fPrimary_Xpol->assign(primNum,0);
-	fPrimary_Ypol->assign(primNum,0);
-	fPrimary_Zpol->assign(primNum,0);
+	fPrimary_Xpol->resize(0);
+	fPrimary_Ypol->resize(0);
+	fPrimary_Zpol->resize(0);
+	
+	fPrimary_Id->resize(0);
 	
 	fNbTotHits = 0;
 	
 	fVolIndex->resize(0);
+	fHitVolCopyNum->resize(0);
 	fHitVolId->resize(0);
 	fTime->resize(0);
 	

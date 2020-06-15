@@ -71,8 +71,8 @@ public:
 	void PrintVolumeCoordinates(const G4String& VolName);
 	void PrintVolumeInfo(const G4String& VolName);
 	
-	void PrintListOfPhysVols();
-	void PrintListOfLogVols();
+	void PrintListOfPhysVols() const;
+	void PrintListOfLogVols() const;
 	
 protected:
 	//These methods are only used at the startup as default (and to debug)

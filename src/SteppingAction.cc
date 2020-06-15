@@ -28,7 +28,7 @@ void SteppingActionOptPh::UserSteppingAction(const G4Step* theStep)
 {
 	if(!theStep) return;
 	if(fAnalysisManager){
-		fAnalysisManager->Step(theStep);
+		fAnalysisManager->Step(theStep, fpSteppingManager);
 	}
 }
 

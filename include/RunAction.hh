@@ -17,12 +17,10 @@ public:
 	void BeginOfRunAction(const G4Run *pRun);
 	void EndOfRunAction(const G4Run *pRun);
 	
-	void SetRanSeed(G4int hRanSeed) { fRanSeed = hRanSeed; }
+	
 
 private:
 	AnalysisManagerOptPh *fAnalysisManager;
-	
-	G4int fRanSeed;
 };
 
 #endif

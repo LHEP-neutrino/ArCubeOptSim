@@ -65,6 +65,12 @@ AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager)
 	fAutoSaveCmd->SetGuidance("Autosave settings of the data TTree (see ROOT reference guide for more).");
 	fAutoSaveCmd->SetParameterName("AutoSave", false, false);
 	fAutoSaveCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+	
+	fRandSeedCmd = new G4UIcmdWithAnInteger("/argoncube/analysis/SetRandSeed",this);
+	fRandSeedCmd->SetGuidance("Manual set of the random seed. 0 is from machine time (default).");
+	fRandSeedCmd->SetParameterName("RandSeed", true);
+	fRandSeedCmd->SetDefaultValue(0);
+	fRandSeedCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 
@@ -80,6 +86,7 @@ AnalysisOptPhMessenger::~AnalysisOptPhMessenger()
 	delete fAnalysisDir;
 	delete fAutoSaveCmd;
 	delete fAutoFlushCmd;
+	delete fRandSeedCmd;
 }
 
 
@@ -87,31 +94,31 @@ void AnalysisOptPhMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewV
 {
 	
 	if(pUIcommand == fVerboseCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fVerboseCmd" << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fVerboseCmd" << std::endl;
 		fAnManager->SetVerbosity(fVerboseCmd->GetNewIntValue(hNewValue));
 		return;
 	}
 	
 	if(pUIcommand == fPrintModuloCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fPrintModuloCmd" << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fPrintModuloCmd" << std::endl;
 		fAnManager->SetPrintModulo(fPrintModuloCmd->GetNewIntValue(hNewValue));
 		return;
 	}
 	
 	if(pUIcommand == fStepDebugCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fVerboseCmd. Setting the analysis manager steps debug flag to: " << G4UIcommand::ConvertToString(fStepDebugCmd->GetNewBoolValue(hNewValue)) << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fVerboseCmd. Setting the analysis manager steps debug flag to: " << G4UIcommand::ConvertToString(fStepDebugCmd->GetNewBoolValue(hNewValue)) << std::endl;
 		fAnManager->SetStepsDebug(fStepDebugCmd->GetNewBoolValue(hNewValue));
 		return;
 	}
 	
 	if(pUIcommand == fSaveDataCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fSaveDataCmd. Setting the analysis manager saving flag to: " << fSaveDataCmd->ConvertToString(fSaveDataCmd->GetNewIntValue(hNewValue)) << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fSaveDataCmd. Setting the analysis manager saving flag to: " << fSaveDataCmd->ConvertToString(fSaveDataCmd->GetNewIntValue(hNewValue)) << std::endl;
 		fAnManager->SetSaveData((AnalysisManagerOptPh::datasave)fSaveDataCmd->GetNewIntValue(hNewValue));
 		return;
 	}
 	
 	if(pUIcommand == fFileNameCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fFileNameCmd. Setting the tree file name to: " << hNewValue << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fFileNameCmd. Setting the tree file name to: " << hNewValue << std::endl;
 		if(fAnManager->GetSaveStatus()>AnalysisManagerOptPh::kOff){
 			fAnManager->SetDataFilename(hNewValue);
 		}
@@ -119,25 +126,31 @@ void AnalysisOptPhMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewV
 	}
 	
 	if(pUIcommand == fDefOptSDCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fDefOptSDCmd. Setting the optical photons sensitive volumes file name to: " << hNewValue << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fDefOptSDCmd. Setting the optical photons sensitive volumes file name to: " << hNewValue << std::endl;
 		fAnManager->DefineOptPhSensDet(hNewValue);
 		return;
 	}
 	
 	if(pUIcommand == fAutoFlushCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fAutoFlushCmd. Setting the data TTree autoflush to " << hNewValue << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fAutoFlushCmd. Setting the data TTree autoflush to " << hNewValue << std::endl;
 		fAnManager->SetAutoFlush( std::stoll(hNewValue) );
 		return;
 	}
 	
 	if(pUIcommand == fAutoSaveCmd){
-		G4cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fAutoSaveCmd. Setting the data TTree autosave to " << hNewValue << G4endl;
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fAutoSaveCmd. Setting the data TTree autosave to " << hNewValue << std::endl;
 		fAnManager->SetAutoSave( std::stoll(hNewValue) );
 		return;
 	}
 	
+	if(pUIcommand == fRandSeedCmd){
+		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fRandSeedCmd. Setting the random seed to " << hNewValue << std::endl;
+		fAnManager->SetRanSeed( std::stoi(hNewValue) );
+		return;
+	}
 	
-	G4cerr << "ERROR ---> AnalysisOptPhMessenger::SetNewValue(...): not recognized command!" << G4endl;
+	
+	std::cout << "\nERROR ---> AnalysisOptPhMessenger::SetNewValue(...): not recognized command!" << std::endl;
 
 }
 
