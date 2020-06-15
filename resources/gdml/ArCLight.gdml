@@ -551,7 +551,7 @@
       <composite n="1" ref="gold"/>
     </material>
     <material formula="" name="Silicon">
-      <D value="19.32"/>
+      <D value="2.33"/>
       <composite n="1" ref="silicon"/>
     </material>
     <material formula="" name="EJ280WLS">
@@ -593,7 +593,7 @@
       <solidref ref="SiPM_Sens_shape"/>
     </volume>
     <volume name="volMirror">
-      <materialref ref="ESR"/>
+      <materialref ref="LAr"/>
       <solidref ref="Mirror_shape"/>
       <physvol copynumber="0">
         <volumeref ref="volWLS"/>
@@ -702,7 +702,7 @@
       </physvol>
     </volume>
     <volume name="volDetEnclosure">
-      <materialref ref="LAr"/>
+      <materialref ref="Air"/>
       <solidref ref="DetEnclosure"/>
       <physvol copynumber="0">
         <volumeref ref="volArCLight"/>
