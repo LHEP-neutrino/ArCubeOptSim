@@ -20,7 +20,7 @@
 /argoncube/gun/halfy 155 mm
 /argoncube/gun/halfz 1 mm
 /argoncube/gun/confine volTPB_PV
-/argoncube/gun/primaryNb 1000
+/argoncube/gun/primaryNb 10000
 
 #/argoncube/gun/particle opticalphoton
 #/argoncube/gun/angtype direction

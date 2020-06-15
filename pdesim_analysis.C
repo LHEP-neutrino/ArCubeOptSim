@@ -32,11 +32,11 @@ void pdesim_analysis() {
    Double_t prim_Ypos;
    Double_t prim_Zpos;
    Int_t totsteps;
-   vector<Long64_t> *trackid;
-   vector<Long64_t> *firstparentid;
+   vector<Long64_t> *trackid=0;
+   vector<Long64_t> *firstparentid=0;
    vector<Int_t> evhits (neve,0);
      
-  tr->SetBranchAddress("eventid",&eventid); //ev number
+  tr->SetBranchAddress("EvId",&eventid); //ev number
   tr->SetBranchAddress("prim_Xpos",&prim_Xpos);
   tr->SetBranchAddress("prim_Ypos",&prim_Ypos);
   tr->SetBranchAddress("prim_Zpos",&prim_Zpos);
@@ -44,12 +44,15 @@ void pdesim_analysis() {
   tr->SetBranchAddress("trackid",&trackid);
   tr->SetBranchAddress("firstparentid",&firstparentid);
   
-   for (Long64_t i=0;i<10; i++) {
+   for (Long64_t i=900;i<901; i++) {
       tr->GetEntry(i);
-      Long64_t evlen = trackid->size();
-	  for (Long64_t j=0;j<evlen; j++) {
-		  std::cout << "trackid: " << (*trackid)[j] << " firstparentid: " << (*firstparentid)[j] << std::endl;
+      Long64_t evlen = firstparentid->size();
+      std::cout << " firstparentid: ";
+	 if(evlen!=0){
+		 for (Long64_t j=0;j<evlen; j++) {
+			 std::cout << (*firstparentid)[j] << " ";
 	  }
+	 }
    }
 }
 
