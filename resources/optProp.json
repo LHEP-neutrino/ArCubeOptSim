@@ -3,11 +3,62 @@
     {
       "name": "setmatprop",
       "obj": {
+        "matname": "EJ280WLS",
+        "propfile": {
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_EJ280WLS.dat",
+          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_EJ280WLS.dat"
+        },
+        "constprop": {
+          "WLSTIMECONSTANT": 8.5
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
+        "matname": "G10",
+        "propfile": {
+          "RINDEX": "resources/datafiles/RINDEX_G10.dat"
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
+        "matname": "Gold",
+        "propfile": {
+          "RINDEX": "resources/datafiles/RINDEX_Gold.dat"
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
+        "matname": "Kapton",
+        "propfile": {
+          "RINDEX": "resources/datafiles/RINDEX_Kapton.dat"
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
         "matname": "LAr",
         "propfile": {
-          "RINDEX": "resources/datafiles/RINDEX_LAr.dat",
           "ABSLENGTH": "resources/datafiles/ABSLENGTH_LAr.dat",
-          "RAYLEIGH": "resources/datafiles/RAYLEIGH_LAr.dat"
+          "RAYLEIGH": "resources/datafiles/RAYLEIGH_LAr.dat",
+          "RINDEX": "resources/datafiles/RINDEX_LAr.dat"
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
+        "matname": "Silicon",
+        "propfile": {
+          "RINDEX": "resources/datafiles/RINDEX_Silicon.dat"
         }
       }
     },
@@ -16,31 +67,68 @@
       "obj": {
         "matname": "TPB",
         "propfile": {
-          "RINDEX": "resources/datafiles/RINDEX_TPB.dat",
           "ABSLENGTH": "resources/datafiles/ABSLENGTH_TPB.dat",
+          "RINDEX": "resources/datafiles/RINDEX_TPB.dat",
           "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_TPB.dat",
           "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_TPB.dat"
         },
-		"constprop": {
-			"WLSTIMECONSTANT": 5.0
-		}
-      }
-    },
-    {
-      "name": "setmatprop",
-      "obj": {
-        "matname": "EJ280WLS",
-        "propfile": {
-          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat"
+        "constprop": {
+          "WLSTIMECONSTANT": 5.0
         }
       }
     },
     {
-      "name": "setmatprop",
+      "name": "buildoptsurf",
       "obj": {
-        "matname": "ESR",
+        "surfname": "LAr2G10_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
         "propfile": {
-          "RINDEX": "resources/datafiles/RINDEX_ESR.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2G10.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2G10.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2Kapton_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Kapton.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Kapton.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2FR4_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2FR4.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2FR4.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2Gold_optsurf",
+        "model": "unified",
+        "type": "dielectric_metal",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Gold.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Gold.dat"
         }
       }
     },
@@ -50,8 +138,18 @@
         "surfname": "LAr2TPB_optsurf",
         "model": "unified",
         "type": "dielectric_dielectric",
-        "finish": "rough",
-        "sigma_alpha": 0.1
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2TPB.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2ESR_optsurf"
       }
     },
     {
@@ -70,8 +168,15 @@
         "surfname": "TPB2EJ280_optsurf",
         "model": "unified",
         "type": "dielectric_dielectric",
-        "finish": "polished",
-        "sigma_alpha": 0.1
+        "finish": "polished"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802LAr_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric"
       }
     },
     {
@@ -79,7 +184,7 @@
       "obj": {
         "surfname": "EJ2802TPB_optsurf",
         "model": "unified",
-        "type": "dielectric_metal",
+        "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
           "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802TPB.dat"
@@ -89,21 +194,9 @@
     {
       "name": "buildoptsurf",
       "obj": {
-        "surfname": "EJ2802LAr_optsurf",
-        "model": "unified",
-        "type": "dielectric_metal",
-        "finish": "polished",
-        "propfile": {
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802LAr.dat"
-        }
-      }
-    },
-    {
-      "name": "buildoptsurf",
-      "obj": {
         "surfname": "EJ2802ESR_optsurf",
         "model": "unified",
-        "type": "dielectric_metal",
+        "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
           "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat"
@@ -118,7 +211,41 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
+          "EFFICIENCY": "resources/datafiles/EFFICIENCY_EJ2802SiPM.dat",
           "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802SiPM.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "WLS2LAr_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "WLS2TPB_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2TPB.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "WLS2SiPM_optsurf",
+        "model": "unified",
+        "type": "dielectric_metal",
+        "finish": "polished",
+        "propfile": {
+          "EFFICIENCY": "resources/datafiles/EFFICIENCY_WLS2SiPM.dat",
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2SiPM.dat"
         }
       }
     },
@@ -174,6 +301,33 @@
         "vol1": "volWLS_PV",
         "vol2": "volSiPM_Sens_PV",
         "optsurf": "EJ2802SiPM_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "LCM2TPB_logsurf",
+        "vol1": "volLCM_PV",
+        "vol2": "volTPB_Fiber_PV",
+        "optsurf": "LAr2TPB_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "TPB2LCM_logsurf",
+        "vol1": "volTPB_Fiber_PV",
+        "vol2": "volLCM_PV",
+        "optsurf": "TPB2LAr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "Fiber2TPB_logsurf",
+        "vol1": "volFiber_PV",
+        "vol2": "volTPB_Fiber_PV",
+        "optsurf": "EJ2802TPB_optsurf"
       }
     },
     {
