@@ -971,15 +971,15 @@ void OptPropManager::buildoptsurf(const json keyval)
 		}
 	}
 	
-	if( keyval.contains("dichroicfile")){
+	if(keyval.contains("dichroicfile")){
 		
 		if(keyval.at("dichroicfile").is_string()){
 			
 			if(fVerbose>=OptPropManager::kDetails){
-				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting property  <dichroicfile> from file <" << keyval.value().get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
+				std::cout << "Detail --> OptPropManager::buildoptsurf(...): Setting property  <dichroicfile> from file <" << keyval.at("dichroicfile").get<std::string>() << "> for the optical surface <" << surfname << ">." << std::endl;
 			}
 			
-			setenv("G4DICHROICDATA",keyval.at("dichroicfile").get<std::string>(),1);
+			setenv("G4DICHROICDATA",keyval.at("dichroicfile").get<std::string>().c_str(),1);
 			optsurf->ReadDichroicFile();
 			unsetenv("G4DICHROICDATA");
 		}else{
