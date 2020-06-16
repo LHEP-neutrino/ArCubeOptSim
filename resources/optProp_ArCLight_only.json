@@ -187,11 +187,8 @@
       "obj": {
         "surfname": "EJ2802TPB_optsurf",
         "model": "unified",
-        "type": "dielectric_dielectric",
-        "finish": "polished",
-        "propfile": {
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802TPB.dat"
-        }
+        "type": "dielectric_dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
     },
     {
