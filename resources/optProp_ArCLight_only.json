@@ -167,12 +167,9 @@
       "obj": {
         "surfname": "TPB2EJ280_optsurf",
         "model": "unified",
-        "type": "dielectric_dielectric",
+        "type": "dielectric_dichroic",
         "finish": "polished",
-	"propfile": {
-	   "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_TPB2EJ280.dat",
-	   "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_TPB2EJ280.dat"
-      }
+	"dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
     },
     {
       "name": "buildoptsurf",
@@ -294,8 +291,8 @@
       "name": "buildlogbordersurf",
       "obj": {
         "surfname": "TPB2EJ280_logsurf",
-	"vol1": "volWLS_PV",
-	"vol2": "volTPB_PV",
+	"vol1": "volTPB_PV",
+	"vol2": "volWLS_PV",
 	"optsurf": "TPB2EJ280_optsurf"
       }
     }
