@@ -169,7 +169,8 @@
         "model": "unified",
         "type": "dielectric_dichroic",
         "finish": "polished",
-	"dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+	    "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+	  }
     },
     {
       "name": "buildoptsurf",
@@ -291,9 +292,9 @@
       "name": "buildlogbordersurf",
       "obj": {
         "surfname": "TPB2EJ280_logsurf",
-	"vol1": "volTPB_PV",
-	"vol2": "volWLS_PV",
-	"optsurf": "TPB2EJ280_optsurf"
+		"vol1": "volTPB_PV",
+		"vol2": "volWLS_PV",
+		"optsurf": "TPB2EJ280_optsurf"
       }
     }
   ]
