@@ -29,4 +29,4 @@
 #/argoncube/gun/position 0 81.4 0 mm
 #/argoncube/gun/primaryNb 1
 
-/run/beamOn 1
+#/run/beamOn 1
