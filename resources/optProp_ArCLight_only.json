@@ -168,7 +168,6 @@
         "surfname": "TPB2EJ280_optsurf",
         "model": "unified",
         "type": "dielectric_dichroic",
-        "finish": "polished",
 	    "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
 	  }
     },
