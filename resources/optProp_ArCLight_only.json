@@ -166,7 +166,7 @@
       "name": "buildoptsurf",
       "obj": {
         "surfname": "TPB2EJ280_optsurf",
-        "model": "unified",
+        "model": "dichroic",
         "type": "dielectric_dichroic",
 	    "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
 	  }
@@ -183,7 +183,7 @@
       "name": "buildoptsurf",
       "obj": {
         "surfname": "EJ2802TPB_optsurf",
-        "model": "unified",
+        "model": "dichroic",
         "type": "dielectric_dichroic",
         "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
