@@ -18,6 +18,15 @@
     {
       "name": "setmatprop",
       "obj": {
+        "matname": "ESR",
+        "propfile": {
+          "RINDEX": "resources/datafiles/RINDEX_ESR.dat"
+        }
+      }
+    },
+    {
+      "name": "setmatprop",
+      "obj": {
         "matname": "G10",
         "propfile": {
           "RINDEX": "resources/datafiles/RINDEX_G10.dat"
@@ -149,16 +158,10 @@
     {
       "name": "buildoptsurf",
       "obj": {
-        "surfname": "LAr2ESR_optsurf"
-      }
-    },
-    {
-      "name": "buildoptsurf",
-      "obj": {
         "surfname": "TPB2LAr_optsurf",
         "model": "unified",
         "type": "dielectric_dielectric",
-        "finish": "rough",
+        "finish": "ground",
         "sigma_alpha": 0.1
       }
     },
@@ -167,15 +170,25 @@
       "obj": {
         "surfname": "TPB2EJ280_optsurf",
         "model": "dichroic",
-	"dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
-	  }
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "TPB2EJ280_old_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished"
+      }
     },
     {
       "name": "buildoptsurf",
       "obj": {
         "surfname": "EJ2802LAr_optsurf",
         "model": "unified",
-        "type": "dielectric_dielectric"
+        "type": "dielectric_dielectric",
+        "finish": "polished"
       }
     },
     {
@@ -189,12 +202,26 @@
     {
       "name": "buildoptsurf",
       "obj": {
+        "surfname": "EJ2802TPB_old_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802TPB.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
         "surfname": "EJ2802ESR_optsurf",
         "model": "unified",
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
         }
       }
     },
@@ -203,41 +230,8 @@
       "obj": {
         "surfname": "EJ2802SiPM_optsurf",
         "model": "unified",
-        "type": "dielectric_metal",
-        "finish": "polished"
-      }
-    },
-    {
-      "name": "buildoptsurf",
-      "obj": {
-        "surfname": "WLS2LAr_optsurf",
-        "model": "unified",
-        "type": "dielectric_dielectric"
-      }
-    },
-    {
-      "name": "buildoptsurf",
-      "obj": {
-        "surfname": "WLS2TPB_optsurf",
-        "model": "unified",
         "type": "dielectric_dielectric",
-        "finish": "polished",
-        "propfile": {
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2TPB.dat"
-        }
-      }
-    },
-    {
-      "name": "buildoptsurf",
-      "obj": {
-        "surfname": "WLS2SiPM_optsurf",
-        "model": "unified",
-        "type": "dielectric_metal",
-        "finish": "polished",
-        "propfile": {
-          "EFFICIENCY": "resources/datafiles/EFFICIENCY_WLS2SiPM.dat",
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2SiPM.dat"
-        }
+        "finish": "polished"
       }
     },
     {
@@ -270,6 +264,15 @@
     {
       "name": "buildlogbordersurf",
       "obj": {
+        "surfname": "EJ2802LAr_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volTPB_LAr_PV",
+        "optsurf": "EJ2802LAr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
         "surfname": "EJ2802ESR_logsurf",
         "vol1": "volWLS_PV",
         "vol2": "volMirror_PV",
@@ -283,15 +286,6 @@
         "vol1": "volWLS_PV",
         "vol2": "volSiPM_Sens_PV",
         "optsurf": "EJ2802SiPM_optsurf"
-      }
-    },
-    {
-      "name": "buildlogbordersurf",
-      "obj": {
-        "surfname": "TPB2EJ280_logsurf",
-		"vol1": "volTPB_PV",
-		"vol2": "volWLS_PV",
-		"optsurf": "TPB2EJ280_optsurf"
       }
     }
   ]
