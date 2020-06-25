@@ -124,4 +124,3 @@ target_link_libraries(ArgonCubeOptPh-GeomInfo ${Geant4_LIBRARIES} ${ROOT_LIBRARI
 #
 #install(TARGETS ArgonCubeOptPh ArgonCubeOptPh-PVlist DESTINATION bin)
 #install(FILES ${_SCRIPTS} DESTINATION bin)
-
