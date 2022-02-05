@@ -8,11 +8,10 @@
 #include <iomanip>
 
 
-AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager)
+AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager):
+fAnManager(pAnManager)
 { 
 	std::stringstream txt; txt.str("");
-	
-	fAnManager = pAnManager;
 	
 	fAnalysisDir = new G4UIdirectory("/argoncube/analysis/");
 	fAnalysisDir->SetGuidance("ArgonCube analysis manager settings.");
@@ -20,10 +19,11 @@ AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager)
 	
 	fVerboseCmd = new G4UIcmdWithAnInteger("/argoncube/analysis/verbose",this);
 	fVerboseCmd->SetGuidance("Set verbosity of the analysis manager");
-	fVerboseCmd->SetGuidance(" Default 1");
+	txt.str(""); txt << " Default " << static_cast<G4int>(AnalysisVerbosity::kInfo) << ".";
+	fVerboseCmd->SetGuidance(txt.str().c_str());
 	fVerboseCmd->SetParameterName("Verb", false);
-	fVerboseCmd->SetDefaultValue(1);
-	txt << "Verb>=0 && Verb<=" << AnalysisManagerOptPh::kDebug;
+	fVerboseCmd->SetDefaultValue(static_cast<G4int>(AnalysisVerbosity::kInfo));
+	txt.str(""); txt << "Verb>=" << static_cast<G4int>(AnalysisVerbosity::kSilent) << " && Verb<=" << static_cast<G4int>(AnalysisVerbosity::kDebug);
 	fVerboseCmd->SetRange( txt.str().c_str() );
 	fVerboseCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 	
@@ -33,24 +33,40 @@ AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager)
 	fPrintModuloCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
 	fStepDebugCmd = new G4UIcmdWithABool("/argoncube/analysis/stepsDebug", this);
-	fStepDebugCmd->SetGuidance("Activates debugging controls and messages at step level.");
+	fStepDebugCmd->SetGuidance("Activates debugging controls and messages at step level for optical photons arriving to or coming from a volumes boundary (super heavy and super slow).");
 	fStepDebugCmd->SetParameterName("DebugSteps", false);
 	fStepDebugCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 	
 	fSaveDataCmd = new G4UIcmdWithAnInteger("/argoncube/analysis/SaveData", this);
-	fSaveDataCmd->SetGuidance("Control for data tree saving: 0 to not save; 1 standard analysis variables (default); 2 extended tracking info for debugging (slow and heavy)");
-	fSaveDataCmd->SetParameterName("Save", false);
+	fSaveDataCmd->SetGuidance("Usage: /argoncube/analysis/SaveData SaveLev");
+	fSaveDataCmd->SetGuidance("Control for data tree saving:");
+	txt.str(""); txt << (int)DatasaveLevel::kOff << " to not save;";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	txt.str(""); txt << (int)DatasaveLevel::kHits << " save hit variables in defined sensitive volumes (default);";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	txt.str(""); txt << (int)DatasaveLevel::kHitsExt << " save extended hit variables in defined sensitive volumes (default);";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	txt.str(""); txt << (int)DatasaveLevel::kSdSteps << " save stepping variables in defined sensitive volumes (heavy);";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	txt.str(""); txt << (int)DatasaveLevel::kAll << " save stepping variables in every volume (very heavy);";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	fSaveDataCmd->SetParameterName("SaveLev", false);
+	txt.str(""); txt << "SaveLev>=" << static_cast<G4int>(DatasaveLevel::kOff) << " && SaveLev<=" << static_cast<G4int>(DatasaveLevel::kAll);
+	fSaveDataCmd->SetRange( txt.str().c_str() );
+	fSaveDataCmd->SetDefaultValue(static_cast<G4int>(DatasaveLevel::kHits));
 	fSaveDataCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 	
 	fFileNameCmd = new G4UIcmdWithAString("/argoncube/analysis/FileName",this);
-	fFileNameCmd->SetGuidance("Set the file name where data tree will be saved.");
+	fFileNameCmd->SetGuidance("Usage: /argoncube/analysis/FileName [/path/]<filename.root>");
+	fFileNameCmd->SetGuidance("Set the file name where data tree will be saved. The path can be a relative path.");
 	fFileNameCmd->SetParameterName("filename", false);
 	fFileNameCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 	
 	// Define optical sensitive volumes
 	fDefOptSDCmd = new G4UIcmdWithAString("/argoncube/analysis/DefOptSD", this);
 	fDefOptSDCmd->SetGuidance("Defines a list of physical volume as sensitive (NULL to unset).");
-	fDefOptSDCmd->SetGuidance("DefOptSD: sensdet VolName1 VolName2 ...");
+	fDefOptSDCmd->SetGuidance("Note that in hit mode the optical photon is killed also at its first step in the volume.");
+	fDefOptSDCmd->SetGuidance("Usage: /argoncube/analysis/DefOptSD VolName1 VolName2 ...");
 	fDefOptSDCmd->SetParameterName("VolName", true, true);
 	fDefOptSDCmd->SetDefaultValue("NULL");
 	fDefOptSDCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
@@ -75,7 +91,7 @@ AnalysisOptPhMessenger::AnalysisOptPhMessenger(AnalysisManagerOptPh *pAnManager)
 	fAutoSaveCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 	
 	fRandSeedCmd = new G4UIcmdWithAnInteger("/argoncube/analysis/SetRandSeed",this);
-	fRandSeedCmd->SetGuidance("Manual set of the random seed. 0 is from machine time (default).");
+	fRandSeedCmd->SetGuidance("Manual set of the random seed. 0 is taken from machine time (default).");
 	fRandSeedCmd->SetParameterName("RandSeed", true);
 	fRandSeedCmd->SetDefaultValue(0);
 	fRandSeedCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
@@ -104,7 +120,7 @@ void AnalysisOptPhMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewV
 	
 	if(pUIcommand == fVerboseCmd){
 		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fVerboseCmd" << std::endl;
-		fAnManager->SetVerbosity(fVerboseCmd->GetNewIntValue(hNewValue));
+		fAnManager->SetVerbosity(static_cast<AnalysisVerbosity>(fVerboseCmd->GetNewIntValue(hNewValue)));
 		return;
 	}
 	
@@ -122,13 +138,13 @@ void AnalysisOptPhMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewV
 	
 	if(pUIcommand == fSaveDataCmd){
 		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fSaveDataCmd. Setting the analysis manager saving flag to: " << fSaveDataCmd->ConvertToString(fSaveDataCmd->GetNewIntValue(hNewValue)) << std::endl;
-		fAnManager->SetSaveData((AnalysisManagerOptPh::datasave)fSaveDataCmd->GetNewIntValue(hNewValue));
+		fAnManager->SetSaveData(static_cast<DatasaveLevel>(fSaveDataCmd->GetNewIntValue(hNewValue)));
 		return;
 	}
 	
 	if(pUIcommand == fFileNameCmd){
 		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fFileNameCmd. Setting the tree file name to: " << hNewValue << std::endl;
-		if(fAnManager->GetSaveStatus()>AnalysisManagerOptPh::kOff){
+		if(fAnManager->GetSaveStatus()>DatasaveLevel::kOff){
 			fAnManager->SetDataFilename(hNewValue);
 		}
 		return;
@@ -162,7 +178,7 @@ void AnalysisOptPhMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewV
 	
 	if(pUIcommand == fRandSeedCmd){
 		std::cout << "Info --> AnalysisOptPhMessenger::SetNewValue(...): called command fRandSeedCmd. Setting the random seed to " << hNewValue << std::endl;
-		fAnManager->SetRanSeed( std::stoi(hNewValue) );
+		fAnManager->SetRunSeed( std::stoi(hNewValue) );
 		return;
 	}
 	

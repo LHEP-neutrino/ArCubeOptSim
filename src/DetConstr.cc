@@ -34,6 +34,7 @@
 #include "G4PVParameterised.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolumeStore.hh"
+#include "G4UserLimits.hh"
 
 #include "G4OpBoundaryProcess.hh"
 #include "G4LogicalBorderSurface.hh"
@@ -62,13 +63,11 @@ using std::ofstream;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // constructor
-DetConstrOptPh::DetConstrOptPh(G4String gdmlfilename)
+DetConstrOptPh::DetConstrOptPh(G4String gdmlfilename):
+fWorld(nullptr),
+fDetectorMessenger(nullptr),
+fVerbose(DetVerbosity::kSilent)
 {
-	fWorld = NULL;
-	fDetectorMessenger = NULL;
-	
-	fVerbose = DetConstrOptPh::kSilent;
-	
 	fGDMLParser = new G4GDMLParser;
 	
 	{
@@ -93,6 +92,8 @@ DetConstrOptPh::DetConstrOptPh(G4String gdmlfilename)
 	fOptSurfTab = G4SurfaceProperty::GetSurfacePropertyTable();
 	
 	fTpbThick = 0.001*mm; //Default value. Can be changed by a user command
+	
+	BuildGeometry();
 }
 
 
@@ -106,9 +107,12 @@ DetConstrOptPh::~DetConstrOptPh()
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-G4VPhysicalVolume *DetConstrOptPh::Construct()
+void DetConstrOptPh::BuildGeometry()
 {
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct(): Entering the function."<<G4endl;
+#ifndef NDEBUG
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildGeometry: Entering the function."<<G4endl;
+#endif
+	
 	if(fWorld){
 		if( G4PhysicalVolumeStore::GetInstance()->GetVolume("volTPB_LAr_PV") ){
 			BuildTPBlayer();
@@ -131,28 +135,28 @@ G4VPhysicalVolume *DetConstrOptPh::Construct()
 		
 	}
 	
-	if(fVerbose>=DetConstrOptPh::kInfo) G4cout << "Info --> DetConstrOptPh::Construct(): Finished construction "<<G4endl;
+	if(fVerbose>=DetVerbosity::kInfo) G4cout << "Info --> DetConstrOptPh::BuildGeometry(): Finished construction " << G4endl;
 	
+#ifndef NDEBUG
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct(): Exiting the function."<<G4endl;
+#endif
 	
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct(): Exiting the function."<<G4endl;
-	return fWorld;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void DetConstrOptPh::BuildTPBlayer()
 {
-	
-	if(fVerbose>=DetConstrOptPh::kDebug){
-		G4cout << "Debug --> DetConstrOptPh::BuildTPBlayer(): Entering the function." << G4endl;
-	}
+#ifndef NDEBUG	
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildTPBlayer(): Entering the function." << G4endl;
+#endif
 	
 	G4VPhysicalVolume* layerVol = G4PhysicalVolumeStore::GetInstance()->GetVolume("volTPB_LAr_PV");
 	
 	G4Box *layerGeom = dynamic_cast<G4Box*>( layerVol->GetLogicalVolume()->GetSolid() );
 	
 	if(!layerGeom){
-		G4cout << "\nERROR --> DetConstrOptPh::BuildTPBlayer(): Cannot find the LAr layer volume <volTPB_LAr_PV>, where the TPB layer will be placed. TPB layer for ArCLight will not be build!\n" << G4endl;
+		G4cerr << "\nERROR --> DetConstrOptPh::BuildTPBlayer(): Cannot find the LAr layer volume <volTPB_LAr_PV>, where the TPB layer will be placed. TPB layer for ArCLight will not be build!\n" << G4endl;
 		return;
 	}
 	
@@ -171,7 +175,7 @@ void DetConstrOptPh::BuildTPBlayer()
 	G4double layerDz_hl = layerGeom->GetZHalfLength();
 	
 	if(fTpbThick>2*layerDz_hl){
-		G4cout << "\nERROR --> DetConstrOptPh::BuildTPBlayer(): The TPB layer thickness (" << fTpbThick << ") is larger than that of the LAr layer volume <volTPB_LAr_PV> (" << 2*layerDz_hl << "), where the TPB layer will be placed. TPB layer for ArCLight will not be build!\n" << G4endl;
+		G4cerr << "\nERROR --> DetConstrOptPh::BuildTPBlayer: The TPB layer thickness (" << fTpbThick << ") is larger than that of the LAr layer volume <volTPB_LAr_PV> (" << 2*layerDz_hl << "), where the TPB layer will be placed. TPB layer for ArCLight will not be build!\n" << G4endl;
 		return;
 	}
 	
@@ -179,9 +183,9 @@ void DetConstrOptPh::BuildTPBlayer()
 	G4Material* tpbMat = FindMaterial("TPB");
 	if(!tpbMat){
 		tpbMat = FindMaterial("LAr");
-		G4cout << "WARNING --> DetConstrOptPh::BuildTPBlayer(): Building the TPB material as a copy of LAr material, with different name." << G4endl;
+		G4cerr << "\nWARNING --> DetConstrOptPh::BuildTPBlayer: Building the TPB material as a copy of LAr material, with different name." << G4endl;
 		if(!tpbMat){
-			G4cout << "\nERROR --> DetConstrOptPh::BuildTPBlayer(): LAr material not found!. TPB layer for ArCLight will not be build, but this might be a major problem for the whole simulation!\n" << G4endl;
+			G4cerr << "\nERROR --> DetConstrOptPh::BuildTPBlayer: LAr material not found!. TPB layer for ArCLight will not be build, but this might be a major problem for the whole simulation!\n" << G4endl;
 			return;
 		}
 		//Build the tpb as LAr copy, but change the name only. Only optical properties matter.
@@ -192,12 +196,12 @@ void DetConstrOptPh::BuildTPBlayer()
 	
 	G4LogicalVolume* tpbLog= new G4LogicalVolume(tpbGeom,tpbMat,"volTPB");
 	
-	new G4PVPlacement(NULL, G4ThreeVector(0.,0., -layerDz_hl+fTpbThick/2.), tpbLog, "volTPB_PV", layerVol->GetLogicalVolume(), false, 0);
+	new G4PVPlacement(nullptr, G4ThreeVector(0.,0., -layerDz_hl+fTpbThick/2.), tpbLog, "volTPB_PV", layerVol->GetLogicalVolume(), false, 0);
 	
 	
-	if(fVerbose>=DetConstrOptPh::kDebug){
-		G4cout << "Debug --> DetConstrOptPh::BuildTPBlayer(): TPB layer buit! Exiting the function." << G4endl;
-	}
+#ifndef NDEBUG	
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildTPBlayer(): TPB layer buit! Exiting the function." << G4endl;
+#endif
 }
 
 
@@ -237,7 +241,9 @@ void DetConstrOptPh::BuildDefaultOptSurf()
 /////////////////////////////////////////////////////////////////////////////////////////
 void DetConstrOptPh::BuildDefaultLogSurfaces()
 {
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultLogSurfaces(): Entering the function."<<G4endl;
+#ifndef NDEBUG
+	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultLogSurfaces: Entering the function."<<G4endl;
+#endif
 	//By default the EJ28 WLS does't have optical properties.
 	//They can be defined later
 	
@@ -294,7 +300,7 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 
 
 	// -----------------------------------------//
-	//  Interface between Fiber and LAr  //
+	//  Interface between Fiber and LAr         //
 	// -----------------------------------------//
 	
 	// LogSurface between Fibers and LAr (using same as EJ280 to ESR)
@@ -309,22 +315,42 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM4_logsurf","volFiber_PV","volSiPM_LCM_4_PV","EJ2802SiPM_optsurf");
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM5_logsurf","volFiber_PV","volSiPM_LCM_5_PV","EJ2802SiPM_optsurf");
 	
-	
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultOpticalSurfaces(): Exiting the function."<<G4endl;
+#ifndef NDEBUG	
+	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultOpticalSurfaces: Exiting the function."<<G4endl;
+#endif
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 void DetConstrOptPh::SetDefaultOptProperties()
 {
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties(): Entering the function."<<G4endl;
+#ifndef NDEBUG
+	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Entering the function."<<G4endl;
+#endif
 	
-  if(!fOptPropManager){
+	if(!fOptPropManager){
 		G4Exception("DetConstrOptPh::DefaultOptProperties()","Geom.002", FatalException,"\"OptPropManager\" pointer is null.");
 	}
+
+#ifndef NDEBUG	
+	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Exiting the function."<<G4endl;
+#endif	
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+void DetConstrOptPh::SetStepTrackLimit(const G4String& log_vol, const G4double step_lim)
+{
+	G4LogicalVolume *logVol = G4LogicalVolumeStore::GetInstance()->GetVolume(log_vol, false);
 	
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties(): Exiting the function."<<G4endl;
+	if(!logVol){
+		G4cerr << "\nERROR --> DetConstrOptPh::SetStepTrackLimit: could not find the logical volume <" << log_vol << ">." << G4endl;
+		return;
+	}
 	
+	if(logVol->GetUserLimits()) delete logVol->GetUserLimits(); //This is a bit dangerous but the operation below can produce memory leaks.
+	
+	logVol->SetUserLimits(new G4UserLimits(step_lim));
 }
 
 
@@ -486,15 +512,15 @@ G4Material* DetConstrOptPh::FindMaterial(G4String matname)
 	
 	G4MaterialTable *tab = G4Material::GetMaterialTable();
 	
-	if(!tab) return NULL;
+	if(!tab) return nullptr;
 	
 	G4MaterialTable::iterator iT;
 	for(iT=tab->begin(); iT!=tab->end(); ++iT){
 		if( ((*iT)->GetName())==matname ) return (*iT);
 	}
 	
-	//Here I did not find the material ==> returning NULL
-	return NULL;
+	//Here I did not find the material ==> returning nullptr
+	return nullptr;
 	
 }
 
@@ -528,7 +554,7 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 	
 	G4int nDVols = mvol->GetLogicalVolume()->GetNoDaughters();
 	
-	if(fVerbose>=DetConstrOptPh::kDetails){
+	if(fVerbose>=DetVerbosity::kDetails){
 		std::cout << "Detail --> Scanning dauters of volume <" << mvol->GetName() << ">:" << std::endl;
 		
 		std::map<std::string, G4int> vols_map;
@@ -578,7 +604,7 @@ void DetConstrOptPh::ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::s
 const std::vector<G4VPhysicalVolume* >* DetConstrOptPh::GetPvList(G4String pvname) const
 {
 	PVmap::const_iterator it = fPVolsMap.find(pvname);
-	if( it==fPVolsMap.end() ) return NULL;
+	if( it==fPVolsMap.end() ) return nullptr;
 	
 	const std::vector<G4VPhysicalVolume* > *vp = &(it->second);
 	

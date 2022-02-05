@@ -26,38 +26,55 @@ class G4SubtractionSolid;
 class DetectorMessenger;
 //class OptPropManager;
 
+enum class DetVerbosity{kSilent, kInfo, kDetails, kDebug};
 
 class DetConstrOptPh: public G4VUserDetectorConstruction
 {
 public:
 	
-	typedef std::map<std::string, std::vector<G4VPhysicalVolume*> > PVmap;
+	using PVmap = std::map<std::string, std::vector<G4VPhysicalVolume*> >;
+	//typedef std::map<std::string, std::vector<G4VPhysicalVolume*> > PVmap;
+
+private:
+	DetectorMessenger *fDetectorMessenger;
 	
-	enum verbosity{
-		kSilent,
-		kInfo,
-		kDetails,
-		kDebug
-	};
+	OptPropManager *fOptPropManager;
+	
+	G4GDMLParser *fGDMLParser;
+	G4VPhysicalVolume *fWorld;
+	
+	DetVerbosity fVerbose;
+	
+	PVmap fPVolsMap;
+	std::map<std::string, int > fPVolsRecour; //How many time it is found in the tree
+	
+	const G4SurfacePropertyTable *fOptSurfTab;
+		
+	G4double fTpbThick;
+	
+	
+public:
 	
 	DetConstrOptPh(G4String gdmlfilename);
 	virtual ~DetConstrOptPh();
 	
-	G4VPhysicalVolume* Construct();
+	G4VPhysicalVolume* Construct(){return fWorld;};
 	
 	
 	const G4GDMLParser* GetGdmlParser() const {return fGDMLParser;};
 	const G4VPhysicalVolume* GetWorldVolume() const {return fWorld;};
 	
 	
-	inline void SetVerbosity(DetConstrOptPh::verbosity verb){
+	inline void SetVerbosity(DetVerbosity verb){
 		fVerbose=verb;
-		fOptPropManager->SetVerbosity( (OptPropManager::verbosity)verb );
+		fOptPropManager->SetVerbosity( static_cast<OptPropManager::verbosity>(verb) );
 	};
-	inline DetConstrOptPh::verbosity GetVerbosity(){return fVerbose;};
+	inline DetVerbosity GetVerbosity(){return fVerbose;};
 	
 	inline void SetTpbThickness(G4double thick){fTpbThick = thick;};
 	inline G4double GetTpbThickness(){return fTpbThick;}
+	
+	void SetStepTrackLimit(const G4String& vol, const G4double step_lim);
 	
 	const std::vector<G4VPhysicalVolume* >* GetPvList(G4String pvname) const;
 	
@@ -84,28 +101,12 @@ protected:
 	virtual void SetDefaultOptProperties();
 	virtual G4Material* FindMaterial(G4String matname);
 	
-	
-	
 private:
 	
 	//Using a std::set in the map in order to avoid having more entries with same volumes pointers (like for a std::vector). This fills the fPVolsMap object.
 	void ScanVols(G4VPhysicalVolume* mvol, std::map<G4String, std::set<G4VPhysicalVolume*> > *map=NULL);
 	
-	DetectorMessenger *fDetectorMessenger;
-	
-	OptPropManager *fOptPropManager;
-	
-	G4GDMLParser *fGDMLParser;
-	G4VPhysicalVolume *fWorld;
-	
-	DetConstrOptPh::verbosity fVerbose;
-	
-	PVmap fPVolsMap;
-	std::map<std::string, int > fPVolsRecour; //How many time it is found in the tree
-	
-	const G4SurfacePropertyTable *fOptSurfTab;
-		
-	G4double fTpbThick;
+	void BuildGeometry();
 };
 
 

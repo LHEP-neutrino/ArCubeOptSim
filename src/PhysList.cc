@@ -33,6 +33,7 @@
 #include "G4UserLimits.hh"
 #include "G4ios.hh"
 
+#include "G4StepLimiter.hh"
 #include "G4OpAbsorption.hh"
 #include "G4OpWLS.hh"
 #include "G4OpRayleigh.hh"
@@ -42,18 +43,20 @@
 #include "G4SystemOfUnits.hh"
 
 //Instance and initialize all the static members
-const G4double PhysListOptPh::fDefaultCutValue = 1. * mm;
-G4ThreadLocal G4int PhysListOptPh::fVerboseLevel = 0;
+//G4ThreadLocal G4int PhysListOptPh::fVerboseLevel = 0;
 //G4ThreadLocal G4int PhysListOptPh::fOpVerbLevel = 0;
-G4ThreadLocal G4OpAbsorption* PhysListOptPh::fAbsorptionProcess = NULL;
-G4ThreadLocal G4OpWLS* PhysListOptPh::fWLSProcess = NULL;
-G4ThreadLocal G4OpRayleigh* PhysListOptPh::fRayleighScatteringProcess = NULL;
-//G4ThreadLocal G4OpMieHG* PhysListOptPh::fMieHGScatteringProcess = NULL;
-G4ThreadLocal G4OpBoundaryProcess* PhysListOptPh::fBoundaryProcess = NULL;
+G4ThreadLocal G4OpAbsorption* PhysListOptPh::fAbsorptionProcess = nullptr;
+G4ThreadLocal G4OpWLS* PhysListOptPh::fWLSProcess = nullptr;
+G4ThreadLocal G4OpRayleigh* PhysListOptPh::fRayleighScatteringProcess = nullptr;
+//G4ThreadLocal G4OpMieHG* PhysListOptPh::fMieHGScatteringProcess = nullptr;
+G4ThreadLocal G4OpBoundaryProcess* PhysListOptPh::fBoundaryProcess = nullptr;
+G4ThreadLocal G4StepLimiter *PhysListOptPh::fStepLimiter = nullptr;
 
 
-
-PhysListOptPh::PhysListOptPh():G4VUserPhysicsList()
+PhysListOptPh::PhysListOptPh():
+G4VUserPhysicsList(),
+fVerboseLevel(PhysVerbosity::kSilent),
+fDefaultCutValue(1. * mm)
 {
 	
 	fMessenger = new PhysListOptPhMessenger(this);
@@ -65,7 +68,7 @@ PhysListOptPh::PhysListOptPh():G4VUserPhysicsList()
 	VerboseLevel = 0;
 	OpVerbLevel = 0;
 	*/
-	SetVerboseLevel(PhysListOptPh::fVerboseLevel);
+	SetVerboseLevel( static_cast<G4int>(PhysListOptPh::fVerboseLevel) );
 
 }
 
@@ -104,12 +107,12 @@ void PhysListOptPh::ConstructProcess()
 
 // Optical Processes ////////////////////////////////////////////////////////
 
-void
-PhysListOptPh::ConstructOptical()
+void PhysListOptPh::ConstructOptical()
 {
 	//I don't need all the scintillation and chernkov processses
 	
 	// optical processes
+	fStepLimiter = new G4StepLimiter();
 	fAbsorptionProcess = new G4OpAbsorption();
 	fWLSProcess = new G4OpWLS();
 	fRayleighScatteringProcess = new G4OpRayleigh();
@@ -120,11 +123,14 @@ PhysListOptPh::ConstructOptical()
 	//  theWLSProcess->DumpPhysicsTable();
 	//  theRayleighScatteringProcess->DumpPhysicsTable();
 	
-	fAbsorptionProcess->SetVerboseLevel(PhysListOptPh::fVerboseLevel);
-	fWLSProcess->SetVerboseLevel(PhysListOptPh::fVerboseLevel);
-	fRayleighScatteringProcess->SetVerboseLevel(PhysListOptPh::fVerboseLevel);
-	fBoundaryProcess->SetVerboseLevel(PhysListOptPh::fVerboseLevel);
-	//fMieHGScatteringProcess->SetVerboseLevel(PhysListOptPh::fVerboseLevel);
+	
+	
+	fStepLimiter->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fAbsorptionProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fWLSProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fRayleighScatteringProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	//fMieHGScatteringProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fBoundaryProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
 	
 	
 	//G4OpticalSurfaceModel themodel = unified;
@@ -146,7 +152,11 @@ PhysListOptPh::ConstructOptical()
 		
 		if(particleName == "opticalphoton")
 		{
-			if(fVerboseLevel>1) G4cout << " Adding DiscreteProcesses for \"opticalphoton\" particle" << G4endl;
+			if(fVerboseLevel>=PhysVerbosity::kInfo){
+				G4cout << "Info --> PhysListOptPh::ConstructOptical: Adding DiscreteProcesses for \"opticalphoton\" particle" << G4endl;
+			}
+			ph->RegisterProcess(fStepLimiter, particle);
+			
 			//pmanager->AddDiscreteProcess(fAbsorptionProcess);
 			//pmanager->AddDiscreteProcess(fWLSProcess);
 			//pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
@@ -157,6 +167,7 @@ PhysListOptPh::ConstructOptical()
 			ph->RegisterProcess(fWLSProcess, particle);
 			ph->RegisterProcess(fRayleighScatteringProcess, particle);
 			ph->RegisterProcess(fBoundaryProcess, particle);
+			
 		}
 	}
 }

@@ -30,7 +30,7 @@ public:
 	
 	Int_t fPrimaryVolumeIndex;
 	Int_t fPrimaryVolumeCopyNum;
-	Int_t fPrimaryVolumeId;
+	string *fPrimaryVolumeGlobCp;
 	
 	vector<Int_t> *fPrimary_Id; //Id of the primary particle of the chain (used only for the hit mode)
 	
@@ -40,7 +40,7 @@ public:
 	Double_t fPrimary_Zpos;
 	
 	//Energy of the primary particle
-	vector<Double_t> *fPrimEn;
+	vector<Double_t> *fPrimWaveLength;
 	
 	// Momentum of the primary particle
 	vector<Double_t> *fPrimary_Xmom;
@@ -58,7 +58,7 @@ public:
 	
 	vector<Int_t> *fVolIndex;
 	vector<Int_t> *fHitVolCopyNum;
-	vector<Long64_t> *fHitVolId; //Id of the touchable where the step accurred (absorption volume if LUT table are needed)
+	vector<string> *fHitVolGlobCp; //Id of the touchable where the step occurred (absorption volume if LUT table are needed)
 	
 	vector<Double_t> *fTime; //Time of the step
 	
@@ -66,7 +66,7 @@ public:
 	vector<Int_t> *fPartGener; //Generation of the particle
 	
 	//Extended hit quantities for LUTs: these quantities are general both for "extended info" data level and for more stepping details. The only difference is that in "hit mode" the stuff is saved only when there is an absorption (useful for LUTs making) while in "steping mode" they are saved always, for any kind of process
-	vector<Double_t> *fEkin;
+	vector<Double_t> *fPhWaveLength;
 	vector<Double_t> *fXpos, *fYpos, *fZpos; //Coordinates where the step occurred
 	vector<Double_t> *fXmom, *fYmom, *fZmom; //Momentum direction at the step
 	vector<Double_t> *fXpol, *fYpol, *fZpol; //Polarisation of the particle at the step

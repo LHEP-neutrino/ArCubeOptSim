@@ -6,10 +6,11 @@ EventDataOptPh::EventDataOptPh()
 	fEventId = -1;
 	//fPrimaryVolume = new vector<int>;
 	
-	fPrimEn = new vector<Double_t>;
+	fPrimWaveLength = new vector<Double_t>;
 	
 	fPrimaryVolumeIndex=-1;
 	fPrimaryVolumeCopyNum=-1;
+	fPrimaryVolumeGlobCp = new string;
 	
 	fPrimary_Xmom = new vector<Double_t>;
 	fPrimary_Ymom = new vector<Double_t>;
@@ -24,7 +25,7 @@ EventDataOptPh::EventDataOptPh()
 	
 	fVolIndex = new vector<Int_t>;
 	fHitVolCopyNum = new vector<Int_t>;
-	fHitVolId = new vector<Long64_t>;
+	fHitVolGlobCp = new vector<string>;
 	fTime = new vector<Double_t>;
 	
 	fTrackId = new vector<Int_t>;
@@ -33,7 +34,7 @@ EventDataOptPh::EventDataOptPh()
 	
 	fParentId = new vector<Int_t>;
 	
-	fEkin = new vector<Double_t>;
+	fPhWaveLength = new vector<Double_t>;
 	
 	fXpos = new vector<Double_t>;
 	fYpos = new vector<Double_t>;
@@ -56,8 +57,9 @@ EventDataOptPh::EventDataOptPh()
 EventDataOptPh::~EventDataOptPh()
 {
 	//delete fPrimaryVolume;
+	delete fPrimaryVolumeGlobCp;
 	
-	delete fPrimEn;
+	delete fPrimWaveLength;
 	
 	delete fPrimary_Xmom;
 	delete fPrimary_Ymom;
@@ -69,7 +71,8 @@ EventDataOptPh::~EventDataOptPh()
 	
 	delete fVolIndex;
 	delete fHitVolCopyNum;
-	delete fHitVolId;
+	
+	delete fHitVolGlobCp;
 	delete fTime;
 	
 	delete fTrackId;
@@ -79,7 +82,7 @@ EventDataOptPh::~EventDataOptPh()
 	
 	delete fParentId;
 	
-	delete fEkin;
+	delete fPhWaveLength;
 	
 	delete fXpos;
 	delete fYpos;
@@ -103,7 +106,9 @@ void EventDataOptPh::Reset()
 {
 	fEventId = -1;
 	
-	fPrimEn->resize(0);
+	fPrimaryVolumeGlobCp->resize(0);
+	
+	fPrimWaveLength->resize(0);
 	
 	fPrimaryVolumeIndex=-1;
 	fPrimaryVolumeCopyNum=-1;
@@ -122,7 +127,7 @@ void EventDataOptPh::Reset()
 	
 	fVolIndex->resize(0);
 	fHitVolCopyNum->resize(0);
-	fHitVolId->resize(0);
+	fHitVolGlobCp->resize(0);
 	fTime->resize(0);
 	
 	fTrackId->resize(0);
@@ -130,7 +135,7 @@ void EventDataOptPh::Reset()
 	fPartGener->resize(0);
 	fParentId->resize(0);
 	
-	fEkin->resize(0);
+	fPhWaveLength->resize(0);
 	
 	fXpos->resize(0);
 	fYpos->resize(0);

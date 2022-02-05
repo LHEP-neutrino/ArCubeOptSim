@@ -26,6 +26,7 @@ public:
 	~DetectorMessenger();
 
 	void SetNewValue(G4UIcommand *pUIcommand, G4String hString);
+	void ProcessTrackLimCmd(const G4UIcommand *cmd, const G4String& newValues);
 
 private:
 	DetConstrOptPh* fDetector;
@@ -38,6 +39,8 @@ private:
 	G4UIcmdWithAnInteger *fDetConstrVerb;
 	
 	G4UIcmdWithADoubleAndUnit *fTpbThicknCmd;
+	
+	G4UIcommand *fStepTrackLimCmd;
 	
 	G4UIcmdWithAString *fPhysVolCoordCmd;
 	

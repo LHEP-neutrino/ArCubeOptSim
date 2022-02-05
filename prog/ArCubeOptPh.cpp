@@ -5,6 +5,7 @@
 //#include "StackingAction.hh"
 #include "RunAction.hh"
 #include "EventAction.hh"
+#include "TrackingAction.hh"
 #include "SteppingAction.hh"
 
 #include "globals.hh"
@@ -151,6 +152,7 @@ int main(int argc, char **argv)
 	//pRunManager->SetUserAction(new StackingAction(pAnalysisManager));
 	pRunManager->SetUserAction(new RunActionOptPh(pAnalysisManager));
 	pRunManager->SetUserAction(new EventActionOptPh(pAnalysisManager));
+	pRunManager->SetUserAction(new TrackAct(pAnalysisManager));
 	pRunManager->SetUserAction(new SteppingActionOptPh(pAnalysisManager));
 	
 	

@@ -45,8 +45,20 @@ DetectorMessenger::DetectorMessenger(DetConstrOptPh *pDetector)
 	fDetConstrVerb->SetGuidance("Set the verbosity for the detector constructor.");
 	fDetConstrVerb->SetParameterName("DetVerb",false);
 	fDetConstrVerb->AvailableForStates(G4State_PreInit, G4State_Idle);
-	txt.str(""); txt << "DetVerb>=0 && DetVerb<=" << DetConstrOptPh::kDebug;
+	txt.str(""); txt << "DetVerb>=0 && DetVerb<=" << static_cast<G4int>(DetVerbosity::kDebug);
 	fDetConstrVerb->SetRange( txt.str().c_str() );
+	
+	fStepTrackLimCmd = new G4UIcommand("/argoncube/detector/setMaxTrackStep", this);
+	fStepTrackLimCmd->SetGuidance("Set the maximum tracking step length for a given logical volume.");
+	fStepTrackLimCmd->SetGuidance("usage: /argoncube/detector/setMaxTrackStep LogVol step unit");
+	fStepTrackLimCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+	G4UIparameter *param;
+	param = new G4UIparameter("LogVol", 's', false);
+	fStepTrackLimCmd->SetParameter(param);
+	param = new G4UIparameter("Step", 'd', false);
+	fStepTrackLimCmd->SetParameter(param);
+	param = new G4UIparameter("unit", 's', false);
+	fStepTrackLimCmd->SetParameter(param);
 	
 	fPhysVolCoordCmd = new G4UIcmdWithAString("/argoncube/detector/PhysVolCoord", this);
 	fPhysVolCoordCmd->SetParameterName("physvol", false);
@@ -86,6 +98,7 @@ DetectorMessenger::~DetectorMessenger()
 	delete fLoadOpticalSettingsFile;
 	delete fDetectorOptDir;
 	delete fDetectorDir;
+	delete fStepTrackLimCmd;
 	
 }
 
@@ -93,12 +106,19 @@ void DetectorMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewValue)
 {
 	if(pUIcommand == fDetConstrVerb){
 		G4cout << "Info --> DetectorMessenger::SetNewValue(...): called command fDetConstrVerb" << G4endl;
-		fDetector->SetVerbosity( (DetConstrOptPh::verbosity)std::stoi(hNewValue) );
+		fDetector->SetVerbosity( static_cast<DetVerbosity>(std::stoi(hNewValue)) );
 	}
 	
 	if(pUIcommand == fTpbThicknCmd){
 		G4cout << "Info --> DetectorMessenger::SetNewValue(...): called command fTpbThicknCmd" << G4endl;
 		fDetector->SetTpbThickness( fTpbThicknCmd->GetNewDoubleValue(hNewValue) );
+	}
+	
+	if(pUIcommand == fStepTrackLimCmd){
+		G4cout << "\nInfo --> MediPixDetMessenger::SetNewValue: called command \"fStepTrackLimCmd\"" << G4endl;
+		
+		ProcessTrackLimCmd(fStepTrackLimCmd, hNewValue);
+		return;
 	}
 	
 	if(pUIcommand == fPhysVolCoordCmd){
@@ -127,4 +147,18 @@ void DetectorMessenger::SetNewValue(G4UIcommand *pUIcommand, G4String hNewValue)
 	}
 }
 
+
+void DetectorMessenger::ProcessTrackLimCmd(const G4UIcommand *cmd, const G4String& newValues)
+{
+	G4Tokenizer next(newValues);
+
+	// check argument
+	G4String LogVol = next();
+	G4double stepLim = StoD(next());
+	G4String unit = next();
+	
+	G4cout << "Info --> DetectorMessenger::ProcessTrackLimCmd: Setting track length limit for <" << LogVol << "> logical volume to " << stepLim << " " << unit << "." << G4endl;
+	
+	fDetector->SetStepTrackLimit(LogVol, stepLim*cmd->ValueOf(unit.c_str()));
+}
 
