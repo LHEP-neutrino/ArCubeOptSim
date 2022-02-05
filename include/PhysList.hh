@@ -24,16 +24,17 @@ class PhysListOptPh: public G4VUserPhysicsList
 {
 	PhysListOptPhMessenger* fMessenger;
 	
-	//All the static declaration here are made for speed and low memory consumption in addition they are thread safe using the G4 internal functionalities
-	//Note: All this static members are not shared between different threads but shared between different instances of the class in the same thread
 	PhysVerbosity fVerboseLevel;
 	
+	//All the static declaration here are made for speed and low memory consumption in addition they are thread safe using the G4 internal functionalities
+	//Note: All this static members are not shared between different threads but shared between different instances of the class in the same thread
+	
+	static G4ThreadLocal G4StepLimiter *fStepLimiter;
 	static G4ThreadLocal G4OpAbsorption* fAbsorptionProcess;
 	static G4ThreadLocal G4OpRayleigh* fRayleighScatteringProcess;
 	static G4ThreadLocal G4OpWLS* fWLSProcess;
-	//static G4ThreadLocal G4OpMieHG* fMieHGScatteringProcess;
+	static G4ThreadLocal G4OpMieHG* fMieHGScatteringProcess;
 	static G4ThreadLocal G4OpBoundaryProcess* fBoundaryProcess;
-	static G4ThreadLocal G4StepLimiter *fStepLimiter;
 	
 	G4double fDefaultCutValue;
 	

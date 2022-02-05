@@ -45,12 +45,14 @@
 //Instance and initialize all the static members
 //G4ThreadLocal G4int PhysListOptPh::fVerboseLevel = 0;
 //G4ThreadLocal G4int PhysListOptPh::fOpVerbLevel = 0;
-G4ThreadLocal G4OpAbsorption* PhysListOptPh::fAbsorptionProcess = nullptr;
-G4ThreadLocal G4OpWLS* PhysListOptPh::fWLSProcess = nullptr;
-G4ThreadLocal G4OpRayleigh* PhysListOptPh::fRayleighScatteringProcess = nullptr;
-//G4ThreadLocal G4OpMieHG* PhysListOptPh::fMieHGScatteringProcess = nullptr;
-G4ThreadLocal G4OpBoundaryProcess* PhysListOptPh::fBoundaryProcess = nullptr;
+
 G4ThreadLocal G4StepLimiter *PhysListOptPh::fStepLimiter = nullptr;
+G4ThreadLocal G4OpAbsorption* PhysListOptPh::fAbsorptionProcess = nullptr;
+G4ThreadLocal G4OpRayleigh* PhysListOptPh::fRayleighScatteringProcess = nullptr;
+G4ThreadLocal G4OpWLS* PhysListOptPh::fWLSProcess = nullptr;
+G4ThreadLocal G4OpMieHG* PhysListOptPh::fMieHGScatteringProcess = nullptr;
+G4ThreadLocal G4OpBoundaryProcess* PhysListOptPh::fBoundaryProcess = nullptr;
+
 
 
 PhysListOptPh::PhysListOptPh():
@@ -116,7 +118,8 @@ void PhysListOptPh::ConstructOptical()
 	fAbsorptionProcess = new G4OpAbsorption();
 	fWLSProcess = new G4OpWLS();
 	fRayleighScatteringProcess = new G4OpRayleigh();
-	//fMieHGScatteringProcess = new G4OpMieHG();
+	fMieHGScatteringProcess = new G4OpMieHG();
+	fWLSProcess = new G4OpWLS();
 	fBoundaryProcess = new G4OpBoundaryProcess();
 	
 	//  theAbsorptionProcess->DumpPhysicsTable();
@@ -129,7 +132,8 @@ void PhysListOptPh::ConstructOptical()
 	fAbsorptionProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
 	fWLSProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
 	fRayleighScatteringProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
-	//fMieHGScatteringProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fMieHGScatteringProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
+	fWLSProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
 	fBoundaryProcess->SetVerboseLevel(static_cast<G4int>(PhysListOptPh::fVerboseLevel));
 	
 	
@@ -144,30 +148,23 @@ void PhysListOptPh::ConstructOptical()
 	theParticleIterator->reset();
 	
 	while( (*theParticleIterator)() ){
+		
 		G4ParticleDefinition *particle = theParticleIterator->value();
 		G4ProcessManager *pmanager = particle->GetProcessManager();
 		G4String particleName = particle->GetParticleName();
 		
-		
-		
-		if(particleName == "opticalphoton")
-		{
+		if(particleName == "opticalphoton"){
+			
 			if(fVerboseLevel>=PhysVerbosity::kInfo){
 				G4cout << "Info --> PhysListOptPh::ConstructOptical: Adding DiscreteProcesses for \"opticalphoton\" particle" << G4endl;
 			}
+			
 			ph->RegisterProcess(fStepLimiter, particle);
-			
-			//pmanager->AddDiscreteProcess(fAbsorptionProcess);
-			//pmanager->AddDiscreteProcess(fWLSProcess);
-			//pmanager->AddDiscreteProcess(fRayleighScatteringProcess);
-			//pmanager->AddDiscreteProcess(fMieHGScatteringProcess);
-			//pmanager->AddDiscreteProcess(fBoundaryProcess);
-			
 			ph->RegisterProcess(fAbsorptionProcess, particle);
-			ph->RegisterProcess(fWLSProcess, particle);
 			ph->RegisterProcess(fRayleighScatteringProcess, particle);
+			ph->RegisterProcess(fWLSProcess, particle);
+			ph->RegisterProcess(fMieHGScatteringProcess, particle);
 			ph->RegisterProcess(fBoundaryProcess, particle);
-			
 		}
 	}
 }
