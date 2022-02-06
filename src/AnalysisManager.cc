@@ -116,10 +116,10 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	//std::string partdef_dict = BuildParticlesDict();
 	
 #ifndef NDEBUG	
-	if(fVerbose>=AnalysisVerbosity::kDebug){
-		G4cout << "\nDebug --> AnalysisManager::BeginOfRun: Content of the \"partdef_dict\":" <<  G4endl;
-		G4cout << "          " << partdef_dict << G4endl;
-	}
+	//if(fVerbose>=AnalysisVerbosity::kDebug){
+		//G4cout << "\nDebug --> AnalysisManager::BeginOfRun: Content of the \"partdef_dict\":" <<  G4endl;
+		//G4cout << "          " << partdef_dict << G4endl;
+	//}
 #endif
 	
 	
@@ -545,7 +545,7 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep, const G4SteppingManager* pS
 		if((postStepPoint->GetStepStatus()==fGeomBoundary) || fWasAtBoundary){
 			if(fStepsDebug){ //Boundary related printouts
 				if(!fWasAtBoundary){ //Printout at post step point boundary
-					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << track->GetTrackID() << ". Optical photon at volumes boundary" << G4endl;
+					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon at volumes boundary" << G4endl;
 					G4cout << "               Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
 					G4cout << "               Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
 					G4cout << "           Track status: " << TrackStat << G4endl;
@@ -555,7 +555,7 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep, const G4SteppingManager* pS
 					G4cout << "            Step length: " << pStep->GetStepLength() << G4endl;
 					G4cout << "       Deposited energy: " << pStep->GetTotalEnergyDeposit() << G4endl;
 				}else{ //Printout after boundary post step point
-					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << track->GetTrackID() << ". Optical photon after volumes boundary" << G4endl;
+					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon after volumes boundary" << G4endl;
 					G4cout << "              Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
 					G4cout << "              Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
 					G4cout << "              " << "Track status: " << TrackStat << G4endl;
@@ -569,9 +569,9 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep, const G4SteppingManager* pS
 				//G4cout << "Press a enter to continue..."; std::cin >> foo;
 			}else{
 				//Print out for any condition
-				if( (fSave==kAll) || (fOptPhSenDetVolPtrs.find(post_Vol)!=fOptPhSenDetVolPtrs.end()) ){
+				if( (fSave==DatasaveLevel::kAll) || (fOptPhSenDetVolPtrs.find(post_Vol)!=fOptPhSenDetVolPtrs.end()) ){
 					G4cout << "Debug ---> AnalysisManagerOptPh::Step:\n" << G4endl;
-					G4cout << "Event " << fCurrentEvent << ", trackID: " << track->GetTrackID() << ". Optical photon at volumes boundary"<< G4endl;
+					G4cout << "Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon at volumes boundary"<< G4endl;
 					G4cout << "               Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
 					G4cout << "               Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
 					G4cout << "           Track status: " << TrackStat << G4endl;

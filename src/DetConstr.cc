@@ -242,7 +242,7 @@ void DetConstrOptPh::BuildDefaultOptSurf()
 void DetConstrOptPh::BuildDefaultLogSurfaces()
 {
 #ifndef NDEBUG
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultLogSurfaces: Entering the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultLogSurfaces: Entering the function."<<G4endl;
 #endif
 	//By default the EJ28 WLS does't have optical properties.
 	//They can be defined later
@@ -316,7 +316,7 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 	//fOptPropManager->BuildLogicalBorderSurface("Fib2SiPM5_logsurf","volFiber_PV","volSiPM_LCM_5_PV","EJ2802SiPM_optsurf");
 	
 #ifndef NDEBUG	
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultOpticalSurfaces: Exiting the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildDefaultOpticalSurfaces: Exiting the function."<<G4endl;
 #endif
 }
 
@@ -325,7 +325,7 @@ void DetConstrOptPh::BuildDefaultLogSurfaces()
 void DetConstrOptPh::SetDefaultOptProperties()
 {
 #ifndef NDEBUG
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Entering the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Entering the function."<<G4endl;
 #endif
 	
 	if(!fOptPropManager){
@@ -333,7 +333,7 @@ void DetConstrOptPh::SetDefaultOptProperties()
 	}
 
 #ifndef NDEBUG	
-	if(fVerbose>=DetConstrOptPh::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Exiting the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::SetDefaultOptProperties: Exiting the function."<<G4endl;
 #endif	
 }
 
