@@ -3,7 +3,8 @@
 #/event/verbose 2
 #/tracking/verbose 2
 
-/argoncube/detector/optical/loadOptSett resources/optProp_ArCLight_woMirror.json
+#/argoncube/detector/optical/loadOptSett resources/optProp_womirr.json
+/argoncube/detector/optical/loadOptSett resources/optProp.json
 #/argoncube/detector/optical/loadOptSett resources/optProp_ArCLight_only.json
 
 #The drift direction is "x", the vertical direction is "y" and the direction normal to the light detectors is "z"
@@ -12,15 +13,17 @@
 /argoncube/gun/shape Box
 /argoncube/gun/angtype iso
 /argoncube/gun/polarization 1 0 0
-/argoncube/gun/energy 9.6863 eV
-/argoncube/gun/center 2.325 0 5.0140 mm
-#/argoncube/gun/halfx 140 mm
-#/argoncube/gun/halfy 150 mm
-#/argoncube/gun/halfz 0.001 mm
-/argoncube/gun/halfx 145 mm
-/argoncube/gun/halfy 155 mm
-/argoncube/gun/halfz 1 mm
-/argoncube/gun/confine volTPB_PV
+/argoncube/gun/energy 9.69 eV
+#/argoncube/gun/center 2.325 0 5.0140 mm #emmit in TPB layer
+/argoncube/gun/center 2.325 0 5.0146 mm #center for just above TPB w Mirr
+#/argoncube/gun/center 2.325 0 4.9511 mm #center for just above TPB woMirr
+/argoncube/gun/halfx 140 mm
+/argoncube/gun/halfy 150 mm
+/argoncube/gun/halfz 0.0001 mm
+#/argoncube/gun/halfx 145 mm
+#/argoncube/gun/halfy 155 mm
+#/argoncube/gun/halfz 1 mm
+#/argoncube/gun/confine volTPB_PV
 /argoncube/gun/primaryNb 10000
 
 #/argoncube/gun/particle opticalphoton
@@ -30,4 +33,4 @@
 #/argoncube/gun/position 0 81.4 0 mm
 #/argoncube/gun/primaryNb 1
 
-/run/beamOn 1000
+/run/beamOn 10000
