@@ -1,0 +1,5 @@
+#/process/verbose 3
+#/argoncube/detector/optical/verbosity 2
+#/argoncube/analysis/SaveData 3
+#/argoncube/analysis/DefOptSD volSiPM_Sens_PV
+/argoncube/detector/setTpbThick 0.001 mm
