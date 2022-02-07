@@ -169,33 +169,35 @@ int main(int argc, char **argv)
 	}
 	
 	if(!hOutFileName.empty()){
-    pAnalysisManager->SetDataFilename(hOutFileName);
-  }else{
-    pAnalysisManager->SetDataFilename("events.root");
-  }
+		pAnalysisManager->SetDataFilename(hOutFileName);
+	}else{
+		pAnalysisManager->SetDataFilename("events.root");
+	}
 
 	//Initialize the RunManager
 	pRunManager->Initialize();
 	
 	if(bInteractive){
-		// Visualization Manager
-		pVisManager = new G4VisExecutive;
-		pVisManager->Initialize();
-		
-		//Let G4UIExecutive guess what is the best available UI
-		ui = new G4UIExecutive(1,argv);
-		if (ui->IsGUI() && bUseGui ){
-			if(bVisMacroFile){
-				G4String hCommand = "/control/execute " + hVisMacroFileName;
-				pUImanager->ApplyCommand(hCommand);
+		if( bUseGui ){
+			//Let G4UIExecutive guess what is the best available UI
+			ui = new G4UIExecutive(1,argv);
+			if(ui->IsGUI()){
+				// Visualization Manager
+				pVisManager = new G4VisExecutive;
+				pVisManager->Initialize();
+			
+				if(bVisMacroFile){
+					G4String hCommand = "/control/execute " + hVisMacroFileName;
+					pUImanager->ApplyCommand(hCommand);
+				}
+				if(bMacroFile)
+				{
+					G4String hCommand = "/control/execute " + hMacroFileName;
+					pUImanager->ApplyCommand(hCommand);
+				}
+				ui->SessionStart();
+				delete ui;
 			}
-			if(bMacroFile)
-			{
-				G4String hCommand = "/control/execute " + hMacroFileName;
-				pUImanager->ApplyCommand(hCommand);
-			}
-			ui->SessionStart();
-			delete ui;
 		}else{
 			pUIsession = new G4UIterminal(new G4UItcsh);
 			if(bMacroFile)
