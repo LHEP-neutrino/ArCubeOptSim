@@ -932,8 +932,8 @@ void OptPropManager::buildoptsurf(const json keyval)
 	}
 	
 	
-	if(fVerbose>=OptPropManager::kDetails){
-		std::cout << "Detail --> OptPropManager::buildoptsurf(...): Building new optical surface with name <" << surfname << ">" << std::endl;
+	if(fVerbose>=OptPropManager::kInfo){
+		std::cout << "Info --> OptPropManager::buildoptsurf(...): Building new optical surface with name <" << surfname << ">" << std::endl;
 	}
 	optsurf = new G4OpticalSurface( surfname) ;
 	optsurf->SetMaterialPropertiesTable(new G4MaterialPropertiesTable());
@@ -1095,12 +1095,18 @@ void OptPropManager::buildlogbordersurf(const json keyval)
 		return;
 	}
 	
+	
 	if( !keyval.at("surfname").is_string() ){
 		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <surfname> key must be a json string type!\n" << std::endl;
 		return;
 	}
 	
 	std::string logsurfname = keyval.at("surfname").get<std::string>();
+	
+	if(fVerbose>=OptPropManager::kInfo){
+		std::cout << "Info --> OptPropManager::buildlogbordersurf(...): Building new logical border surface with name <" << logsurfname << ">" << std::endl;
+	}
+	
 	
 	if( !keyval.contains("optsurf") ){
 		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <optsurf> key is mandatory! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
