@@ -151,6 +151,8 @@ private:
 	
 	std::map<G4String, std::set< G4LogicalSurface*> > fLogSurfMap;
 	
+	//std::map<G4String, G4OpticalSurface*> fOptSurfMap;
+	
 	DetConstrOptPh* fDetConstr;
 	
 	//The following functions process the info of the "setmatprop" key word at the upper level of the jsonfile structure

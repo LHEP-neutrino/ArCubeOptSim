@@ -58,7 +58,7 @@ public:
 	DetConstrOptPh(G4String gdmlfilename);
 	virtual ~DetConstrOptPh();
 	
-	G4VPhysicalVolume* Construct(){return fWorld;};
+	G4VPhysicalVolume* Construct();
 	
 	
 	const G4GDMLParser* GetGdmlParser() const {return fGDMLParser;};

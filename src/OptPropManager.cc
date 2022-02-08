@@ -25,14 +25,14 @@
 
 
 
-OptPropManager* OptPropManager::gThis = NULL;
+OptPropManager* OptPropManager::gThis = nullptr;
 
 
-//std::map<G4String, G4OpticalSurfaceModel>* OptPropManager::OptSurfModelMap = NULL;
+//std::map<G4String, G4OpticalSurfaceModel>* OptPropManager::OptSurfModelMap = nullptr;
 
-//std::map<G4String, G4SurfaceType>* OptPropManager::OptSurfTypeMap = NULL;
+//std::map<G4String, G4SurfaceType>* OptPropManager::OptSurfTypeMap = nullptr;
 
-//std::map<G4String, G4OpticalSurfaceFinish>* OptPropManager::OptSurfFinishMap = NULL;
+//std::map<G4String, G4OpticalSurfaceFinish>* OptPropManager::OptSurfFinishMap = nullptr;
 
 
 
@@ -40,7 +40,7 @@ OptPropManager::OptPropManager()
 {
 	fVerbose = OptPropManager::kSilent;
 	
-	fDetConstr = NULL;
+	fDetConstr = nullptr;
 	
 	//Map of the optical surfaces models
 	(OptPropManager::OptSurfModelMap)["glisur"] = glisur;
@@ -223,7 +223,7 @@ void OptPropManager::ProcessJsonFile(const G4String& jsonfilename)
 std::set<G4LogicalSurface*>* OptPropManager::FindLogSurf(const G4String& logsurfname)
 {
 	std::map<G4String, std::set<G4LogicalSurface*> >::iterator it = fLogSurfMap.find(logsurfname);
-	if(it == fLogSurfMap.end()) return  NULL;
+	if(it == fLogSurfMap.end()) return  nullptr;
 	
 	return &(it->second);
 }
@@ -234,8 +234,13 @@ G4OpticalSurface* OptPropManager::FindOptSurf(const G4String& optsurfname)
 {
 	G4SurfacePropertyTable* surftab = (G4SurfacePropertyTable*)G4OpticalSurface::GetSurfacePropertyTable();
 	size_t nSurf = G4OpticalSurface::GetNumberOfSurfaceProperties();
-		
-	if( (!surftab) || (nSurf<=0) ) return NULL;
+	
+	//if( fOptSurfMap.find(optsurfname)!=fOptSurfMap.end() ) return fOptSurfMap[optsurfname];
+	
+	
+	if( (!surftab) || (nSurf<=0) ) return nullptr;
+	
+	
 	
 	for(size_t iSurf=0; iSurf<nSurf; iSurf++){
 		if(surftab->at(iSurf)->GetName() == optsurfname){
@@ -243,7 +248,7 @@ G4OpticalSurface* OptPropManager::FindOptSurf(const G4String& optsurfname)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 
@@ -252,7 +257,7 @@ G4Material* OptPropManager::FindMaterial(const G4String& materialname)
 	G4MaterialTable *pMatTable = G4Material::GetMaterialTable();
 	size_t nMat = G4Material::GetNumberOfMaterials();
 	
-	if( (!pMatTable) || (nMat<=0) ) return NULL;
+	if( (!pMatTable) || (nMat<=0) ) return nullptr;
 	
 	for(size_t iMat=0; iMat<nMat; iMat++){
 		if( (pMatTable->at(iMat)->GetName()) == materialname ){
@@ -260,7 +265,7 @@ G4Material* OptPropManager::FindMaterial(const G4String& materialname)
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 
@@ -268,9 +273,9 @@ const std::vector<G4VPhysicalVolume* >* OptPropManager::FindPhysVol(const G4Stri
 {
 	G4PhysicalVolumeStore *pPhysVolStore = G4PhysicalVolumeStore::GetInstance();
 	
-	if(!pPhysVolStore) return NULL; //This is a big problem as the static method above returns a static class member!!!
+	if(!pPhysVolStore) return nullptr; //This is a big problem as the static method above returns a static class member!!!
 	
-	if(!fDetConstr) return NULL;
+	if(!fDetConstr) return nullptr;
 	
 	return fDetConstr->GetPvList(physvolname);
 }
@@ -680,7 +685,7 @@ void OptPropManager::setlogbordersurf(const json keyval)
 		std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Found "<< logsurflist->size() << " logical border surfaces named <"<< logsurfname << ">" << std::endl;
 	}
 	
-	G4OpticalSurface *optsurf = NULL;
+	G4OpticalSurface *optsurf = nullptr;
 	std::string optsurfname = "";
 	if( keyval.contains("optsurf") ){
 		if( keyval.at("optsurf").is_string() ){
@@ -934,6 +939,7 @@ void OptPropManager::buildoptsurf(const json keyval)
 	optsurf->SetMaterialPropertiesTable(new G4MaterialPropertiesTable());
 	G4MaterialPropertiesTable* propTab = optsurf->GetMaterialPropertiesTable();
 	
+	//fOptSurfMap[surfname] = optsurf;
 	
 	if(keyval.contains("model")){
 		if( keyval.at("model").is_string() && (OptSurfModelMap.find(keyval.at("model").get<std::string>())!=OptSurfModelMap.end()) ){
@@ -1113,11 +1119,13 @@ void OptPropManager::buildlogbordersurf(const json keyval)
 	
 	if(!optsurf){
 		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): Could not find the optical surface <" << optsurfname << ">. The optical surface must be built before than the logical surface that uses it. The logical border surfaces <" << logsurfname << "> will not be built.\n" << std::endl;
+		return;
 	}
 	
 	
 	if( !keyval.contains("vol1") ){
 		std::cout << "\nERROR --> OptPropManager::buildlogbordersurf(...): The <vol1> key is mandatory to build a new logical border surface! The logical border surfaces <" << logsurfname << "> will not be built!\n" << std::endl;
+		return;
 	}
 	
 	if( !keyval.at("vol1").is_string() ){
@@ -1200,7 +1208,7 @@ void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const G4in
 	const G4LogicalBorderSurfaceTable* surftab = G4LogicalBorderSurface::GetSurfaceTable();
 	
 	if(surftab){
-		G4LogicalSurface* Surface = NULL;
+		G4LogicalSurface* Surface = nullptr;
 		
 		for(size_t iSurf=0; iSurf<surftab->size(); iSurf++){
 			G4String name = surftab->at(iSurf)->GetName();
@@ -1532,7 +1540,7 @@ void OptPropManager::SetSurfModel(const std::set<G4LogicalSurface* >* logsurflis
 	}
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -1641,7 +1649,7 @@ void OptPropManager::SetSurfType(const std::set<G4LogicalSurface* >* logsurflist
 	}
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -1751,7 +1759,7 @@ void OptPropManager::SetSurfFinish(const std::set<G4LogicalSurface* >* logsurfli
 	}
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -1851,7 +1859,7 @@ void OptPropManager::SetSurfSigmaAlpha(const std::set<G4LogicalSurface* >* logsu
 	}
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -1965,7 +1973,7 @@ void OptPropManager::SetSurfPropFromFile(const std::set<G4LogicalSurface* >* log
 	}
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -2065,7 +2073,7 @@ void OptPropManager::SetSurfConstProp(const std::set<G4LogicalSurface* >* logsur
 	
 	
 	
-	G4OpticalSurface *lastoptsurf = NULL;
+	G4OpticalSurface *lastoptsurf = nullptr;
 	std::string firstsurfname, lastsurfname;
 	std::set<G4LogicalSurface* >::iterator iT;
 	int nSurfs = logsurflist->size();
@@ -2232,7 +2240,7 @@ int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const
 	
 	
 	//Check if the optical surface already exists
-	G4OpticalSurface *optsurf = NULL;
+	G4OpticalSurface *optsurf = nullptr;
 	size_t nOptSurf = G4OpticalSurface::GetNumberOfSurfaceProperties();
 	if(optsurfname != G4String("")){
 		for(size_t iSurf=0; iSurf<nOptSurf; iSurf++){
@@ -2321,7 +2329,7 @@ int OptPropManager::BuildLogicalBorderSurface(const G4String& logsurfname, const
 
 void OptPropManager::SetOpticalSurface(const G4String& logsurfname, const G4String& optsurfname)
 {
-	G4OpticalSurface *optsurf = NULL;
+	G4OpticalSurface *optsurf = nullptr;
 	
 	G4SurfacePropertyTable *optsurftab = (G4SurfacePropertyTable*)G4OpticalSurface::GetSurfacePropertyTable();
 	

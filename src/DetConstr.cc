@@ -66,7 +66,8 @@ using std::ofstream;
 DetConstrOptPh::DetConstrOptPh(G4String gdmlfilename):
 fWorld(nullptr),
 fDetectorMessenger(nullptr),
-fVerbose(DetVerbosity::kSilent)
+fVerbose(DetVerbosity::kSilent),
+fTpbThick(1*um) //Default value. Can be changed by a user command
 {
 	fGDMLParser = new G4GDMLParser;
 	
@@ -91,9 +92,6 @@ fVerbose(DetVerbosity::kSilent)
 	
 	fOptSurfTab = G4SurfaceProperty::GetSurfacePropertyTable();
 	
-	fTpbThick = 0.001*mm; //Default value. Can be changed by a user command
-	
-	BuildGeometry();
 }
 
 
@@ -107,14 +105,14 @@ DetConstrOptPh::~DetConstrOptPh()
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
-void DetConstrOptPh::BuildGeometry()
+G4VPhysicalVolume* DetConstrOptPh::Construct()
 {
 #ifndef NDEBUG
-	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::BuildGeometry: Entering the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct: Entering the function."<<G4endl;
 #endif
 	
 	if(fWorld){
-		if( G4PhysicalVolumeStore::GetInstance()->GetVolume("volTPB_LAr_PV") ){
+		if( G4PhysicalVolumeStore::GetInstance()->GetVolume("volTPB_LAr_PV") && (fTpbThick>0.) ){
 			BuildTPBlayer();
 		}
 		
@@ -126,21 +124,22 @@ void DetConstrOptPh::BuildGeometry()
 			ScanVols(fWorld);
 		}
 		
-		OptPropManager::verbosity oldverb = fOptPropManager->GetVerbosity();
-		fOptPropManager->SetVerbosity( (OptPropManager::verbosity)fVerbose );
+		//OptPropManager::verbosity oldverb = fOptPropManager->GetVerbosity();
+		//fOptPropManager->SetVerbosity( (OptPropManager::verbosity)fVerbose );
 		//BuildDefaultOptSurf();
 		//BuildDefaultLogSurfaces();
 		//SetDefaultOptProperties();
-		fOptPropManager->SetVerbosity( oldverb );
+		//fOptPropManager->SetVerbosity( oldverb );
 		
 	}
 	
-	if(fVerbose>=DetVerbosity::kInfo) G4cout << "Info --> DetConstrOptPh::BuildGeometry(): Finished construction " << G4endl;
+	if(fVerbose>=DetVerbosity::kInfo) G4cout << "Info --> DetConstrOptPh::Construct: Finished construction " << G4endl;
 	
 #ifndef NDEBUG
-	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct(): Exiting the function."<<G4endl;
+	if(fVerbose>=DetVerbosity::kDebug) G4cout << "Debug --> DetConstrOptPh::Construct: Exiting the function."<<G4endl;
 #endif
 	
+	return fWorld;
 }
 
 
