@@ -7,6 +7,7 @@
 
 #include "TNamed.h"
 
+#include "G4String.hh"
 #include "Randomize.hh"
 #include "G4SDManager.hh"
 #include "G4RunManager.hh"
@@ -205,7 +206,7 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	//if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_part_type", "vector<Int_t>", &fEventData->fPartType);
 	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_vol_index", "vector<Int_t>", &fEventData->fVolIndex);//ID of the physical volume (it is a whish!). //Fill at step stage
 	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_vol_copy", "vector<Int_t>", &fEventData->fHitVolCopyNum);//This is the copy number of a specific physics volume. //Fill at step stage
-	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_vol_globcp", "vector<Int_t>", &fEventData->fHitVolGlobCp);//This MUST become the unique ID of the touchable volume. //Fill at step stage
+	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_vol_globcp", "vector<string>", &fEventData->fHitVolGlobCp);//This MUST become the unique ID of the touchable volume. //Fill at step stage
 	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_time", "vector<Double_t>", &fEventData->fTime);//Fill at step stage
 	//if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_trackid", "vector<Int_t>", &fEventData->fTrackId);//Fill at step stage
 	if(fSave < DatasaveLevel::kSdSteps) fTree->Branch("hit_firstparentid", "vector<Int_t>", &fEventData->fFirstParentId); //Fill at step stage
@@ -235,7 +236,7 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("vol_index", "vector<Int_t>", &fEventData->fVolIndex);//Fill at step stage
 	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("vol_copy", "vector<Int_t>", &fEventData->fHitVolCopyNum);//ID of the touchable volume//Fill at step stage
 	//if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("vol_id", "vector<Long64_t>", &fEventData->fHitVolId);//ID of the touchable volume//Fill at step stage
-	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("vol_globcp", "vector<Int_t>", &fEventData->fHitVolGlobCp);//ID of the touchable volume//Fill at step stage
+	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("vol_globcp", "vector<string>", &fEventData->fHitVolGlobCp);//ID of the touchable volume//Fill at step stage
 	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("time", "vector<Double_t>", &fEventData->fTime);//Fill at step stage
 	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("trackid", "vector<Int_t>", &fEventData->fTrackId);//Fill at end of Event
 	if(fSave >= DatasaveLevel::kSdSteps) fTree->Branch("partgener", "vector<Int_t>", &fEventData->fPartGener);//Fill at end of Event
@@ -542,44 +543,56 @@ void AnalysisManagerOptPh::Step(const G4Step *pStep, const G4SteppingManager* pS
 		if(trstatus==fPostponeToNextEvent) TrackStat = "PostponeToNextEvent";
 		
 		
-		if((postStepPoint->GetStepStatus()==fGeomBoundary) || fWasAtBoundary){
-			if(fStepsDebug){ //Boundary related printouts
+		if(fStepsDebug){ //Boundary related printouts
+			if((postStepPoint->GetStepStatus()==fGeomBoundary) || fWasAtBoundary){
 				if(!fWasAtBoundary){ //Printout at post step point boundary
 					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon at volumes boundary" << G4endl;
 					G4cout << "               Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
 					G4cout << "               Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
 					G4cout << "           Track status: " << TrackStat << G4endl;
+					G4cout << "            At boundary: " << (postStepPoint->GetStepStatus()==fGeomBoundary) << G4endl;
 					G4cout << "               Sel proc: " << postStepPoint->GetProcessDefinedStep()->GetProcessName() << G4endl;
 					G4cout << "   First step in volume: " << pStep->IsFirstStepInVolume() << G4endl;
 					G4cout << "    Last step in volume: " << pStep->IsLastStepInVolume() << G4endl;
-					G4cout << "            Step length: " << pStep->GetStepLength() << G4endl;
-					G4cout << "       Deposited energy: " << pStep->GetTotalEnergyDeposit() << G4endl;
+					G4cout << "       Step length (mm): " << pStep->GetStepLength()/mm << G4endl;
 				}else{ //Printout after boundary post step point
 					G4cout << "\nStepDebug --> Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon after volumes boundary" << G4endl;
-					G4cout << "              Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
-					G4cout << "              Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
-					G4cout << "              " << "Track status: " << TrackStat << G4endl;
-					G4cout << "               Sel proc: " << postStepPoint->GetProcessDefinedStep()->GetProcessName() << G4endl;
-					G4cout << "   First step in volume: " << pStep->IsFirstStepInVolume() << G4endl;
-					G4cout << "    Last step in volume: " << pStep->IsLastStepInVolume() << G4endl;
-					G4cout << "            Step length: " << pStep->GetStepLength() << G4endl;
-					G4cout << "       Deposited energy: " << pStep->GetTotalEnergyDeposit() << G4endl;
-				}
-				//std::string foo;
-				//G4cout << "Press a enter to continue..."; std::cin >> foo;
-			}else{
-				//Print out for any condition
-				if( (fSave==DatasaveLevel::kAll) || (fOptPhSenDetVolPtrs.find(post_Vol)!=fOptPhSenDetVolPtrs.end()) ){
-					G4cout << "Debug ---> AnalysisManagerOptPh::Step:\n" << G4endl;
-					G4cout << "Event " << fCurrentEvent << ", trackID: " << fCurrentTrack->GetTrackID() << ". Optical photon at volumes boundary"<< G4endl;
 					G4cout << "               Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
 					G4cout << "               Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
 					G4cout << "           Track status: " << TrackStat << G4endl;
+					G4cout << "            At boundary: " << (postStepPoint->GetStepStatus()==fGeomBoundary) << G4endl;
 					G4cout << "               Sel proc: " << postStepPoint->GetProcessDefinedStep()->GetProcessName() << G4endl;
 					G4cout << "   First step in volume: " << pStep->IsFirstStepInVolume() << G4endl;
 					G4cout << "    Last step in volume: " << pStep->IsLastStepInVolume() << G4endl;
-					G4cout << "            Step length: " << pStep->GetStepLength() << G4endl;
-					G4cout << "       Deposited energy: " << pStep->GetTotalEnergyDeposit() << G4endl;
+					G4cout << "       Step length (mm): " << pStep->GetStepLength()/mm << G4endl;
+				}
+			}
+		}else{
+			//Print out for any condition
+			//if( (fSave==DatasaveLevel::kAll) || (fOptPhSenDetVolPtrs.find(saveVol)!=fOptPhSenDetVolPtrs.end()) ){
+			
+			if(true){
+				G4String creatProc("Primary");
+				if(fCurrentTrack->GetCreatorProcess()) creatProc = fCurrentTrack->GetCreatorProcess()->GetProcessName();
+				
+				G4double preGlobTime = 0.;
+				if(preStepPoint) preGlobTime = preStepPoint->GetGlobalTime()/CLHEP::ns;
+				
+				G4cout << "Debug ---> AnalysisManagerOptPh::Step:\n" << G4endl;
+				G4cout << "Event " << fCurrentEvent << " | trackID: " << fCurrentTrack->GetTrackID() << " | Parent ID: " << fCurrentTrack->GetParentID() << " | Creat. Proc: " << creatProc << G4endl;
+				G4cout << "               Step num: " << fCurrentTrack->GetCurrentStepNumber() << G4endl;
+				G4cout << "               Volume 1: <" << pre_Vol->GetName() << ">, copy num: " << pre_touch->GetCopyNumber() << G4endl; 
+				G4cout << "               Volume 2: <" << post_Vol->GetName() << ">, copy num:" << post_touch->GetCopyNumber() << G4endl;
+				G4cout << "           Track status: " << TrackStat << G4endl;
+				G4cout << "            At boundary: " << (postStepPoint->GetStepStatus()==fGeomBoundary) << G4endl;
+				G4cout << "               Sel proc: " << postStepPoint->GetProcessDefinedStep()->GetProcessName() << G4endl;
+				G4cout << "   First step in volume: " << pStep->IsFirstStepInVolume() << G4endl;
+				G4cout << "    Last step in volume: " << pStep->IsLastStepInVolume() << G4endl;
+				G4cout << "       Step length (mm): " << pStep->GetStepLength()/mm << G4endl;
+				G4cout << "        Wavelength (nm): " << h_Planck*c_light/postStepPoint->GetKineticEnergy()/nm << G4endl;
+				if(preStepPoint){//Avoids out of world steps
+					G4cout << "     Track time P1 (ns): " << preGlobTime << G4endl;
+					G4cout << "     Track time P2 (ns): " << postStepPoint->GetGlobalTime()/CLHEP::ns << G4endl;
 				}
 				
 			}

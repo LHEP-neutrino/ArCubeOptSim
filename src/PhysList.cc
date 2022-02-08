@@ -159,13 +159,15 @@ void PhysListOptPh::ConstructOptical()
 				G4cout << "Info --> PhysListOptPh::ConstructOptical: Adding DiscreteProcesses for \"opticalphoton\" particle" << G4endl;
 			}
 			
-			ph->RegisterProcess(fStepLimiter, particle);
+			
 			ph->RegisterProcess(fAbsorptionProcess, particle);
 			ph->RegisterProcess(fRayleighScatteringProcess, particle);
 			ph->RegisterProcess(fWLSProcess, particle);
 			ph->RegisterProcess(fMieHGScatteringProcess, particle);
 			ph->RegisterProcess(fBoundaryProcess, particle);
 		}
+		//ph->RegisterProcess(fStepLimiter, particle);
+		pmanager->AddDiscreteProcess(new G4StepLimiter);
 	}
 }
 
