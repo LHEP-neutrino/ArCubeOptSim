@@ -1,0 +1,197 @@
+{
+  "commands":[
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802Mirr_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "WLS2TPB_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_WLS2TPB.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "WLS2LAr_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_WLS2LAr.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_WLS2LAr.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "Mirr2EJ280_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2G10_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2G10.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2G10.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2Kapton_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Kapton.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Kapton.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2FR4_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2FR4.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2FR4.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2Gold_optsurf",
+        "model": "unified",
+        "type": "dielectric_metal",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Gold.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Gold.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2TPB_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1,
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2TPB.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "TPB2LAr_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "ground",
+        "sigma_alpha": 0.1
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802LAr_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "TPB2EJ280_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802TPB_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "LAr2EJ280_dicr_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802LAr_dicr_optsurf",
+        "model": "dichroic",
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802ESR_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished"
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802SiPMmask_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+	"propfile": {
+	  "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"	
+	}
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
+        "surfname": "EJ2802SiPM_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished"
+      }
+    }
+  ]
+}

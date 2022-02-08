@@ -1,0 +1,41 @@
+{
+  "commands":[
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802LAr_dicr_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volTPB_LAr_PV",
+        "optsurf": "EJ2802LAr_dicr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "LArEJ2802_dicr_logsurf",
+		"vol1": "volTPB_LAr_PV",
+        "vol2": "volWLS_PV",
+        "optsurf": "LAr2EJ280_dicr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802SiPM_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volSiPM_Sens_PV",
+        "optsurf": "EJ2802SiPM_optsurf"
+      }
+    },
+
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802SiPMmask_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volSiPM_Mask_PV",
+        "optsurf": "EJ2802SiPMmask_optsurf"
+      }
+    }
+  ]
+}
