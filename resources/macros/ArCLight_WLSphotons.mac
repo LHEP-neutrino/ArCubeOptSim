@@ -14,10 +14,21 @@
 /argoncube/detector/optical/verbosity 0
 /argoncube/detector/optical/loadOptSett resources/optMatProp_all.json #Load optical properties of materials
 /argoncube/detector/optical/loadOptSett resources/optSurfs_all.json #Load all the optical surfaces
+
 ### Select one configuration to properly load the logical surfaces ###
-/argoncube/detector/optical/loadOptSett resources/optProp_woMirr_woTPB_dicr.json # Dicroic on top surface only. No TPB coating. No ESR mirror.
-#/argoncube/detector/optical/loadOptSett resources/optProp_wSideDicMirr.json # Dicroic all around the WLS. No TPB coating. No ESR mirror.
-#/argoncube/detector/optical/loadOptSett resources/optProp_woMirr_wTPB_dicr.json # Dicroic on top surface only. With TPB coating. No ESR mirror.
+
+# Dicroic on top surface only. No TPB coating. No ESR mirror.
+/argoncube/detector/optical/loadOptSett resources/ArCLight_optProp_woMirr_woTPB_dicr.json #Remember to set TPB thickness to 0 for this
+
+# Dicroic on top surface only. With TPB coating. No ESR mirror.
+#/argoncube/detector/optical/loadOptSett resources/ArCLight_optProp_woMirr_wTPB_dicr.json #Remember to set TPB thickness > 0 for this
+
+# Dicroic all around the WLS. No TPB coating. Dicroic mirror all around.
+#/argoncube/detector/optical/loadOptSett resources/ArCLight_optProp_wSideDicMirr.json  #Remember to set TPB thickness to 0 for this
+
+# Dicroic all around the WLS. With TPB coating. Dicroic mirror all around.
+#/argoncube/detector/optical/loadOptSett resources/ArCLight_optProp_wSideDicMirr_wTPB.json #Remember to set TPB thickness > 0 for this 
+
 
 ### Define volumes to kill photons ###
 #/argoncube/analysis/DefAbsVols volSiPM_Sens_PV volSiPM_LCM_PV #Needed only in the stepping mode
@@ -39,13 +50,6 @@
 /argoncube/gun/halfx 15.0 cm # shape of volWLS_LAr
 /argoncube/gun/halfy 16.0 cm # shape of volWLS_LAr
 /argoncube/gun/halfz 0.5 cm # shape of volWLS_LAr
-/argoncube/gun/direction 0 0 -1 # perpendicular onto TPB layer
-/argoncube/gun/confine 
+/argoncube/gun/confine volWLS_PV # Force the photons to be generated in the WLS physical volume
 
-
-### Hit the TPB coating of ArCLight ###
-#/argoncube/gun/position 0 -15 25 cm
-#/argoncube/gun/direction 0 0.1 1
-
-
-#/run/beamOn 100
+#/run/beamOn 100 #In batch mode use the -n <nevents> option and not this command
