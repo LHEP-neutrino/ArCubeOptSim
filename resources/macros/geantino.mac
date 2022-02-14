@@ -1,12 +1,11 @@
 #/control/verbose 2
 #/run/verbose 2
-/event/verbose 2
+#/event/verbose 2
 /tracking/verbose 2
 
 /argoncube/gun/particle geantino
 /argoncube/gun/angtype direction
-/argoncube/gun/direction 0 0 1
-/argoncube/gun/position 1.1085 -465.6 0 mm
+/argoncube/gun/direction 0 0 -1
+/argoncube/gun/position 0 0 3 cm
 
 /run/beamOn 1
-
