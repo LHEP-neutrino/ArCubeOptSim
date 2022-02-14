@@ -3,12 +3,19 @@
 #/event/verbose 2
 #/tracking/verbose 2
 
-#The drift direction is "x", the vertical direction is "y" and the direction normal to the light detectors is "z"
-/argoncube/gun/particle opticalphoton
-/argoncube/gun/angtype direction
-/argoncube/gun/direction 0 1 0
-/argoncube/gun/polarization 1 0 0
-/argoncube/gun/position 0 0 315 mm
-/argoncube/gun/primaryNb 1
+### Load optical properties from JSON file ###
+/argoncube/detector/optical/verbosity 0
+/argoncube/detector/optical/loadOptSett resources/optMatProp_all.json
+/argoncube/detector/optical/loadOptSett resources/optSurfs_all.json
+/argoncube/detector/optical/loadOptSett resources/optProp_woMirr_woTPB_dicr.json
 
-/run/beamOn 1
+
+#/argoncube/gun/particle opticalphoton
+#/argoncube/gun/energy 2.53 eV #Green photon
+#/argoncube/gun/angtype direction
+#/argoncube/gun/direction 0 1 0
+#/argoncube/gun/polarization 1 0 0
+#/argoncube/gun/position 0 0 315 mm
+#/argoncube/gun/primaryNb 1
+
+#/run/beamOn 1
