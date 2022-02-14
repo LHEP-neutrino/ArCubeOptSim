@@ -1,0 +1,51 @@
+#/control/verbose 2
+#/run/verbose 2
+#/event/verbose 2
+#/tracking/verbose 2
+
+### Define debug levels ###
+#/argoncube/analysis/stepsDebug 0
+
+### Define verbosity levels ###
+#/argoncube/detector/optical/verbosity 1
+#/tracking/verbose 1
+
+### Load optical properties from JSON file ###
+/argoncube/detector/optical/verbosity 0
+/argoncube/detector/optical/loadOptSett resources/optMatProp_all.json #Load optical properties of materials
+/argoncube/detector/optical/loadOptSett resources/optSurfs_all.json #Load all the optical surfaces
+### Select one configuration to properly load the logical surfaces ###
+/argoncube/detector/optical/loadOptSett resources/optProp_woMirr_woTPB_dicr.json # Dicroic on top surface only. No TPB coating. No ESR mirror.
+#/argoncube/detector/optical/loadOptSett resources/optProp_wSideDicMirr.json # Dicroic all around the WLS. No TPB coating. No ESR mirror.
+#/argoncube/detector/optical/loadOptSett resources/optProp_woMirr_wTPB_dicr.json # Dicroic on top surface only. With TPB coating. No ESR mirror.
+
+### Define volumes to kill photons ###
+#/argoncube/analysis/DefAbsVols volSiPM_Sens_PV volSiPM_LCM_PV #Needed only in the stepping mode
+
+### Define volumes to detect photons ###
+/argoncube/analysis/DefOptSD volSiPM_Sens_PV
+
+### Define particle type and properties ###
+/argoncube/gun/primaryNb 1
+/argoncube/gun/particle opticalphoton
+/argoncube/gun/energy 2.53 eV #Green photon at ~490 nm
+/argoncube/gun/angtype iso
+
+### Generate monochromatic photons ###
+### uniformly distributed inside the WLS tile ###
+/argoncube/gun/sourceType Volume
+/argoncube/gun/shape Box
+/argoncube/gun/center 0 0 0 mm #Center of the generation box
+/argoncube/gun/halfx 15.0 cm # shape of volWLS_LAr
+/argoncube/gun/halfy 16.0 cm # shape of volWLS_LAr
+/argoncube/gun/halfz 0.5 cm # shape of volWLS_LAr
+/argoncube/gun/direction 0 0 -1 # perpendicular onto TPB layer
+/argoncube/gun/confine 
+
+
+### Hit the TPB coating of ArCLight ###
+#/argoncube/gun/position 0 -15 25 cm
+#/argoncube/gun/direction 0 0.1 1
+
+
+#/run/beamOn 100
