@@ -1,0 +1,67 @@
+{
+  "commands":[
+	{
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "LAr2TPB_logsurf",
+        "vol1": "volTPB_LAr_PV",
+        "vol2": "volTPB_PV",
+        "optsurf": "LAr2TPB_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "TPB2LAr_logsurf",
+        "vol1": "volTPB_PV",
+        "vol2": "volTPB_LAr_PV",
+        "optsurf": "TPB2LAr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "TPB2EJ2802_dicr_logsurf",
+        "vol1": "volTPB_PV",
+        "vol2": "volWLS_PV",
+        "optsurf": "LAr2EJ280_dicr_optsurf"
+      }
+    },
+	{
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802TPB_dicr_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volTPB_PV",
+        "optsurf": "LAr2EJ280_dicr_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802SiPM_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volSiPM_Sens_PV",
+        "optsurf": "EJ2802SiPM_optsurf"
+      }
+    },
+    {
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "LAr2EJ2802_dicr_logsurf",
+        "vol1": "volDetEnclosure_PV",
+        "vol2": "volWLS_PV",
+        "optsurf": "LAr2EJ280_dicr_optsurf"
+      }
+    },
+	{
+      "name": "buildlogbordersurf",
+      "obj": {
+        "surfname": "EJ2802LAr_dicr_logsurf",
+        "vol1": "volWLS_PV",
+        "vol2": "volDetEnclosure_PV",
+        "optsurf": "LAr2EJ280_dicr_optsurf"
+      }
+    }
+  ]
+}
