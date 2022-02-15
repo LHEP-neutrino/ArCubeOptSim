@@ -48,8 +48,8 @@
     {
       "name": "buildlogbordersurf",
       "obj": {
-        "surfname": "LAr2EJ2802_dicr_logsurf",
-        "vol1": "volDetEnclosure_PV",
+        "surfname": "Mirr2EJ2802_dicr_logsurf",
+        "vol1": "volMirror_PV",
         "vol2": "volWLS_PV",
         "optsurf": "LAr2EJ280_dicr_optsurf"
       }
@@ -57,9 +57,9 @@
 	{
       "name": "buildlogbordersurf",
       "obj": {
-        "surfname": "EJ2802LAr_dicr_logsurf",
+        "surfname": "EJ2802Mirr_dicr_logsurf",
         "vol1": "volWLS_PV",
-        "vol2": "volDetEnclosure_PV",
+        "vol2": "volMirror_PV",
         "optsurf": "LAr2EJ280_dicr_optsurf"
       }
     }
