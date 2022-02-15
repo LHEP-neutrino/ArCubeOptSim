@@ -69,6 +69,8 @@ fDetectorMessenger(nullptr),
 fVerbose(DetVerbosity::kSilent),
 fTpbThick(1*um) //Default value. Can be changed by a user command
 {
+	fDetectorMessenger = new DetectorMessenger(this);
+	
 	fGDMLParser = new G4GDMLParser;
 	
 	{
@@ -79,15 +81,15 @@ fTpbThick(1*um) //Default value. Can be changed by a user command
 		}
 	}
 	
-	if(fWorld){
-		fDetectorMessenger = new DetectorMessenger(this);
+	if(!fWorld){
+		G4Exception("DetConstrOptPh::DetConstrOptPh(...)","Geom.001", FatalException,"The \"fWorld\" pointer is null!");
 	}
 	
 	fOptPropManager = OptPropManager::GetInstance();
 	fOptPropManager->SetDetConstr(this);
 	
 	if(!fOptPropManager){
-		G4Exception("DetConstrOptPh::DetConstrOptPh(...)","Geom.001", FatalException,"Cannot get \"OptPropManager\" pointer.");
+		G4Exception("DetConstrOptPh::DetConstrOptPh(...)","Geom.002", FatalException,"Cannot get \"OptPropManager\" pointer.");
 	}
 	
 	fOptSurfTab = G4SurfaceProperty::GetSurfacePropertyTable();
@@ -328,7 +330,7 @@ void DetConstrOptPh::SetDefaultOptProperties()
 #endif
 	
 	if(!fOptPropManager){
-		G4Exception("DetConstrOptPh::DefaultOptProperties()","Geom.002", FatalException,"\"OptPropManager\" pointer is null.");
+		G4Exception("DetConstrOptPh::DefaultOptProperties()","Geom.003", FatalException,"\"OptPropManager\" pointer is null.");
 	}
 
 #ifndef NDEBUG	
