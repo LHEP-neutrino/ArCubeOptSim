@@ -52,6 +52,8 @@ private:
      G4UIcmdWithoutParameter    *fGetDirectCmd;
 	 G4UIcmdWithoutParameter    *fGetPolarCmd;
 	 G4UIcmdWithoutParameter    *fGetPartCmd;
+	 G4UIcmdWithAString         *fEneryDistCmd;
+	 G4UIcmdWithAString         *fSpectrumFileCmd;
 };
 
 #endif

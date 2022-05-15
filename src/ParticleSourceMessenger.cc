@@ -84,7 +84,16 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fPolarCmd->SetParameterName("ex", "ey", "ez", true, true);
 	fPolarCmd->SetRange("ex != 0 || ey != 0 || ez != 0");
 	fPolarCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
-
+	
+	//Energy distribution type
+	fEneryDistCmd = new G4UIcmdWithAString("/argoncube/gun/EnDistType", this);
+	fEneryDistCmd->SetGuidance("Sets energy distribution type.");
+	fEneryDistCmd->SetGuidance("Options: \"Mono\" or \"Spectrum\"");
+	fEneryDistCmd->SetParameterName("EnergyDisType", true, true);
+	fEneryDistCmd->SetDefaultValue("Mono");
+	fEneryDistCmd->SetCandidates("Mono Spectrum");
+	fEneryDistCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+	
 	// particle energy
 	fEnergyCmd = new G4UIcmdWithADoubleAndUnit("/argoncube/gun/energy", this);
 	fEnergyCmd->SetGuidance("Set optical photon energy.");
@@ -93,7 +102,17 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fEnergyCmd->SetUnitCategory("Energy");
 	fEnergyCmd->SetUnitCandidates("eV keV MeV GeV TeV");
 	fEnergyCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
-
+	
+	// source distribution type
+	fTypeCmd = new G4UIcmdWithAString("/argoncube/gun/sourceType", this);
+	fTypeCmd->SetGuidance("Sets source distribution type.");
+	fTypeCmd->SetGuidance("Options: \"Point\" or \"Volume\"");
+	fTypeCmd->SetParameterName("DisType", true, true);
+	fTypeCmd->SetDefaultValue("Point");
+	fTypeCmd->SetCandidates("Point Volume");
+	fTypeCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+	
+	// particle position (if source type is "Point")
 	fPositionCmd = new G4UIcmdWith3VectorAndUnit("/argoncube/gun/position", this);
 	fPositionCmd->SetGuidance("Set starting position of the particle.");
 	fPositionCmd->SetParameterName("X", "Y", "Z", true, true);
@@ -101,15 +120,6 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fPositionCmd->SetUnitCategory("Length");
 	fPositionCmd->SetUnitCandidates("nm mum mm cm m km");
 	fPositionCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
-	
-	// source distribution type
-	fTypeCmd = new G4UIcmdWithAString("/argoncube/gun/sourceType", this);
-	fTypeCmd->SetGuidance("Sets source distribution type.");
-	fTypeCmd->SetGuidance("Either Point or Volume");
-	fTypeCmd->SetParameterName("DisType", true, true);
-	fTypeCmd->SetDefaultValue("Point");
-	fTypeCmd->SetCandidates("Point Volume");
-	fTypeCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
 	// source shape
 	fShapeCmd = new G4UIcmdWithAString("/argoncube/gun/shape", this);
@@ -168,7 +178,7 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fConfineCmd->SetGuidance("Confine source to volume(s) (NULL to unset).");
 	fConfineCmd->SetGuidance("usage: confine VolName1 VolName2 ...");
 	fConfineCmd->SetParameterName("VolName", true, true);
-	fConfineCmd->SetDefaultValue("NULL");
+	fConfineCmd->SetDefaultValue("");
 	fConfineCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
 	// angular distribution
@@ -176,8 +186,8 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fAngTypeCmd->SetGuidance("Sets angular source distribution type");
 	fAngTypeCmd->SetGuidance("Possible variables are: iso direction");
 	fAngTypeCmd->SetParameterName("AngDis", true, true);
-	fAngTypeCmd->SetDefaultValue("iso");
-	fAngTypeCmd->SetCandidates("iso direction");
+	fAngTypeCmd->SetDefaultValue("Iso");
+	fAngTypeCmd->SetCandidates("Iso Direction");
 	fAngTypeCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 
 	// verbosity
@@ -204,6 +214,12 @@ ParticleSourceOptPhMessenger::ParticleSourceOptPhMessenger(ParticleSourceOptPh *
 	fGetPolarCmd = new G4UIcmdWithoutParameter("/argoncube/gun/getPolar", this);
 	fGetPolarCmd->SetGuidance("Prints the particle polarization set");
 	fGetPolarCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+	
+	// Spectrum file
+	fSpectrumFileCmd = new G4UIcmdWithAString("/argoncube/gun/EnergySpectrum", this);
+	fSpectrumFileCmd->SetGuidance("Load the spectrum of the optical photons from an ascii file with two numerical columns. The first column must be the photon anergy in eV the second the spectral density (in arbitrary units).");
+	fSpectrumFileCmd->SetGuidance("usage: EnergySpec <path/filename.txt>");
+	fSpectrumFileCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
 }
 
 ParticleSourceOptPhMessenger::~ParticleSourceOptPhMessenger()
@@ -229,6 +245,8 @@ ParticleSourceOptPhMessenger::~ParticleSourceOptPhMessenger()
 	delete fGetPartCmd;
 	delete fGetDirectCmd;
 	delete fGetPolarCmd;
+	delete fEneryDistCmd;
+	delete fSpectrumFileCmd;
 }
 
 void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String newValues)
@@ -245,19 +263,42 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 		if(pd){
 			G4cout << "\nSetting primary particle to: <" << pd->GetParticleName() << ">" << G4endl;
 			fParticleSource->SetParticleDef(pd);
+		}else{
+			G4cerr << "\nERROR --> ParticleSourceOptPhMessenger::SetNewValue: Particle \"" << newValues << "\" not present in the particle table.\n" << G4endl;
 		}
 		return;
 	}
 	
 	if(command == fTypeCmd){
-		G4cout << "\nSetting position distribution type to: \"" << newValues << "\"" << G4endl;
-		fParticleSource->SetPosDisType(newValues);
+		
+		if(newValues == G4String("Point")){
+			G4cout << "\nSetting position distribution type to: \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetPosDisType(ParticleSourceOptPh::SourceType::kPoint);
+		}else if(newValues == G4String("Volume")){
+			G4cout << "\nSetting position distribution type to: \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetPosDisType(ParticleSourceOptPh::SourceType::kVolume);
+		}else{
+			G4cerr << "\nERROR --> ParticleSourceOptPhMessenger::SetNewValue: The only allowed values for the position distribution type are [\"Point\", \"Volume\"]\n" << G4endl;
+		}
 		return;
 	}
 	
 	if(command == fShapeCmd){
-		G4cout << "\nSetting position source shape to: \"" << newValues << "\"" << G4endl;
-		fParticleSource->SetPosDisShape(newValues);
+		
+		if(newValues == G4String("Sphere")){
+			G4cout << "\nSetting position source shape to: \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetPosDisShape(ParticleSourceOptPh::SourceShape::kSphere);
+			
+		}else if(newValues == G4String("Cylinder")){
+			G4cout << "\nSetting position source shape to: \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetPosDisShape(ParticleSourceOptPh::SourceShape::kCylinder);
+			
+		}else if(newValues == G4String("Box")){
+			G4cout << "\nSetting position source shape to: \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetPosDisShape(ParticleSourceOptPh::SourceShape::kBox);
+		}else{
+			G4cerr << "\nERROR --> ParticleSourceOptPhMessenger::SetNewValue: The only allowed volume shapes are [\"Sphere\", \"Cylinder\", \"Box\"]\n" << G4endl;
+		}
 		return;
 	}
 	
@@ -292,8 +333,19 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 	}
 	
 	if(command == fAngTypeCmd){
-		G4cout << "\nSetting angular distribution type to: \"" << newValues << "\"" << G4endl;
-		fParticleSource->SetAngDistType(newValues);
+		
+		if(newValues == G4String("Direction")){
+			fParticleSource->SetAngDistType(ParticleSourceOptPh::AngDistType::kDirection);
+			G4cout << "\nSetting angular distribution type to: \"" << newValues << "\"" << G4endl;
+			
+		}else if(newValues == G4String("Iso")){
+			fParticleSource->SetAngDistType(ParticleSourceOptPh::AngDistType::kIso);
+			G4cout << "\nSetting angular distribution type to: \"" << newValues << "\"" << G4endl;
+			
+		}else{
+			G4cerr << "\nERROR --> ParticleSourceOptPhMessenger::SetNewValue: The only allowed angular distribution types are [\"Direction\", \"Iso\"]\n" << G4endl;
+			
+		}
 		return;
 	}
 	
@@ -309,18 +361,14 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 		return;
 	}
 	
-	//else if(command == fListCmd) fParticleSource->DumpTable();return;
-	
 	if(command == fDirectionCmd)
 	{
 		G4cout << "\nSetting primary particle direction to: " << fDirectionCmd->GetNew3VectorValue(newValues) << G4endl;
-		G4cout << "\nSetting angular distribution type to: \"direction\"" << G4endl;
-		fParticleSource->SetAngDistType("direction");
 		fParticleSource->SetDirection(fDirectionCmd->GetNew3VectorValue(newValues));
 		return;
 	}
 	
-	if(command==fPolarCmd){
+	if(command == fPolarCmd){
 		G4cout << "\nSetting primary particle polarization to: " << fPolarCmd->GetNew3VectorValue(newValues) << G4endl;
 		fParticleSource->SetPhotonPolar(fPolarCmd->GetNew3VectorValue(newValues));
 		return;
@@ -329,8 +377,6 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 	if(command == fEnergyCmd)
 	{
 		G4cout << "\nSetting primary particle energy to: " << newValues << G4endl;
-		G4cout << "\nSetting energy distribution type to: \"Mono\"" << G4endl;
-		fParticleSource->SetEnergyDisType("Mono");
 		fParticleSource->SetKinEnergy(fEnergyCmd->GetNewDoubleValue(newValues));
 		return;
 	}
@@ -338,8 +384,6 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 	if(command == fPositionCmd)
 	{
 		G4cout << "\nSetting primary particle position to: " << fPositionCmd->GetNew3VectorValue(newValues) << G4endl;
-		G4cout << "\nSetting position distribution type to: \"Point\"" << G4endl;
-		fParticleSource->SetPosDisType("Point");
 		fParticleSource->SetCenterCoords(fPositionCmd->GetNew3VectorValue(newValues));
 		return;
 	}
@@ -363,6 +407,27 @@ void ParticleSourceOptPhMessenger::SetNewValue(G4UIcommand* command, G4String ne
 		return;
 	}
 	
-	G4cerr << "ParticleSourceOptPhMessenger::SetNewValue(...) --> ERROR: not recognized command" << G4endl;
+	if(command == fEneryDistCmd){
+		if(newValues == G4String("Mono")){
+			G4cout << "\nSetting primary particle energy distribution to \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetEnergyDisType(ParticleSourceOptPh::EnergyDistType::kMono);
+			
+		}else if(newValues == G4String("Spectrum")){
+			G4cout << "\nSetting primary particle energy distribution to \"" << newValues << "\"" << G4endl;
+			fParticleSource->SetEnergyDisType(ParticleSourceOptPh::EnergyDistType::kSpectrum);
+			
+		}else{
+			G4cerr << "\nERROR --> ParticleSourceOptPhMessenger::SetNewValue: The only allowed energy distribution types are [\"Mono\", \"Spectrum\"]\n" << G4endl;
+		}
+		return;
+	}
+	
+	if(command == fSpectrumFileCmd)
+	{
+		fParticleSource->SetEnergySpectrum(newValues);
+		return;
+	}
+	
+	G4cerr << "ERROR --> ParticleSourceOptPhMessenger::SetNewValue: command not recognized." << G4endl;
 }
 

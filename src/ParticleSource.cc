@@ -1,19 +1,23 @@
+#include "TGraph.h"
+#include "TF1.h"
+#include "Math/Integrator.h"
+
 #include "ParticleSource.hh"
 #include "ParticleSourceMessenger.hh"
 #include "PrimGenAction.hh"
 
-#include <G4PrimaryParticle.hh>
-#include <G4Event.hh>
-#include <G4TransportationManager.hh>
-#include <G4VPhysicalVolume.hh>
-#include <G4PhysicalVolumeStore.hh>
-#include <G4ParticleTable.hh>
-#include <G4ParticleDefinition.hh>
-#include <G4IonTable.hh>
-#include <G4Ions.hh>
-#include <G4TrackingManager.hh>
-#include <G4Track.hh>
-#include <Randomize.hh>
+#include "G4PrimaryParticle.hh"
+#include "G4Event.hh"
+#include "G4TransportationManager.hh"
+#include "G4VPhysicalVolume.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4ParticleTable.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4IonTable.hh"
+#include "G4Ions.hh"
+#include "G4TrackingManager.hh"
+#include "G4Track.hh"
+#include "Randomize.hh"
 #include "G4SystemOfUnits.hh"
 
 #include <iostream>
@@ -24,11 +28,15 @@ using std::stringstream;
 
 
 
-ParticleSourceOptPh::ParticleSourceOptPh(PrimaryGeneratorActionOptPh *primGenAct, G4int nPrim, G4int verb)
+ParticleSourceOptPh::ParticleSourceOptPh(PrimaryGeneratorActionOptPh *primGenAct, G4int nPrim, G4int verb):
+fPrimGenAct(primGenAct),
+fPrimNb(nPrim),
+fEnergySpectLoaded(false),
+fInvIntegralSpectrum(nullptr)
 {
-	fPrimGenAct = primGenAct;
+	//fPrimGenAct = primGenAct;
 	
-	fPrimNb = nPrim;
+	//fPrimNb = nPrim;
 	
 	fParticleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("opticalphoton");
 	
@@ -50,6 +58,7 @@ ParticleSourceOptPh::ParticleSourceOptPh(PrimaryGeneratorActionOptPh *primGenAct
 ParticleSourceOptPh::~ParticleSourceOptPh()
 {
 	delete fMessenger;
+	if(fInvIntegralSpectrum) delete fInvIntegralSpectrum;
 }
 
 
@@ -66,22 +75,22 @@ void ParticleSourceOptPh::SetInitialValues()
 	
 	
 	fVol = NULL;
-	fPosition=G4ThreeVector(0.,0.,0.);
-	fTime=0.;
-	fPolarization=G4ThreeVector(1.,0.,0.);
+	fPosition = G4ThreeVector(0.,0.,0.);
+	fTime = 0.;
+	fPolarization = G4ThreeVector(1.,0.,0.);
 	
 	
-	fSourcePosType="Point";
-	fShape="NULL";;
+	fSourcePosType = SourceType::kPoint;
+	fShape = SourceShape::kNone;
 	fCenterCoords=G4ThreeVector(0.,0.,0.);
 	
-	fHalfx=0.;
-	fHalfy=0.;
-	fHalfz=0.;
-	fRadius=0.;
-	fConfine=false;
-	fAngDistType="iso";
-	fEnergyDisType="Mono";
+	fHalfx = 0.;
+	fHalfy = 0.;
+	fHalfz = 0.;
+	fRadius = 0.;
+	fConfine = false;
+	fAngDistType = AngDistType::kDirection;
+	fEnergyDisType = EnergyDistType::kMono;
 	
 	fMaxConfineLoop = 100000;
 	
@@ -102,7 +111,7 @@ void ParticleSourceOptPh::GeneratePrimaryVertex(G4Event* evt)
 {
 	if(!fParticleDefinition)
 	{
-		G4cerr << "\nParticleSourceOptPh::GeneratePrimaryVertex(...)--> ERROR: No particle is defined!" << G4endl;
+		G4cerr << "\nERROR --> ParticleSourceOptPh::GeneratePrimaryVertex: No particle is defined!" << G4endl;
 		return;
 	}
 	
@@ -110,9 +119,9 @@ void ParticleSourceOptPh::GeneratePrimaryVertex(G4Event* evt)
 	G4bool srcconf = false;
 	
 	
-	if(fSourcePosType == "Point"){
+	if(fSourcePosType == SourceType::kPoint){
 		GeneratePointSource();
-	}else if(fSourcePosType == "Volume"){
+	}else if(fSourcePosType == SourceType::kVolume){
 		
 		if(fConfine == true){
 			
@@ -146,21 +155,6 @@ void ParticleSourceOptPh::GeneratePrimaryVertex(G4Event* evt)
 	fPosPrim = fPosition;
 	fVolPrim = fVol;
 	
-	// Angular stuff
-	if(fAngDistType == "direction"){
-		SetDirection(fMomentumDirection);
-	}else{
-		if(fAngDistType != "iso"){
-			G4cerr << "\nERROR --> ParticleSourceOptPh::GeneratePrimaryVertex(...): AngDistType has unusual value" << G4endl;
-			return;
-		}
-	}
-	
-	// Energy stuff
-	if(fEnergyDisType != "Mono"){
-		G4cerr << "\nERROR --> ParticleSourceOptPh::GeneratePrimaryVertex: EnergyDisType has unusual value" << G4endl;
-		return;
-	}
 	
 	// create a new vertex
 	G4PrimaryVertex *vertex = new G4PrimaryVertex(fPosition, fTime);
@@ -168,36 +162,51 @@ void ParticleSourceOptPh::GeneratePrimaryVertex(G4Event* evt)
 	G4String PhysVolName = fNavigator->LocateGlobalPointAndSetup(fPosition)->GetName();
 	
 	
-	if(fVerbosityLevel > 2)
-		G4cout << "Debug --> ParticleSourceOptPh::GeneratePrimaryVertex: Creating primaries and assigning to vertex" << G4endl;
+	if(fVerbosityLevel > 1)
+		G4cout << "\nDetail --> ParticleSourceOptPh::GeneratePrimaryVertex: Creating primaries and assigning to vertex." << G4endl;
 	
 	
 	if(fVerbosityLevel > 0){
-		G4cout << "\nInfo --> ParticleSourceOptPh::GeneratePrimaryVertex(...): " << G4endl;
+		G4cout << "\nInfo --> ParticleSourceOptPh::GeneratePrimaryVertex: " << G4endl;
 		G4cout << " Number of prymaries per event: " << fPrimNb << G4endl;
 		G4cout << "                 Particle name: " << fParticleDefinition->GetParticleName() << G4endl;
-		G4cout << "                        Energy: " << fTotEnergy/keV << " keV" << G4endl;
+		if(fEnergyDisType==EnergyDistType::kMono){
+			G4cout << "                  Energy(Mono): " << fTotEnergy/eV << " eV" << G4endl;
+		}
 		G4cout << "                          Mass: " << fMass/MeV << " MeV" << G4endl;
 		G4cout << "                      Position: " << fPosition << G4endl;
-		if(fAngDistType == "direction"){
-		G4cout << "                     Direction: " << fMomentumDirection << G4endl;
-		G4cout << "                  Polarization: " << fPolarization << G4endl;
-		}else if(fAngDistType == "iso"){
-		G4cout << "                     Direction: isotropic" << fMomentumDirection << G4endl;
-		G4cout << "                  Polarization: random" << fPolarization << G4endl;
+		if(fAngDistType == AngDistType::kDirection){
+			G4cout << "                     Direction: " << fMomentumDirection << G4endl;
+			G4cout << "                  Polarization: " << fPolarization << G4endl;
+		}else if(fAngDistType == AngDistType::kIso){
+			G4cout << "                     Direction: isotropic" << G4endl;
+			G4cout << "                  Polarization: random" << G4endl;
 		}
 	}
 	
 	
-	if(fVerbosityLevel > 2) G4cout << "\nDebug --> ParticleSourceOptPh::GeneratePrimaryVertex(...): " << G4endl;
+	if(fVerbosityLevel > 1) G4cout << "\nDetail --> ParticleSourceOptPh::GeneratePrimaryVertex: " << G4endl;
 	
 	for(G4int iPart = 0; iPart < fPrimNb; iPart++)
 	{
-		if(fAngDistType == "iso"){
+		if(fAngDistType == AngDistType::kIso){
 			GenerateIsotropic();
-			if(fVerbosityLevel > 2){
-				G4cout << "    Direction("<<iPart<<"): " << fMomentumDirection.unit() << G4endl;
-				G4cout << "    Polarization("<<iPart<<"): " << fPolarization << G4endl;
+			if(fVerbosityLevel > 1){
+				G4cout << "                  Direction["<<iPart<<"]: " << fMomentumDirection.unit() << G4endl;
+				G4cout << "               Polarization["<<iPart<<"]: " << fPolarization << G4endl;
+			}
+		}
+		
+		if(fEnergyDisType==EnergyDistType::kSpectrum){
+			
+			if( (!fInvIntegralSpectrum) || (!fEnergySpectLoaded) ){
+				G4Exception("ParticleSourceOptPh::GeneratePrimaryVertex","Event0102",FatalException,"Energy spectrum not loaded.");
+			}
+			
+			SetKinEnergy(SampleEnergyFromSpectrum());
+			
+			if(fVerbosityLevel > 1){
+					G4cout << "                     Energy["<<iPart<<"]: " << fTotEnergy/eV << " eV" << G4endl;
 			}
 		}
 		
@@ -213,7 +222,7 @@ void ParticleSourceOptPh::GeneratePrimaryVertex(G4Event* evt)
 		fPolPrim.at(iPart) = particle->GetPolarization();
 	}
 	evt->AddPrimaryVertex(vertex);
-	if(fVerbosityLevel > 1) G4cout << " Primary Vertex generated with " << fMomPrim.size() << " particles." << G4endl;
+	if(fVerbosityLevel > 0) G4cout << "\nInfo --> ParticleSourceOptPh::GeneratePrimaryVertex: Primary vertex generated with " << fMomPrim.size() << " particles." << G4endl;
 }
 
 
@@ -235,7 +244,7 @@ void ParticleSourceOptPh::SetPrimNb(G4int nprim)
 void ParticleSourceOptPh::SetParticleDef(G4ParticleDefinition *aParticleDefinition)
 {
 	if(!aParticleDefinition){
-		G4Exception("ParticleSourceOptPh::SetParticleDef(...)","Event0101",FatalException,"Null pointer is given.");
+		G4Exception("ParticleSourceOptPh::SetParticleDef","Event0101",FatalException,"Null pointer is given.");
 	}
 	fParticleDefinition = aParticleDefinition;
 	fCharge = fParticleDefinition->GetPDGCharge();
@@ -244,8 +253,9 @@ void ParticleSourceOptPh::SetParticleDef(G4ParticleDefinition *aParticleDefiniti
 }
 
 
-void ParticleSourceOptPh::SetKinEnergy(G4double KinEnergy){
-	fKinEnergy = KinEnergy;
+void ParticleSourceOptPh::SetKinEnergy(G4double dKinEnergy)
+{
+	fKinEnergy = dKinEnergy;
 	if(!fParticleDefinition){
 		//Assuming zero mass
 		fMass = 0;
@@ -276,7 +286,7 @@ void ParticleSourceOptPh::SetMomentum(G4double aMomentum)
 void ParticleSourceOptPh::SetMomentum(G4ParticleMomentum aMomentum)
 {
 	fMomentumDirection = aMomentum.unit();
-	SetMomentum(aMomentum.mag());
+	if(fEnergyDisType==EnergyDistType::kMono) SetMomentum(aMomentum.mag());
 }
 
 
@@ -288,20 +298,20 @@ void ParticleSourceOptPh::PrintParticle(){
 
 void ParticleSourceOptPh::PrintDirection()
 {
-	if(GetAngDistrType()!=G4String("iso")){
-		G4cout << "\nParticle direction: " << fMomentumDirection.unit() << G4endl;
-	}else{
+	if(fAngDistType==AngDistType::kIso){
 		G4cout << "\nParticle direction: isotropic" << G4endl;
+	}else{
+		G4cout << "\nParticle direction: " << fMomentumDirection.unit() << G4endl;
 	}
 }
 
 
 void ParticleSourceOptPh::PrintPolar()
 {
-	if(GetAngDistrType()!=G4String("iso")){
-		G4cout << "\nParticle polarization: " << fPolarization.unit() << G4endl;
-	}else{
+	if(fAngDistType==AngDistType::kIso){
 		G4cout << "\nParticle polarization: random" << G4endl;
+	}else{
+		G4cout << "\nParticle polarization: " << fPolarization.unit() << G4endl;
 	}
 }
 
@@ -377,26 +387,23 @@ void ParticleSourceOptPh::ConfineSourceToVolume(G4String hVolumeList)
 void ParticleSourceOptPh::GeneratePointSource()
 {
 	// Generates Points given the point source.
-	if(fSourcePosType == "Point"){
-		fPosition = fCenterCoords;
-		G4ThreeVector nullvect(0., 0., 0.);
-		G4ThreeVector *ptr = &nullvect;
-		fVol = fNavigator->LocateGlobalPointAndSetup(fPosition, ptr, true);
-	}else if(fVerbosityLevel >= 1){
-		G4cout << "ParticleSourceOptPh::GeneratePointSource() --> ERROR SourcePosType is not set to Point" << G4endl;
-	}
+	fPosition = fCenterCoords;
+	G4ThreeVector nullvect(0., 0., 0.);
+	G4ThreeVector *ptr = &nullvect;
+	fVol = fNavigator->LocateGlobalPointAndSetup(fPosition, ptr, true);
 }
 
 
 void ParticleSourceOptPh::GeneratePointsInVolume()
 {
+	if(fShape == SourceShape::kNone){
+		G4Exception("ParticleSourceOptPh::GeneratePointsInVolume","Event0103",FatalException,"Volume shape not defined. Define it with the proper UI command. Allowed values are [\"Spere\", \"Cylinder\", \"Box\"]!");
+	}
+	
 	
 	G4double x = 0., y = 0., z = 0.;
 
-	if((fSourcePosType != G4String("Volume")) && (fVerbosityLevel >= 1))
-		G4cerr << "\nParticleSourceOptPh::GeneratePointsInVolume() --> ERROR: SourcePosType not Volume" << G4endl;
-
-	if(fShape == "Sphere")
+	if(fShape == SourceShape::kSphere)
 	{
 		x = fRadius * 2.;
 		y = fRadius * 2.;
@@ -414,7 +421,7 @@ void ParticleSourceOptPh::GeneratePointsInVolume()
 		
 	}
 
-	else if(fShape == "Cylinder")
+	else if(fShape == SourceShape::kCylinder)
 	{
 		x = fRadius * 2.;
 		y = fRadius * 2.;
@@ -432,15 +439,13 @@ void ParticleSourceOptPh::GeneratePointsInVolume()
 		}while(((x * x) + (y * y)) > (fRadius * fRadius));
 	}
 
-	else if(fShape == "Box")
+	else if(fShape == SourceShape::kBox)
 	{
 		x = 2*(G4UniformRand()-0.5)*fHalfx;
 		y = 2*(G4UniformRand()-0.5)*fHalfy;
 		z = 2*(G4UniformRand()-0.5)*fHalfz;
 	}
-
-	else
-		G4cerr << "\nParticleSourceOptPh::GeneratePointsInVolume() --> ERROR: Volume Shape Does Not Exist" << G4endl;
+		
 	
 	fPosition = fCenterCoords + G4ThreeVector(x,y,z);
 	G4ThreeVector nullvect(0., 0., 0.);
@@ -513,9 +518,103 @@ void ParticleSourceOptPh::GenerateIsotropic()
 	}
 	
 	// m_hParticleMomentumDirection now holds unit momentum vector.
-	if(fVerbosityLevel >= 2) G4cout << "Generating isotropic vector: " << fMomentumDirection << G4endl;
+	if(fVerbosityLevel > 2) G4cout << "Debug --> ParticleSourceOptPh::GenerateIsotropic: Generating isotropic vector: " << fMomentumDirection << G4endl;
 }
 
 
 
+
+void ParticleSourceOptPh::SetEnergySpectrum(G4String filename){
+	
+	fEnergySpectLoaded = false;
+	
+	std::ifstream infile(filename.c_str());
+	
+	if(!infile){
+		std::cerr << "\nERROR --> ParticleSourceOptPh::SetEnergySpectrum: Cannot find or open in read mode the file <" << filename << "> with the primary spectrum.\n" << std::endl;
+		return;
+	}
+	
+	std::string str;
+	std::stringstream ss_tmp;
+	
+	if(fVerbosityLevel>1){
+		std::cout << "Info --> Reading optical photons primary spectrum from file <" << filename << ">:" << std::endl;
+	}
+	
+	TGraph *gr = new TGraph();
+	
+	int iLine =0;
+	G4double ph_en_d;
+	G4double val_d;
+	while(getline(infile,str)){
+		
+		ss_tmp.clear(); ss_tmp.str("");
+		ss_tmp << str;
+		
+		ss_tmp >> str;
+		if(ss_tmp){
+			ph_en_d = std::stod(str);
+			
+		}else{
+			std::cerr << "\nERROR --> ParticleSourceOptPh::SetEnergySpectrum: Line " << (iLine-1) << " of input file <" << filename << "> is corrupted. The spectrum of primary optical photons will not be loaded from this file." << std::endl;
+			delete gr;
+			return;
+		}
+		
+		ss_tmp >> str;
+		if(ss_tmp){//There is only one value while the file format is defined with 2 columns
+			val_d = std::stod(str);
+		}else{
+			std::cerr << "\nERROR --> ParticleSourceOptPh::SetEnergySpectrum: Line " << (iLine-1) << " of input file <" << filename << "> is corrupted. The spectrum of primary optical photons will not be loaded from this file." << std::endl;
+			delete gr;
+			return;
+		}
+		
+		gr->SetPoint(iLine, ph_en_d*eV, val_d);
+		
+		iLine++;
+	}
+	
+	gr->Sort(); //Usually it is redundant.
+	
+	Int_t nPts = gr->GetN();
+	
+	ROOT::Math::IntegratorOneDimOptions::SetDefaultIntegrator("Gauss");
+	
+	//Make a TF1 to integrate the spectral distribution of the primary optical photons
+	TF1 *func = new TF1("func", [&](Double_t *x, Double_t *y){return gr->Eval(x[0]);}, gr->GetX()[0], gr->GetX()[nPts-1], 0);
+	
+	
+	//Make the already inverted spectrum by swapping the x (the energy) and the y (the integrated spectral density)
+	if(fInvIntegralSpectrum) delete fInvIntegralSpectrum;
+	fInvIntegralSpectrum = new TGraph();
+	
+	for(int iPt=0; iPt<nPts; iPt++){
+		fInvIntegralSpectrum->SetPoint(iPt, func->Integral( gr->GetX()[0], gr->GetX()[iPt] ), gr->GetX()[iPt] );
+	}
+	
+	//Normalise to 1 the integral
+	Double_t maxIntegral = fInvIntegralSpectrum->GetX()[nPts-1];
+	
+	for(int iPt=0; iPt<nPts; iPt++){
+		fInvIntegralSpectrum->GetX()[iPt] /= maxIntegral;
+	}
+	
+	fEnergySpectLoaded = true;
+	
+	delete func;
+	delete gr;
+}
+
+
+double ParticleSourceOptPh::SampleEnergyFromSpectrum(){
+	
+	G4double en = fInvIntegralSpectrum->Eval(G4UniformRand());
+	//if(fVerbosityLevel>1){
+	//	G4cout << "Detail --> Sampled energy: " << en/eV << " eV" << G4endl;
+	//}
+	return en;
+	
+}
 
