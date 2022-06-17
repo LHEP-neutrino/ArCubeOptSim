@@ -1,0 +1,40 @@
+### GDML config file dimensions for cross-checking
+SiPM_dimension: 1.470 mm x 6.000 mm x 6.000 mm
+SiPM_pitch_ArCLight: 47.000 mm
+SiPM_pitch_LCM: 49.750 mm
+SiPM_PCB_pitch: 104.950 mm
+Y_dim_light_tiles: 300.000 mm
+Gap_light_tiles: 1.000 mm
+
+
+### Relative positions from GDML in cm ###
+     <position name="SiPM_Sens_pos_0" unit="cm" x="-13.9999" y="-12.845" z="0"/>
+     <position name="SiPM_Sens_pos_1" unit="cm" x="-13.9999" y="-8.145" z="0"/>
+     <position name="SiPM_Sens_pos_2" unit="cm" x="-13.9999" y="-2.35" z="0"/>
+     <position name="SiPM_Sens_pos_3" unit="cm" x="-13.9999" y="2.35" z="0"/>
+     <position name="SiPM_Sens_pos_4" unit="cm" x="-13.9999" y="8.145" z="0"/>
+     <position name="SiPM_Sens_pos_5" unit="cm" x="-13.9999" y="12.845" z="0"/>
+
+     <position name="SiPM_LCM_pos_0" unit="cm" x="0.009" y="-2.4875" z="0"/>
+     <position name="SiPM_LCM_pos_1" unit="cm" x="0.009" y="2.4875" z="0"/>
+
+     <position name="LCM_pos_0" unit="cm" x="0" y="-10.495" z="0"/>
+     <position name="LCM_pos_1" unit="cm" x="0" y="1.42108547152e-15" z="0"/>
+     <position name="LCM_pos_2" unit="cm" x="0" y="10.495" z="0"/>
+
+     <position name="ArCLight_pos_0" unit="cm" x="0.49655" y="46.56" z="0"/>
+     <position name="LCMPlane_pos_1" unit="cm" x="0.49655" y="15.52" z="0"/>
+     <position name="ArCLight_pos_2" unit="cm" x="0.49655" y="-15.52" z="0"/>
+     <position name="LCMPlane_pos_3" unit="cm" x="0.49655" y="-46.56" z="0"/>
+
+
+
+### Coordinates OpChannel 0 - 24 ###
+x: -135.6 mm
+y: [−595.43, −545.68, −490.48, −440.73, −385.53, −335.78, −283.65, −236.65, −178.70, −131.70, −73.75, −26.75, 25.38, 75.13, 130.33, 180.08, 235.28, 285.03, 337.15, 384.15, 442.10, 489.10, 547.05, 594.05] mm
+z: -315.3 mm
+
+### Coordinates OpChannel 25 - 47 ###
+x: -135.6 mm
+y: [−595.43, −545.68, −490.48, −440.73, −385.53, −335.78, −283.65, −236.65, −178.70, −131.70, −73.75, −26.75, 25.38, 75.13, 130.33, 180.08, 235.28, 285.03, 337.15, 384.15, 442.10, 489.10, 547.05, 594.05] mm
+z: 315.3 mm

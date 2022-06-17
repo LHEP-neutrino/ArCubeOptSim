@@ -1,0 +1,92 @@
+/vis/set/touchable volWorld_PV 0 volDetEnclosure_PV 0 volOptSim_PV 0 volFieldcage_PV 0 volKapton_PV 0 volLAr_PV 0 volTPC_PV 0 volTPCActive_PV 0
+/vis/touchable/dump
+
+Dump of Solid properties (DmpSol): volTPCActive_PV
+-----------------------------------------------------------
+    *** Dump for solid - TPCActive_shape ***
+    ===================================================
+Solid type: G4Box
+Parameters: 
+   half length X: 151.3615 mm 
+   half length Y: 620.55 mm 
+   half length Z: 310.15 mm 
+-----------------------------------------------------------
+Local transformation of volume (LocalTrans): 
+         1         0         0     2.324
+         0         1         0         0
+         0         0         1         0
+= translation:
+     2.324         0         0
+* rotation:
+         1         0         0
+         0         1         0
+         0         0         1
+* scale:
+         1         1         1
+Transformed axes:
+x': (1,0,0)
+y': (0,1,0)
+z': (0,0,1)
+Global transformation of volume (GlobalTrans): 
+         1         0         0   5.84475
+         0         1         0         0
+         0         0         1         0
+= translation:
+   5.84475         0         0
+* rotation:
+         1         0         0
+         0         1         0
+         0         0         1
+* scale:
+         1         1         1
+Transformed axes:
+x': (1,0,0)
+y': (0,1,0)
+z': (0,0,1)
+Material Name (Material): LAr
+Material Density (Density): 1.4 g/cm3  (G4BestUnit)
+
+Dump of Solid properties (DmpSol): volLAr_PV
+-----------------------------------------------------------
+    *** Dump for solid - LAr_shape ***
+    ===================================================
+Solid type: G4Box
+Parameters: 
+   half length X: 157.20625 mm 
+   half length Y: 630.936 mm 
+   half length Z: 320.5735 mm 
+-----------------------------------------------------------
+Local transformation of volume (LocalTrans): 
+         1         0         0   -0.0125
+         0         1         0         0
+         0         0         1         0
+= translation:
+   -0.0125         0         0
+* rotation:
+         1         0         0
+         0         1         0
+         0         0         1
+* scale:
+         1         1         1
+Transformed axes:
+x': (1,0,0)
+y': (0,1,0)
+z': (0,0,1)
+Global transformation of volume (GlobalTrans): 
+         1         0         0         0
+         0         1         0         0
+         0         0         1         0
+= translation:
+         0         0         0
+* rotation:
+         1         0         0
+         0         1         0
+         0         0         1
+* scale:
+         1         1         1
+Transformed axes:
+x': (1,0,0)
+y': (0,1,0)
+z': (0,0,1)
+Material Name (Material): LAr
+Material Density (Density): 1.4 g/cm3  (G4BestUnit)
