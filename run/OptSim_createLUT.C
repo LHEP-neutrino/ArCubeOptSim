@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void OptSim_createLUT(int run){
+void OptSim_createLUT(int run, float effSiPM){
 
   //read environment variables
   char temp = (getenv("USRG"))[0];
@@ -25,7 +25,7 @@ void OptSim_createLUT(int run){
   }else{
     format = fopen("OptSim_LUT_voxel_table.txt", "r");
   }
-  
+
   double xyz_min[3] = {0,0,0}; //minimum coordinates
   double xyz_max[3] = {0,0,0}; //maximum coordinates
   double dim_vox[3] = {0,0,0}; //voxel dimensions
@@ -42,7 +42,7 @@ void OptSim_createLUT(int run){
   fscanf(format,"%d %d",&n_evt,&n_ph);
   //printf("number of events per voxel: %d \n", n_evt);
   //printf("number of photons per event: %d \n", n_ph);
-  
+
   fclose(format);
 
   //recreate output root file with LUT tree
@@ -64,7 +64,7 @@ void OptSim_createLUT(int run){
   out_tree->Branch("Visibility", &Visibility);
   out_tree->Branch("T1",&T1);
   out_tree->Branch("Time", "TH1F", &Time);
-  
+
   //variables used for LUT creation
   int voxelID = -1;
   int channelID = -1;
@@ -75,7 +75,7 @@ void OptSim_createLUT(int run){
   int nVox = n_vox[2]*n_vox[0]*n_vox[1];
   int hits[nChannel];
   vector<TH1F*> timeVec;
-  
+
   //vector initialization
   for(i=0; i<nChannel; i++){
     hits[i] = 0;
@@ -108,11 +108,12 @@ void OptSim_createLUT(int run){
   in_tree->SetBranchAddress("hit_ekin", &hit_ekin);
 
   // SiPM efficiency for shifted spectrum
-  float effSiPM = 0.4;
- 
+  #float effSiPM = 0.25; //Mod-0
+  #float effSiPM = 0.39; //Mod-123
+
   //voxelID initialization
   voxelID = k-1;
-  
+
   //number of entries to loop over
   n_entries = in_tree->GetEntries();
 
@@ -129,18 +130,18 @@ void OptSim_createLUT(int run){
         Voxel = voxelID;
         std::cout << "processing voxel no. " << Voxel << " of " << nVox << " ..." << std::endl;
       }
-      
+
       //fill tree and reset values in case this is NOT the first voxel
       else{
         //std::cout << Voxel << std::endl;
-        
+
         //create mean for LCM SiPM pairs
         for(j=0; j<nChannel-6; j+=2){
           if(j>0 && !(j%6)) j += 6;
           hits[j] = (hits[j]+hits[j+1])/2;
           hits[j+1] = hits[j];
         }
-        
+
         //loop over optical channels
         for(j=0; j<nChannel; j++){
           OpChannel = j;
@@ -187,12 +188,12 @@ void OptSim_createLUT(int run){
 
     //get optical channel ID
     for(j=0; j<totalhits; j++){
-      
+
       //only count shifted photons
       if(hit_ekin->at(j) > 9E-6) continue;
 
       hitVolID = hit_vol_id->at(j);
-      
+
       hitVolIdx = hit_vol_index->at(j);
       if(hitVolIdx==10 or hitVolIdx==15) hitVolIdx += 1;
 
@@ -212,7 +213,7 @@ void OptSim_createLUT(int run){
               sipmID += 4;
               break;
           }
-          
+
           switch(hitVolID%10){
             case 0: //SiPM0
               sipmID += 0;
@@ -225,7 +226,7 @@ void OptSim_createLUT(int run){
           switch(hitVolID/10000){
             case 0: //DetR
               channelID += sipmID;
-              
+
               switch((hitVolID%10000)/1000){
                 case 0: //Plane0
                   channelID += 0;
@@ -234,13 +235,13 @@ void OptSim_createLUT(int run){
                   channelID += 12;
                   break;
               }
-              
+
               break;//DetR
-            
+
             case 1: //DetL
               channelID += 24;
               channelID += 5-sipmID;
-              
+
               switch((hitVolID%10000)/1000){
                 case 0: //Plane0
                   channelID += 12;
@@ -249,16 +250,16 @@ void OptSim_createLUT(int run){
                   channelID += 0;
                   break;
               }
-              
+
               break;//DetL
           }
 
           break;//case 11
-        
+
         case 16: //ArCLight
           channelID = 0;
           sipmID = 0;
-      
+
           switch(hitVolID%10){
             case 0: //SiPM0
               sipmID += 0;
@@ -283,7 +284,7 @@ void OptSim_createLUT(int run){
           switch(hitVolID/1000){
             case 0: //DetR
               channelID += sipmID;
-              
+
               switch((hitVolID%1000)/100){
                 case 0: //ArCLight0
                   channelID += 6;
@@ -298,7 +299,7 @@ void OptSim_createLUT(int run){
             case 1: //DetL
               channelID += 24;
               channelID += 5-sipmID;
-              
+
               switch((hitVolID%1000)/100){
                 case 0: //ArCLight0
                   channelID += 18;
@@ -312,7 +313,7 @@ void OptSim_createLUT(int run){
           }
 
           break;//case 16
-      
+
       }//switch(hit_vol_index)
       timeVec[channelID]->Fill(hit_time->at(j));
       hits[channelID] += 1;

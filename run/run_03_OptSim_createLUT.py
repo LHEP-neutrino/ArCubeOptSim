@@ -4,6 +4,7 @@ import numpy as np
 
 #read environent variables
 usrg = int(os.environ['USRG'])
+sipm_eff = int(os.environ['SIPMEFF'])
 
 #read voxel table
 if usrg:
@@ -30,7 +31,7 @@ for bunch in range(np.prod(nvox)/vox_per_bunch+1):
 
     print "\n===> processing voxels %d to %d..." % (vox_min, vox_min+vox_max-1)
 
-    root_call = "OptSim_createLUT.C(%d)" % bunch
+    root_call = "OptSim_createLUT.C(%d,%f)" % (bunch, sipm_eff)
 
     subprocess.call(["/Software/root_v6.22.02/bin/root.exe","-l","-q",root_call])
 
