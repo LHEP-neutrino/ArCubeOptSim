@@ -8,7 +8,7 @@
           "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
           "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
           "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280WLS.dat"
+          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -100,7 +100,7 @@
           "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
           "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
           "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280WLS.dat"
+          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -115,7 +115,7 @@
           "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
           "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
           "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280WLS.dat"
+          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -380,15 +380,6 @@
         "vol1": "volPixelPlane_PV",
         "vol2": "volTPCPCB_PV",
         "optsurf": "LAr2FR4_optsurf"
-      }
-    },
-    {
-      "name": "buildlogbordersurf",
-      "obj": {
-        "surfname": "LAr2Pixel_logsurf",
-        "vol1": "volTPCActive_PV",
-        "vol2": "volTPCPixel_PV",
-        "optsurf": "LAr2Gold_optsurf"
       }
     },
     {
