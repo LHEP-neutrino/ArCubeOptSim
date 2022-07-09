@@ -117,16 +117,16 @@
     <position unit="cm" name="WLS_pos" x="0.23250000000000004" y="0.0" z="-0.005000000000000001"/>
     <position unit="cm" name="TPB_pos" x="0.23250000000000004" y="0.0" z="0.5"/>
     <position unit="cm" name="SiPM_Mask_pos_0" x="-13.850000000000001" y="-10.495000000000001" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_0" x="-13.9999" y="-12.844999999999999" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_1" x="-13.9999" y="-8.145" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_Sens_pos_0" x="-13.9999" y="-12.844999999999999" z="0"/>
+    <position unit="cm" name="SiPM_Sens_pos_1" x="-13.9999" y="-8.145" z="0"/>
     <position unit="cm" name="SiPM_Mask_pos_1" x="-13.850000000000001" y="0.0" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_2" x="-13.9999" y="-2.35" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_3" x="-13.9999" y="2.35" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_Sens_pos_2" x="-13.9999" y="-2.35" z="0"/>
+    <position unit="cm" name="SiPM_Sens_pos_3" x="-13.9999" y="2.35" z="0"/>
     <position unit="cm" name="SiPM_Mask_pos_2" x="-13.850000000000001" y="10.495000000000001" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_4" x="-13.9999" y="8.145000000000001" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_5" x="-13.9999" y="12.844999999999999" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_pos_0" x="0.00900000000000002" y="-2.35" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_pos_1" x="0.00900000000000002" y="2.35" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_Sens_pos_4" x="-13.9999" y="8.145000000000001" z="0"/>
+    <position unit="cm" name="SiPM_Sens_pos_5" x="-13.9999" y="12.844999999999999" z="0"/>
+    <position unit="cm" name="SiPM_pos_0" x="0.008999999999999998" y="-2.35" z="0"/>
+    <position unit="cm" name="SiPM_pos_1" x="0.008999999999999998" y="2.35" z="0"/>
     <position unit="cm" name="SiPM_PCB_pos_0" x="-14.082500000000003" y="-10.495000000000001" z="-0.005000000000000001"/>
     <position unit="cm" name="SiPM_PCB_pos_1" x="-14.082500000000003" y="0.0" z="-0.005000000000000001"/>
     <position unit="cm" name="SiPM_PCB_pos_2" x="-14.082500000000003" y="10.495000000000001" z="-0.005000000000000001"/>
@@ -1811,9 +1811,43 @@
         <rotationref ref="identity"/>
       </physvol>
     </volume>
+    <volume name="volSiPM_Sens">
+      <materialref ref="Silicon"/>
+      <solidref ref="SiPM_Sens_shape"/>
+    </volume>
     <volume name="volWLS">
       <materialref ref="EJ280WLS"/>
       <solidref ref="WLS_panel_shape"/>
+      <physvol>
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_0"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol copynumber="1">
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_1"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol copynumber="2">
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_2"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol copynumber="3">
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_3"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol copynumber="4">
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_4"/>
+        <rotationref ref="identity"/>
+      </physvol>
+      <physvol copynumber="5">
+        <volumeref ref="volSiPM_Sens"/>
+        <positionref ref="SiPM_Sens_pos_5"/>
+        <rotationref ref="identity"/>
+      </physvol>
     </volume>
     <volume name="volTPB_LAr">
       <materialref ref="LAr"/>
@@ -1837,10 +1871,6 @@
         <rotationref ref="identity"/>
       </physvol>
     </volume>
-    <volume name="volSiPM_Sens">
-      <materialref ref="Silicon"/>
-      <solidref ref="SiPM_Sens_shape"/>
-    </volume>
     <volume name="volSiPM_PCB">
       <materialref ref="FR4"/>
       <solidref ref="SiPM_PCB_shape"/>
@@ -1863,44 +1893,14 @@
         <positionref ref="SiPM_Mask_pos_0"/>
         <rotationref ref="identity"/>
       </physvol>
-      <physvol>
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_0"/>
-        <rotationref ref="identity"/>
-      </physvol>
-      <physvol copynumber="1">
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_1"/>
-        <rotationref ref="identity"/>
-      </physvol>
       <physvol copynumber="1">
         <volumeref ref="volSiPM_Mask"/>
         <positionref ref="SiPM_Mask_pos_1"/>
         <rotationref ref="identity"/>
       </physvol>
       <physvol copynumber="2">
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_2"/>
-        <rotationref ref="identity"/>
-      </physvol>
-      <physvol copynumber="3">
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_3"/>
-        <rotationref ref="identity"/>
-      </physvol>
-      <physvol copynumber="2">
         <volumeref ref="volSiPM_Mask"/>
         <positionref ref="SiPM_Mask_pos_2"/>
-        <rotationref ref="identity"/>
-      </physvol>
-      <physvol copynumber="4">
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_4"/>
-        <rotationref ref="identity"/>
-      </physvol>
-      <physvol copynumber="5">
-        <volumeref ref="volSiPM_Sens"/>
-        <positionref ref="SiPM_Sens_pos_5"/>
         <rotationref ref="identity"/>
       </physvol>
       <physvol>
