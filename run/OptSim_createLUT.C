@@ -108,8 +108,8 @@ void OptSim_createLUT(int run, float effSiPM){
   in_tree->SetBranchAddress("hit_ekin", &hit_ekin);
 
   // SiPM efficiency for shifted spectrum
-  #float effSiPM = 0.25; //Mod-0
-  #float effSiPM = 0.39; //Mod-123
+  //float effSiPM = 0.25; //Mod-0
+  //float effSiPM = 0.39; //Mod-123
 
   //voxelID initialization
   voxelID = k-1;
