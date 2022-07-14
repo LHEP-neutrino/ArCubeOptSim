@@ -4,7 +4,7 @@ import numpy as np
 
 #read environent variables
 usrg = int(os.environ['USRG'])
-sipm_eff = int(os.environ['SIPMEFF'])
+sipm_eff = float(os.environ['SIPMEFF'])
 
 #read voxel table
 if usrg:
