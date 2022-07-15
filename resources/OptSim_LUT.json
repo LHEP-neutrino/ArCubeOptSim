@@ -280,6 +280,19 @@
     {
       "name": "buildoptsurf",
       "obj": {
+        "surfname": "EJ2802SiPMmask_optsurf",
+        "model": "unified",
+        "type": "dielectric_dielectric",
+        "finish": "polished",
+        "propfile": {
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
+        }
+      }
+    },
+    {
+      "name": "buildoptsurf",
+      "obj": {
         "surfname": "DCM2EJ280_optsurf",
         "model": "dichroic",
         "dichroicfile": "../resources/datafiles/DICHROICFILE_dfpachill.data"
@@ -496,7 +509,7 @@
         "surfname": "EJ2802SiPMmask_logsurf",
         "vol1": "volWLS_PV",
         "vol2": "volSiPM_Mask_PV",
-        "optsurf": "EJ2802DCM_optsurf"
+        "optsurf": "EJ2802SiPMmask_optsurf"
       }
     },
     {
