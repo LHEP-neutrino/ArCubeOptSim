@@ -285,8 +285,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
-          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
+          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
+          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
         }
       }
     },

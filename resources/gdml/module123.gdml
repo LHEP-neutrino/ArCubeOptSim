@@ -1869,7 +1869,7 @@
       <solidref ref="SiPM_shape"/>
     </volume>
     <volume name="volSiPM_Mask">
-      <materialref ref="PVT"/>
+      <materialref ref="G10"/>
       <solidref ref="SiPM_Mask_shape"/>
       <physvol>
         <volumeref ref="volSiPM"/>
