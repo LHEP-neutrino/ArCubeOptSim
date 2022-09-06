@@ -5,10 +5,10 @@
       "obj": {
         "matname": "EJ280WLS",
         "propfile": {
-          "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
-          "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
-          "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_EJ280WLS.dat",
+          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -20,7 +20,7 @@
       "obj": {
         "matname": "G10",
         "propfile": {
-          "RINDEX": "../resources/datafiles/RINDEX_G10.dat"
+          "RINDEX": "resources/datafiles/RINDEX_G10.dat"
         }
       }
     },
@@ -29,9 +29,9 @@
       "obj": {
         "matname": "Gold",
         "propfile": {
-          "RINDEX": "../resources/datafiles/RINDEX_Gold.dat",
-          "REALRINDEX": "../resources/datafiles/REALRINDEX_Gold.dat",
-          "IMAGINARYRINDEX": "../resources/datafiles/IMAGINARYRINDEX_Gold.dat"
+          "RINDEX": "resources/datafiles/RINDEX_Gold.dat",
+          "REALRINDEX": "resources/datafiles/REALRINDEX_Gold.dat",
+          "IMAGINARYRINDEX": "resources/datafiles/IMAGINARYRINDEX_Gold.dat"
         }
       }
     },
@@ -40,9 +40,9 @@
       "obj": {
         "matname": "Kapton",
         "propfile": {
-          "RINDEX": "../resources/datafiles/RINDEX_Kapton.dat",
-          "REALRINDEX": "../resources/datafiles/REALRINDEX_Kapton.dat",
-          "IMAGINARYRINDEX": "../resources/datafiles/IMAGINARYRINDEX_Kapton.dat"
+          "RINDEX": "resources/datafiles/RINDEX_Kapton.dat",
+          "REALRINDEX": "resources/datafiles/REALRINDEX_Kapton.dat",
+          "IMAGINARYRINDEX": "resources/datafiles/IMAGINARYRINDEX_Kapton.dat"
         }
       }
     },
@@ -51,9 +51,9 @@
       "obj": {
         "matname": "LAr",
         "propfile": {
-          "ABSLENGTH": "../resources/datafiles/ABSLENGTH_LAr.dat",
-          "RAYLEIGH": "../resources/datafiles/RAYLEIGH_LAr.dat",
-          "RINDEX": "../resources/datafiles/RINDEX_LAr.dat"
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_LAr.dat",
+          "RAYLEIGH": "resources/datafiles/RAYLEIGH_LAr.dat",
+          "RINDEX": "resources/datafiles/RINDEX_LAr.dat"
         }
       }
     },
@@ -62,7 +62,7 @@
       "obj": {
         "matname": "PSA",
         "propfile": {
-          "RINDEX": "../resources/datafiles/RINDEX_PSA.dat"
+          "RINDEX": "resources/datafiles/RINDEX_PSA.dat"
         }
       }
     },
@@ -71,9 +71,9 @@
       "obj": {
         "matname": "Silicon",
         "propfile": {
-          "RINDEX": "../resources/datafiles/RINDEX_Silicon.dat",
-          "REALRINDEX": "../resources/datafiles/REALRINDEX_Silicon.dat",
-          "IMAGINARYRINDEX": "../resources/datafiles/IMAGINARYRINDEX_Silicon.dat"
+          "RINDEX": "resources/datafiles/RINDEX_Silicon.dat",
+          "REALRINDEX": "resources/datafiles/REALRINDEX_Silicon.dat",
+          "IMAGINARYRINDEX": "resources/datafiles/IMAGINARYRINDEX_Silicon.dat"
         }
       }
     },
@@ -82,10 +82,10 @@
       "obj": {
         "matname": "TPB",
         "propfile": {
-          "ABSLENGTH": "../resources/datafiles/ABSLENGTH_TPB.dat",
-          "RINDEX": "../resources/datafiles/RINDEX_TPB.dat",
-          "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_TPB.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_TPB.dat"
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_TPB.dat",
+          "RINDEX": "resources/datafiles/RINDEX_TPB.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_TPB.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_TPB.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 5.0
@@ -97,10 +97,10 @@
       "obj": {
         "matname": "Y11",
         "propfile": {
-          "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
-          "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
-          "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_EJ280WLS.dat",
+          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -112,10 +112,10 @@
       "obj": {
         "matname": "Y11C",
         "propfile": {
-          "ABSLENGTH": "../resources/datafiles/ABSLENGTH_EJ280WLS.dat",
-          "RINDEX": "../resources/datafiles/RINDEX_EJ280WLS.dat",
-          "WLSABSLENGTH": "../resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
-          "WLSCOMPONENT": "../resources/datafiles/WLSCOMPONENT_EJ280.dat"
+          "ABSLENGTH": "resources/datafiles/ABSLENGTH_EJ280WLS.dat",
+          "RINDEX": "resources/datafiles/RINDEX_EJ280WLS.dat",
+          "WLSABSLENGTH": "resources/datafiles/WLSABSLENGTH_EJ280WLS.dat",
+          "WLSCOMPONENT": "resources/datafiles/WLSCOMPONENT_EJ280.dat"
         },
         "constprop": {
           "WLSTIMECONSTANT": 8.5
@@ -131,8 +131,8 @@
         "finish": "ground",
         "sigma_alpha": 0.1,
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2G10.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2G10.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2G10.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2G10.dat"
         }
       }
     },
@@ -145,8 +145,8 @@
         "finish": "ground",
         "sigma_alpha": 0.1,
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2Kapton.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2Kapton.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Kapton.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Kapton.dat"
         }
       }
     },
@@ -159,7 +159,7 @@
         "finish": "ground",
         "sigma_alpha": 0.1,
         "propfile": {
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2FR4.dat"
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2FR4.dat"
         }
       }
     },
@@ -171,8 +171,8 @@
         "type": "dielectric_metal",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2Gold.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2Gold.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Gold.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Gold.dat"
         }
       }
     },
@@ -185,8 +185,8 @@
         "finish": "ground",
         "sigma_alpha": 0.1,
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2TPB.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2TPB.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2TPB.dat"
         }
       }
     },
@@ -198,8 +198,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2Y11.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2Y11.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Y11.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Y11.dat"
         }
       }
     },
@@ -211,8 +211,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_LAr2Silicon.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_LAr2Silicon.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_LAr2Silicon.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_LAr2Silicon.dat"
         }
       }
     },
@@ -231,7 +231,7 @@
       "obj": {
         "surfname": "TPB2EJ280_optsurf",
         "model": "dichroic",
-        "dichroicfile": "../resources/datafiles/DICHROICFILE_dfpachill.data"
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
     },
     {
@@ -248,7 +248,7 @@
       "obj": {
         "surfname": "EJ2802TPB_optsurf",
         "model": "dichroic",
-        "dichroicfile": "../resources/datafiles/DICHROICFILE_dfpachill.data"
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
     },
     {
@@ -256,7 +256,7 @@
       "obj": {
         "surfname": "EJ2802DCM_optsurf",
         "model": "dichroic",
-        "dichroicfile": "../resources/datafiles/DICHROICFILE_dfpachill.data"
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
     },
     {
@@ -285,8 +285,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_EJ2802ESR.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_EJ2802ESR.dat"
         }
       }
     },
@@ -295,7 +295,7 @@
       "obj": {
         "surfname": "DCM2EJ280_optsurf",
         "model": "dichroic",
-        "dichroicfile": "../resources/datafiles/DICHROICFILE_dfpachill.data"
+        "dichroicfile": "resources/datafiles/DICHROICFILE_dfpachill.data"
       }
     },
     {
@@ -306,8 +306,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_Y112TPB.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_Y112TPB.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_Y112TPB.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_Y112TPB.dat"
         }
       }
     },
@@ -319,8 +319,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_Y112LAr.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_Y112LAr.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_Y112LAr.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_Y112LAr.dat"
         }
       }
     },
@@ -332,8 +332,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_Y112Core.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_Y112Core.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_Y112Core.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_Y112Core.dat"
         }
       }
     },
@@ -354,8 +354,8 @@
         "type": "dielectric_dielectric",
         "finish": "polished",
         "propfile": {
-          "REFLECTIVITY": "../resources/datafiles/REFLECTIVITY_Core2Y11.dat",
-          "TRANSMITTANCE": "../resources/datafiles/TRANSMITTANCE_Core2Y11.dat"
+          "REFLECTIVITY": "resources/datafiles/REFLECTIVITY_Core2Y11.dat",
+          "TRANSMITTANCE": "resources/datafiles/TRANSMITTANCE_Core2Y11.dat"
         }
       }
     },
