@@ -4,8 +4,9 @@
 #/tracking/verbose 2
 
 #/argoncube/detector/optical/loadOptSett resources/optProp_womirr.json
-/argoncube/detector/optical/loadOptSett resources/optProp.json
+#/argoncube/detector/optical/loadOptSett resources/optProp.json
 #/argoncube/detector/optical/loadOptSett resources/optProp_ArCLight_only.json
+/argoncube/detector/optical/loadOptSett resources/OptSim_acl.json
 
 #The drift direction is "x", the vertical direction is "y" and the direction normal to the light detectors is "z"
 /argoncube/gun/particle opticalphoton
@@ -24,7 +25,7 @@
 #/argoncube/gun/halfy 155 mm
 #/argoncube/gun/halfz 1 mm
 #/argoncube/gun/confine volTPB_PV
-/argoncube/gun/primaryNb 10000
+/argoncube/gun/primaryNb 1
 
 #/argoncube/gun/particle opticalphoton
 #/argoncube/gun/angtype direction
@@ -33,4 +34,4 @@
 #/argoncube/gun/position 0 81.4 0 mm
 #/argoncube/gun/primaryNb 1
 
-/run/beamOn 10000
+/run/beamOn 1
