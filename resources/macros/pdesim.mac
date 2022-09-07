@@ -12,7 +12,8 @@
 /argoncube/gun/particle opticalphoton
 /argoncube/gun/sourceType Volume
 /argoncube/gun/shape Box
-/argoncube/gun/angtype iso
+/argoncube/gun/angtype Direction
+/argoncube/gun/direction 0 0 -1
 /argoncube/gun/polarization 1 0 0
 /argoncube/gun/energy 9.69 eV
 #/argoncube/gun/center 2.325 0 5.0140 mm #emmit in TPB layer
@@ -25,7 +26,7 @@
 #/argoncube/gun/halfy 155 mm
 #/argoncube/gun/halfz 1 mm
 #/argoncube/gun/confine volTPB_PV
-/argoncube/gun/primaryNb 1
+/argoncube/gun/primaryNb 10000
 
 #/argoncube/gun/particle opticalphoton
 #/argoncube/gun/angtype direction
@@ -34,4 +35,4 @@
 #/argoncube/gun/position 0 81.4 0 mm
 #/argoncube/gun/primaryNb 1
 
-/run/beamOn 1
+/run/beamOn 100
