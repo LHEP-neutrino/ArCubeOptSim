@@ -3,6 +3,8 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+vector<int> read_globcp(const string globcp);
+
 void OptSim_createLUT(int run, float effSiPM){
 
   //read environment variables
@@ -69,7 +71,7 @@ void OptSim_createLUT(int run, float effSiPM){
   int voxelID = -1;
   int channelID = -1;
   int sipmID = -1;
-  int hitVolID = 0;
+  int hitVolGlobCP = 0;
   int hitVolIdx = -1;
   int nChannel = 48;
   int nVox = n_vox[2]*n_vox[0]*n_vox[1];
@@ -95,17 +97,17 @@ void OptSim_createLUT(int run, float effSiPM){
   Long64_t totalhits = 0;
   vector<Int_t> * hit_vol_index = 0;
   vector<Int_t> * hit_vol_copy = 0;
-  vector<Long64_t> * hit_vol_id = 0;
+  vector<string> * hit_vol_globcp = 0;
   vector<Double_t> * hit_time = 0;
-  vector<Double_t> * hit_ekin = 0;
+  vector<Double_t> * hit_phot_wavelen = 0;
 
   //set sim file branch addresses
   in_tree->SetBranchAddress("totalhits", &totalhits);
   in_tree->SetBranchAddress("hit_vol_index", &hit_vol_index);
   in_tree->SetBranchAddress("hit_vol_copy", &hit_vol_copy);
-  in_tree->SetBranchAddress("hit_vol_id", &hit_vol_id);
+  in_tree->SetBranchAddress("hit_vol_globcp", &hit_vol_globcp);
   in_tree->SetBranchAddress("hit_time", &hit_time);
-  in_tree->SetBranchAddress("hit_ekin", &hit_ekin);
+  in_tree->SetBranchAddress("hit_phot_wavelen", &hit_phot_wavelen);
 
   // SiPM efficiency for shifted spectrum
   //float effSiPM = 0.25; //Mod-0
@@ -190,19 +192,21 @@ void OptSim_createLUT(int run, float effSiPM){
     for(j=0; j<totalhits; j++){
 
       //only count shifted photons
-      if(hit_ekin->at(j) > 9E-6) continue;
+      if(hit_phot_wavelen->at(j) < 140) continue;
 
-      hitVolID = hit_vol_id->at(j);
+      vector<int> hit_vol_globcp_vec = read_globcp(hit_vol_globcp->at(j));
+
 
       hitVolIdx = hit_vol_index->at(j);
-      if(hitVolIdx==10 or hitVolIdx==15) hitVolIdx += 1;
+      //if(hitVolIdx==10 or hitVolIdx==15) hitVolIdx += 1;
 
       switch(hitVolIdx){
-        case 11: //LCM
+        case 13: //LCM
           channelID = 0;
           sipmID = 0;
 
-          switch((hitVolID%1000)/100){
+
+          switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-3]){
             case 0: //LCM1
               sipmID += 0;
               break;
@@ -214,7 +218,7 @@ void OptSim_createLUT(int run, float effSiPM){
               break;
           }
 
-          switch(hitVolID%10){
+          switch(hit_vol_globcp_vec.back()){
             case 0: //SiPM0
               sipmID += 0;
               break;
@@ -223,11 +227,11 @@ void OptSim_createLUT(int run, float effSiPM){
               break;
           }
 
-          switch(hitVolID/10000){
+          switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-5]){
             case 0: //DetR
               channelID += sipmID;
 
-              switch((hitVolID%10000)/1000){
+              switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-4]){
                 case 0: //Plane0
                   channelID += 0;
                   break;
@@ -242,7 +246,7 @@ void OptSim_createLUT(int run, float effSiPM){
               channelID += 24;
               channelID += 5-sipmID;
 
-              switch((hitVolID%10000)/1000){
+              switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-4]){
                 case 0: //Plane0
                   channelID += 12;
                   break;
@@ -256,11 +260,11 @@ void OptSim_createLUT(int run, float effSiPM){
 
           break;//case 11
 
-        case 16: //ArCLight
+        case 18: //ArCLight
           channelID = 0;
           sipmID = 0;
 
-          switch(hitVolID%10){
+          switch(hit_vol_globcp_vec.back()){
             case 0: //SiPM0
               sipmID += 0;
               break;
@@ -281,11 +285,11 @@ void OptSim_createLUT(int run, float effSiPM){
               break;
           }
 
-          switch(hitVolID/1000){
+          switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-4]){
             case 0: //DetR
               channelID += sipmID;
 
-              switch((hitVolID%1000)/100){
+              switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-3]){
                 case 0: //ArCLight0
                   channelID += 6;
                   break;
@@ -300,7 +304,7 @@ void OptSim_createLUT(int run, float effSiPM){
               channelID += 24;
               channelID += 5-sipmID;
 
-              switch((hitVolID%1000)/100){
+              switch(hit_vol_globcp_vec[hit_vol_globcp_vec.size()-3]){
                 case 0: //ArCLight0
                   channelID += 18;
                   break;
@@ -348,4 +352,25 @@ void OptSim_createLUT(int run, float effSiPM){
 
   out_file->Close();
 
+}
+
+vector<int> read_globcp(const string globcp)
+{
+
+    auto i = 0;
+    string delim = ".";
+    vector<int> list;
+
+    auto pos = globcp.find(delim);
+
+    while (pos != string::npos)
+    {
+        list.push_back(std::stoi(globcp.substr(i, pos - i)));
+        i = ++pos;
+        pos = globcp.find(delim, pos);
+    }
+
+    list.push_back(std::stoi(globcp.substr(i, globcp.length())));
+
+    return list;
 }
