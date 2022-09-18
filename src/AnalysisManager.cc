@@ -323,8 +323,8 @@ void AnalysisManagerOptPh::BeginOfEvent(const G4Event *pEvent)
 	fLastPhysVol = nullptr;
 	fLastVolIdx = -1;
 	fLastCopyNum = -1;
-	fLastVolGlobalCopy = -1;
-	
+	fLastVolGlobalCopy = std::string("");
+
 	fEventData->Reset();
 	
 	
