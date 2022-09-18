@@ -133,7 +133,10 @@ void OptPropManager::ProcessJsonFile(const G4String& jsonfilename)
   }
 	json jsonObj;
 	std::ifstream infile( jsonfilename.c_str() );
-	if(!infile) return;
+	if(!infile){
+		std::cout << "\nERROR --> OptPropManager::ProcessJsonFile(...): Cannot find or read the <" << jsonfilename << "> file with optical settings!\n" << std::endl;
+		return;
+	}
 	
 	infile >> jsonObj;
 	
