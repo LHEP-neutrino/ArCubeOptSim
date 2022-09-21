@@ -5,7 +5,7 @@ import numpy as np
 #read environent variables
 usrg = int(os.environ['USRG'])
 sipm_eff = float(os.environ['SIPMEFF'])
-start_vox = float(os.environ['STARTVOX']
+start_vox = float(os.environ['STARTVOX'])
 
 #read voxel table
 if usrg:
@@ -24,7 +24,8 @@ vox_per_bunch = 100
 #only LUT sim files as bunches of 100
 for bunch in range(np.prod(nvox)/vox_per_bunch+1):
     vox_min = bunch*vox_per_bunch
-    if (vox_min<start_vox) continue
+    if (vox_min<start_vox): 
+	continue
     if (bunch==np.prod(nvox)/vox_per_bunch):
         vox_max = np.prod(nvox)%vox_min
     else:
