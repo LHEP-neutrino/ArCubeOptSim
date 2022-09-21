@@ -198,7 +198,7 @@ void OptSim_createLUT(int run, float effSiPM){
 
 
       hitVolIdx = hit_vol_index->at(j);
-      //if(hitVolIdx==10 or hitVolIdx==15) hitVolIdx += 1;
+      if(hitVolIdx==12 or hitVolIdx==17) hitVolIdx += 1;
 
       switch(hitVolIdx){
         case 13: //LCM
