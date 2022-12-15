@@ -89,7 +89,7 @@ void ParticleSourceOptPh::SetInitialValues()
 	fHalfz = 0.;
 	fRadius = 0.;
 	fConfine = false;
-	fAngDistType = AngDistType::kDirection;
+	fAngDistType = AngDistType::kIso;
 	fEnergyDisType = EnergyDistType::kMono;
 	
 	fMaxConfineLoop = 100000;
