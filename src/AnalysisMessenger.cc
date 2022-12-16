@@ -42,6 +42,8 @@ fAnManager(pAnManager)
 	fSaveDataCmd->SetGuidance("Control for data tree saving:");
 	txt.str(""); txt << (int)DatasaveLevel::kOff << " to not save;";
 	fSaveDataCmd->SetGuidance(txt.str().c_str());
+	txt.str(""); txt << (int)DatasaveLevel::kLUT << " save hit variables in defined sensitive volumes with limited primary info (low memeory usage);";
+	fSaveDataCmd->SetGuidance(txt.str().c_str());
 	txt.str(""); txt << (int)DatasaveLevel::kHits << " save hit variables in defined sensitive volumes (default);";
 	fSaveDataCmd->SetGuidance(txt.str().c_str());
 	txt.str(""); txt << (int)DatasaveLevel::kHitsExt << " save extended hit variables in defined sensitive volumes (default);";

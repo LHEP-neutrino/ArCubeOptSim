@@ -31,6 +31,7 @@ class G4Navigator;
 enum class DatasaveLevel
 {
 	kOff, //No saving
+	kLUT, //Only save hit data (no primary info)
 	kHits, //Only stuff useful for LUT (hits, and primary info)
 	kHitsExt, //Hits extended informations
 	kSdSteps, //All the steps in the physical volumes defined by the user

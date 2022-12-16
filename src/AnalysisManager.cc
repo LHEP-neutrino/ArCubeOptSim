@@ -192,12 +192,12 @@ void AnalysisManagerOptPh::BeginOfRun(const G4Run *pRun)
 	fTree->Branch("prim_Zpos", &fEventData->fPrimary_Zpos, "prim_Zpos/D");//Fill at start of tracking stage only once
 	fTree->Branch("prim_id", "vector<Int_t>", &fEventData->fPrimary_Id);//Fill at start of tracking stage only once
 	fTree->Branch("prim_wavelen", "vector<Double_t>", &fEventData->fPrimWaveLength);//This is the wavelength of the optical photon (in nm units), taken from the Ekin. //Fill start of tracking stage only once
-	fTree->Branch("prim_Xmom", "vector<Double_t>", &fEventData->fPrimary_Xmom);//Fill at start of tracking stage only once
-	fTree->Branch("prim_Ymom", "vector<Double_t>", &fEventData->fPrimary_Ymom);//Fill at start of tracking stage only once
-	fTree->Branch("prim_Zmom", "vector<Double_t>", &fEventData->fPrimary_Zmom);//Fill at start of tracking stage only once
-	fTree->Branch("prim_Xpol", "vector<Double_t>", &fEventData->fPrimary_Xpol);//Fill at start of tracking stage only once
-	fTree->Branch("prim_Ypol", "vector<Double_t>", &fEventData->fPrimary_Ypol);//Fill at start of tracking stage only once
-	fTree->Branch("prim_Zpol", "vector<Double_t>", &fEventData->fPrimary_Zpol);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Xmom", "vector<Double_t>", &fEventData->fPrimary_Xmom);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Ymom", "vector<Double_t>", &fEventData->fPrimary_Ymom);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Zmom", "vector<Double_t>", &fEventData->fPrimary_Zmom);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Xpol", "vector<Double_t>", &fEventData->fPrimary_Xpol);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Ypol", "vector<Double_t>", &fEventData->fPrimary_Ypol);//Fill at start of tracking stage only once
+	if(fSave > DatasaveLevel::kLUT) fTree->Branch("prim_Zpol", "vector<Double_t>", &fEventData->fPrimary_Zpol);//Fill at start of tracking stage only once
 	
 	
 	

@@ -2,7 +2,7 @@
 /argoncube/analysis/stepsDebug 0
 
 ### Define verbosity levels ###
-/argoncube/detector/optical/verbosity 1
+#/argoncube/detector/optical/verbosity 1
 #/tracking/verbose 1
 
 ### Load optical properties from JSON file ###
