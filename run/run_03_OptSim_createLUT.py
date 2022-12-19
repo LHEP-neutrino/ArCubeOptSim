@@ -5,7 +5,8 @@ import numpy as np
 #read environent variables
 usrg = int(os.environ['USRG'])
 sipm_eff = float(os.environ['SIPMEFF'])
-start_vox = float(os.environ['STARTVOX'])
+start_vox = int(os.environ['STARTVOX'])
+stop_vox = int(os.environ['STOPVOX'])
 
 #read voxel table
 if usrg:
@@ -20,11 +21,13 @@ nvox = np.array(vox_tab.readline().split()).astype(np.int)
 print '\n------------------------------'
 
 vox_per_bunch = 100
+if (stop_vox == -1):                #run over all voxels
+    stop_vox = np.prod(nvox)
 
 #only LUT sim files as bunches of 100
 for bunch in range(np.prod(nvox)/vox_per_bunch+1):
     vox_min = bunch*vox_per_bunch
-    if (vox_min<start_vox): 
+    if (vox_min<start_vox):
 	continue
     if (bunch==np.prod(nvox)/vox_per_bunch):
         vox_max = np.prod(nvox)%vox_min
@@ -32,6 +35,9 @@ for bunch in range(np.prod(nvox)/vox_per_bunch+1):
         vox_max = vox_per_bunch
 
     print "\n===> processing voxels %d to %d..." % (vox_min, vox_min+vox_max-1)
+
+    if (vox_min+vox_max >= stop_vox):
+        exit(0)
 
     root_call = "OptSim_createLUT.C(%d,%f)" % (bunch, sipm_eff)
 
