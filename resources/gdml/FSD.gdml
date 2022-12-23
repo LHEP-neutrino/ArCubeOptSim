@@ -102,55 +102,55 @@
     <position unit="cm" name="Asic_pos_9.7" x="-0.1613" y="13.481954999999997" z="11.95795"/>
     <position unit="cm" name="Asic_pos_9.8" x="-0.1613" y="13.481954999999997" z="16.741130000000005"/>
     <position unit="cm" name="Asic_pos_9.9" x="-0.1613" y="13.481954999999997" z="21.524310000000003"/>
-    <position unit="cm" name="PixelPlane_pos_0_R" x="0" y="-134.81955000000002" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_1_R" x="0" y="-104.85964999999999" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_2_R" x="0" y="-74.89975" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_3_R" x="0" y="-44.93985000000001" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_4_R" x="0" y="-14.97995" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_5_R" x="0" y="14.97995" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_6_R" x="0" y="44.93985000000001" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_7_R" x="0" y="74.89975" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_8_R" x="0" y="104.85964999999999" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_9_R" x="0" y="134.81955000000002" z="-23.9159"/>
-    <position unit="cm" name="PixelPlane_pos_0_L" x="0" y="-134.81955000000002" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_0_R" x="0" y="-135.04455000000002" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_1_R" x="0" y="-105.03465" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_2_R" x="0" y="-75.02475" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_3_R" x="0" y="-45.01485" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_4_R" x="0" y="-15.004950000000001" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_5_R" x="0" y="15.004950000000001" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_6_R" x="0" y="45.01485" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_7_R" x="0" y="75.02475" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_8_R" x="0" y="105.03465" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_9_R" x="0" y="135.04455000000002" z="-23.9409"/>
+    <position unit="cm" name="PixelPlane_pos_0_L" x="0" y="-135.04455000000002" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_0_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_1_L" x="0" y="-104.85964999999999" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_1_L" x="0" y="-105.03465" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_1_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_2_L" x="0" y="-74.89975" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_2_L" x="0" y="-75.02475" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_2_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_3_L" x="0" y="-44.93985000000001" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_3_L" x="0" y="-45.01485" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_3_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_4_L" x="0" y="-14.97995" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_4_L" x="0" y="-15.004950000000001" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_4_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_5_L" x="0" y="14.97995" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_5_L" x="0" y="15.004950000000001" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_5_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_6_L" x="0" y="44.93985000000001" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_6_L" x="0" y="45.01485" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_6_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_7_L" x="0" y="74.89975" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_7_L" x="0" y="75.02475" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_7_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_8_L" x="0" y="104.85964999999999" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_8_L" x="0" y="105.03465" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_8_L" x="180.0" y="0.0" z="0.0"/>
-    <position unit="cm" name="PixelPlane_pos_9_L" x="0" y="134.81955000000002" z="23.9159"/>
+    <position unit="cm" name="PixelPlane_pos_9_L" x="0" y="135.04455000000002" z="23.9409"/>
     <rotation unit="degree" name="PixelPlane_rot_9_L" x="180.0" y="0.0" z="0.0"/>
     <position unit="cm" name="WLS_pos" x="0.227" y="0.0" z="-0.005000000000000001"/>
     <position unit="cm" name="DCM_pos_edge_posY" x="0.227" y="14.98545" z="-0.005000000000000001"/>
     <position unit="cm" name="DCM_pos_edge_negY" x="0.227" y="-14.98545" z="-0.005000000000000001"/>
     <position unit="cm" name="DCM_pos_edge_posX" x="23.44325" y="0.0" z="-0.005000000000000001"/>
     <position unit="cm" name="TPB_pos" x="0.227" y="0.0" z="0.5"/>
-    <position unit="cm" name="SiPM_Mask_pos_0" x="-23.066249999999997" y="-9.986633333333334" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_0" x="-23.21065" y="-12.336633333333333" z="0"/>
-    <position unit="cm" name="SiPM_Sens_pos_1" x="-23.21065" y="-7.636633333333333" z="0"/>
+    <position unit="cm" name="SiPM_Mask_pos_0" x="-23.066249999999997" y="-9.95495" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_Sens_pos_0" x="-23.21065" y="-12.30495" z="0"/>
+    <position unit="cm" name="SiPM_Sens_pos_1" x="-23.21065" y="-7.60495" z="0"/>
     <position unit="cm" name="SiPM_Mask_pos_1" x="-23.066249999999997" y="0.0" z="-0.005000000000000001"/>
     <position unit="cm" name="SiPM_Sens_pos_2" x="-23.21065" y="-2.35" z="0"/>
     <position unit="cm" name="SiPM_Sens_pos_3" x="-23.21065" y="2.35" z="0"/>
-    <position unit="cm" name="SiPM_Mask_pos_2" x="-23.066249999999997" y="9.986633333333334" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_Sens_pos_4" x="-23.21065" y="7.636633333333333" z="0"/>
-    <position unit="cm" name="SiPM_Sens_pos_5" x="-23.21065" y="12.336633333333333" z="0"/>
+    <position unit="cm" name="SiPM_Mask_pos_2" x="-23.066249999999997" y="9.95495" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_Sens_pos_4" x="-23.21065" y="7.60495" z="0"/>
+    <position unit="cm" name="SiPM_Sens_pos_5" x="-23.21065" y="12.30495" z="0"/>
     <position unit="cm" name="SiPM_pos_0" x="0.008999999999999998" y="-2.35" z="0"/>
     <position unit="cm" name="SiPM_pos_1" x="0.008999999999999998" y="2.35" z="0"/>
-    <position unit="cm" name="SiPM_PCB_pos_0" x="-23.29875" y="-9.986633333333334" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_PCB_pos_0" x="-23.29875" y="-9.95495" z="-0.005000000000000001"/>
     <position unit="cm" name="SiPM_PCB_pos_1" x="-23.29875" y="0.0" z="-0.005000000000000001"/>
-    <position unit="cm" name="SiPM_PCB_pos_2" x="-23.29875" y="9.986633333333334" z="-0.005000000000000001"/>
+    <position unit="cm" name="SiPM_PCB_pos_2" x="-23.29875" y="9.95495" z="-0.005000000000000001"/>
     <position unit="cm" name="Fiber_pos" x="0" y="0" z="0"/>
     <position unit="cm" name="Fiber_Core_pos" x="0" y="0" z="0"/>
     <position unit="cm" name="TPB_Fiber_pos_center_0" x="0.18250000000000002" y="-4.510000000000001" z="0"/>
@@ -257,19 +257,19 @@
     <position unit="cm" name="SiPM_LCM_pos_0" x="0.008999999999999998" y="-2.4875000000000003" z="0"/>
     <position unit="cm" name="SiPM_LCM_pos_1" x="0.008999999999999998" y="2.4875000000000003" z="0"/>
     <position unit="cm" name="SiPM_LCM_PCB_pos" x="-23.29325" y="0" z="0"/>
-    <position unit="cm" name="LCM_pos_0" x="0" y="-10.495" z="0"/>
-    <position unit="cm" name="LCM_pos_1" x="0" y="1.4210854715202005e-15" z="0"/>
-    <position unit="cm" name="LCM_pos_2" x="0" y="10.495000000000003" z="0"/>
+    <position unit="cm" name="LCM_pos_0" x="0" y="-9.95495" z="0"/>
+    <position unit="cm" name="LCM_pos_1" x="0" y="0.0" z="0"/>
+    <position unit="cm" name="LCM_pos_2" x="0" y="9.95495" z="0"/>
     <position unit="cm" name="ArCLight_pos_0" x="0.49655000000000005" y="-134.81955000000002" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_1" x="0.49655000000000005" y="-108.28999999999999" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_1" x="0.49655000000000005" y="-104.85964999999999" z="0"/>
     <position unit="cm" name="ArCLight_pos_2" x="0.49655000000000005" y="-74.89975" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_3" x="0.49655000000000005" y="-46.41" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_3" x="0.49655000000000005" y="-44.93985000000001" z="0"/>
     <position unit="cm" name="ArCLight_pos_4" x="0.49655000000000005" y="-14.97995" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_5" x="0.49655000000000005" y="15.469999999999999" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_5" x="0.49655000000000005" y="14.97995" z="0"/>
     <position unit="cm" name="ArCLight_pos_6" x="0.49655000000000005" y="44.93985000000001" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_7" x="0.49655000000000005" y="77.35000000000001" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_7" x="0.49655000000000005" y="74.89975" z="0"/>
     <position unit="cm" name="ArCLight_pos_8" x="0.49655000000000005" y="104.85964999999999" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_9" x="0.49655000000000005" y="139.23" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_9" x="0.49655000000000005" y="134.81955000000002" z="0"/>
     <position unit="cm" name="PCBBarL_pos_0" x="-23.64435" y="-134.81955000000002" z="0"/>
     <position unit="cm" name="PCBBarL_pos_1" x="-23.64435" y="-104.85964999999999" z="0"/>
     <position unit="cm" name="PCBBarL_pos_2" x="-23.64435" y="-74.89975" z="0"/>
@@ -280,15 +280,15 @@
     <position unit="cm" name="PCBBarL_pos_7" x="-23.64435" y="74.89975" z="0"/>
     <position unit="cm" name="PCBBarL_pos_8" x="-23.64435" y="104.85964999999999" z="0"/>
     <position unit="cm" name="PCBBarL_pos_9" x="-23.64435" y="134.81955000000002" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_0" x="0.49655000000000005" y="-139.23" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_0" x="0.49655000000000005" y="-134.81955000000002" z="0"/>
     <position unit="cm" name="ArCLight_pos_1" x="0.49655000000000005" y="-104.85964999999999" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_2" x="0.49655000000000005" y="-77.35000000000001" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_2" x="0.49655000000000005" y="-74.89975" z="0"/>
     <position unit="cm" name="ArCLight_pos_3" x="0.49655000000000005" y="-44.93985000000001" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_4" x="0.49655000000000005" y="-15.469999999999999" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_4" x="0.49655000000000005" y="-14.97995" z="0"/>
     <position unit="cm" name="ArCLight_pos_5" x="0.49655000000000005" y="14.97995" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_6" x="0.49655000000000005" y="46.41" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_6" x="0.49655000000000005" y="44.93985000000001" z="0"/>
     <position unit="cm" name="ArCLight_pos_7" x="0.49655000000000005" y="74.89975" z="0"/>
-    <position unit="cm" name="LCMPlane_pos_8" x="0.49655000000000005" y="108.28999999999999" z="0"/>
+    <position unit="cm" name="LCMPlane_pos_8" x="0.49655000000000005" y="104.85964999999999" z="0"/>
     <position unit="cm" name="ArCLight_pos_9" x="0.49655000000000005" y="134.81955000000002" z="0"/>
     <position unit="cm" name="PCBBarR_pos_0" x="-23.64435" y="-134.81955000000002" z="0"/>
     <position unit="cm" name="PCBBarR_pos_1" x="-23.64435" y="-104.85964999999999" z="0"/>
@@ -306,8 +306,8 @@
     <position unit="cm" name="Kapton_pos" x="0.0012500000000000002" y="0" z="0"/>
     <position unit="cm" name="LAr_pos" x="-0.0012500000000000002" y="0" z="0"/>
     <position unit="cm" name="TPC_pos" x="0.0013499999999970758" y="0" z="0"/>
-    <position unit="cm" name="OpticalDetR_pos_R" x="-0.050750000000005006" y="0" z="-48.336800000000004"/>
-    <position unit="cm" name="OpticalDetL_pos_L" x="-0.050750000000005006" y="0" z="48.336800000000004"/>
+    <position unit="cm" name="OpticalDetR_pos_R" x="-0.050750000000005006" y="0" z="-48.3618"/>
+    <position unit="cm" name="OpticalDetL_pos_L" x="-0.050750000000005006" y="0" z="48.3618"/>
     <rotation unit="degree" name="OpticalDetL_rot" x="180.0" y="0.0" z="0.0"/>
     <position unit="cm" name="Bracket_pos_L" x="23.68125" y="0" z="-48.61"/>
     <position unit="cm" name="Bracket_pos_R" x="23.68125" y="0" z="48.61"/>
@@ -914,8 +914,8 @@
     <box name="PCB_shape" lunit="cm" x="0.3175" y="29.9599" z="47.8318"/>
     <box name="Pixel_shape" lunit="cm" x="0.0051" y="0.4" z="0.4"/>
     <box name="Asic_shape" lunit="cm" x="0.1422" y="1.6" z="1.6"/>
-    <box name="TPCPlane" lunit="cm" x="0.4648" y="299.599" z="95.6636"/>
-    <box name="ArCLight" lunit="cm" x="46.8975" y="29.9599" z="1.01"/>
+    <box name="TPCPlane" lunit="cm" x="0.4648" y="300.049" z="95.7136"/>
+    <box name="ArCLight" lunit="cm" x="46.8975" y="29.8599" z="1.01"/>
     <box name="WLS_panel_shape" lunit="cm" x="46.4215" y="29.9599" z="1.0"/>
     <box name="DCM_shape_xz" lunit="cm" x="46.4215" y="0.011000000000000001" z="1.0"/>
     <box name="DCM_shape_yz" lunit="cm" x="0.011000000000000001" y="29.9599" z="1.0"/>
@@ -924,7 +924,7 @@
     <box name="SiPM_Mask_shape" lunit="cm" x="0.165" y="7.825" z="1.0"/>
     <box name="SiPM_Sens_shape" lunit="cm" x="0.0002" y="0.6000000000000001" z="0.6000000000000001"/>
     <box name="SiPM_shape" lunit="cm" x="0.147" y="0.6000000000000001" z="0.6000000000000001"/>
-    <box name="SiPM_PCB_shape" lunit="cm" x="0.30000000000000004" y="9.986633333333334" z="1.0"/>
+    <box name="SiPM_PCB_shape" lunit="cm" x="0.30000000000000004" y="9.950000000000001" z="1.0"/>
     <box name="LCM" lunit="cm" x="46.8865" y="9.950000000000001" z="1.0"/>
     <tube name="TPB_Fiber_shape" lunit="cm" aunit="radian" rmin="0.0" rmax="0.0601" z="46.3215" startphi="0.0" deltaphi="6.283185307179586"/>
     <tube name="Fiber_shape" lunit="cm" aunit="radian" rmin="0.0" rmax="0.06" z="46.3215" startphi="0.0" deltaphi="6.283185307179586"/>
@@ -932,19 +932,19 @@
     <box name="SiPM_LCM_Mask_shape" lunit="cm" x="0.165" y="9.950000000000001" z="1.0"/>
     <box name="SiPM_LCM_shape" lunit="cm" x="0.147" y="4.95" z="0.12"/>
     <box name="SiPM_LCM_PCB_shape" lunit="cm" x="0.30000000000000004" y="9.950000000000001" z="1.0"/>
-    <box name="LCMPlane" lunit="cm" x="46.8865" y="30.939999999999998" z="1.0"/>
-    <box name="OpticalDetL" lunit="cm" x="47.890600000000006" y="299.599" z="1.01"/>
+    <box name="LCMPlane" lunit="cm" x="46.8865" y="29.8599" z="1.0"/>
+    <box name="OpticalDetL" lunit="cm" x="47.890600000000006" y="300.049" z="1.01"/>
     <box name="PCBBarL_shape" lunit="cm" x="0.3175" y="29.9599" z="1.01"/>
-    <box name="OpticalDetR" lunit="cm" x="47.890600000000006" y="299.599" z="1.01"/>
+    <box name="OpticalDetR" lunit="cm" x="47.890600000000006" y="300.049" z="1.01"/>
     <box name="PCBBarR_shape" lunit="cm" x="0.3175" y="29.9599" z="1.01"/>
-    <box name="TPC" lunit="cm" x="47.994800000000005" y="299.599" z="95.6636"/>
-    <box name="TPCActive_shape" lunit="cm" x="47.53" y="299.599" z="95.6636"/>
+    <box name="TPC" lunit="cm" x="47.994800000000005" y="300.049" z="95.7136"/>
+    <box name="TPCActive_shape" lunit="cm" x="47.53" y="300.049" z="95.7136"/>
     <box name="OptSim" lunit="cm" x="48.6325" y="302.63939999999997" z="99.5"/>
     <box name="Fieldcage_shape" lunit="cm" x="48.6325" y="302.63939999999997" z="99.5"/>
     <box name="Kapton_shape" lunit="cm" x="48.0" y="301.37440000000004" z="98.235"/>
     <box name="LAr_shape" lunit="cm" x="47.9975" y="301.3694" z="98.23"/>
     <box name="Bracket_shape" lunit="cm" x="0.635" y="300.0" z="1.01"/>
-    <box name="DetEnclosure" lunit="cm" x="100.0" y="200.0" z="100.0"/>
+    <box name="DetEnclosure" lunit="cm" x="300.0" y="600.0" z="300.0"/>
     <box name="World" lunit="cm" x="40000.0" y="40000.0" z="40000.0"/>
   </solids>
   <structure>
