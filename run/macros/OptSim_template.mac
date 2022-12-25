@@ -39,3 +39,4 @@
 ### Define particle source ###
 /argoncube/gun/sourceType Volume
 /argoncube/gun/shape Box
+/argoncube/gun/angtype Iso
