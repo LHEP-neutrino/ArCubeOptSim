@@ -151,21 +151,20 @@ void OptSim_createLUT(int run, float effSiPM){
           Time = timeVec[j];
           T1 = Time->GetBinCenter(Time->FindFirstBinAbove(0));
 
-          //only fill if vixibility > 0
-          if(Visibility>0){
-            out_tree->Fill();
+          //check if Visibility not negative
+          if(not Visibility>0) Visibility = 0
 
-            //Filly symmetry pair
-            Voxel_temp = Voxel;
-            Voxel += 2*nVox;
-            Voxel -= (2*(Voxel_temp/(n_vox[0]*n_vox[1]))+1)*(n_vox[0]*n_vox[1]);
-            OpChannel = (OpChannel+nChannel/2)%nChannel;
-            timeVec[j]->SetName(Form("Voxel%06d_OpChannel%02d",Voxel,OpChannel));
-            out_tree->Fill();
-            Voxel = Voxel_temp;
-          }/*else{
-            std::cout << "Voxel: " << Voxel << ", OpChannel: " << j << " is has 0 visibility..." << std::endl;
-          }*/
+          //Fill Voxel
+          out_tree->Fill();
+
+          //Filly symmetry pair
+          Voxel_temp = Voxel;
+          Voxel += 2*nVox;
+          Voxel -= (2*(Voxel_temp/(n_vox[0]*n_vox[1]))+1)*(n_vox[0]*n_vox[1]);
+          OpChannel = (OpChannel+nChannel/2)%nChannel;
+          timeVec[j]->SetName(Form("Voxel%06d_OpChannel%02d",Voxel,OpChannel));
+          out_tree->Fill();
+          Voxel = Voxel_temp;
 
           //reset hits
           hits[j] = 0;
