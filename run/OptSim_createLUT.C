@@ -152,7 +152,7 @@ void OptSim_createLUT(int run, float effSiPM){
           T1 = Time->GetBinCenter(Time->FindFirstBinAbove(0));
 
           //check if Visibility not negative
-          if(not Visibility>0) Visibility = 0
+          if(!(Visibility>0)) Visibility = 0;
 
           //Fill Voxel
           out_tree->Fill();
