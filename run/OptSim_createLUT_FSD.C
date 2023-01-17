@@ -73,7 +73,7 @@ void OptSim_createLUT(int run, float effSiPM){
   int sipmID = -1;
   int hitVolGlobCP = 0;
   int hitVolIdx = -1;
-  int nChannel = 48;
+  int nChannel = 120;
   int nVox = n_vox[2]*n_vox[0]*n_vox[1];
   int hits[nChannel];
   vector<TH1F*> timeVec;
