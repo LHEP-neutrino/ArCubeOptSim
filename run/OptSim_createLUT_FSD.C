@@ -335,16 +335,16 @@ void OptSim_createLUT(int run, float effSiPM){
                 case 0: //ArCLight0
                   channelID += 54;
                   break;
-		case 0: //ArCLight1
+		case 1: //ArCLight1
                   channelID += 42;
                   break;
-		case 0: //ArCLight2
+		case 2: //ArCLight2
                   channelID += 30;
                   break;
-		case 0: //ArCLight3
+		case 3: //ArCLight3
                   channelID += 18;
                   break;
-                case 1: //ArCLight4
+                case 4: //ArCLight4
                   channelID += 6;
                   break;
               }
