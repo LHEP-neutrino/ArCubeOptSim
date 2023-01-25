@@ -197,11 +197,11 @@ void OptSim_createLUT(int run, float effSiPM){
 
 
       hitVolIdx = hit_vol_index->at(j);
-      if(hitVolIdx==12 or hitVolIdx==17) hitVolIdx += 1;
-      if(hitVolIdx==11 or hitVolIdx==16) hitVolIdx += 2;
+      if(hitVolIdx==9 or hitVolIdx==14) hitVolIdx += 1;
+      if(hitVolIdx==8 or hitVolIdx==13) hitVolIdx += 2;
 
       switch(hitVolIdx){
-        case 13: //LCM
+        case 10: //LCM
           channelID = 0;
           sipmID = 0;
 
@@ -278,7 +278,7 @@ void OptSim_createLUT(int run, float effSiPM){
 
           break;//case 11
 
-        case 18: //ArCLight
+        case 15: //ArCLight
           channelID = 0;
           sipmID = 0;
 

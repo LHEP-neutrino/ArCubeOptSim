@@ -22,7 +22,7 @@ print '\n------------------------------'
 
 vox_per_bunch = 100
 if (stop_vox == -1):                #run over all voxels
-    stop_vox = np.prod(nvox)
+    stop_vox = np.prod(nvox)+1
 
 #only LUT sim files as bunches of 100
 for bunch in range(np.prod(nvox)/vox_per_bunch+1):
