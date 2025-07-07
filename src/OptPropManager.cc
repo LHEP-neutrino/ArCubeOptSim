@@ -773,7 +773,7 @@ void OptPropManager::setlogbordersurf(const json keyval)
 				if(fVerbose>=OptPropManager::kDetails){
 					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: applying sigma_alpha value of <" << keyval.at("sigma_alpha").get<double>() << "> to the optical surface <"<< optsurfname << ">" << std::endl;
 				}
-				optsurf->SetSigmaAlpha( OptSurfFinishMap.at(keyval.at("sigma_alpha").get<double>()) );
+				optsurf->SetSigmaAlpha( G4double(OptSurfFinishMap.at(std::to_string(keyval.at("sigma_alpha").get<double>())) ));
 			}else{
 				if(fVerbose>=OptPropManager::kDetails){
 					std::cout << "Detail --> OptPropManager::setlogbordersurf(...): Setting logical border surfaces <" << logsurfname << ">: using iterative routine for applying sigma_alpha value of <" << keyval.at("sigma_alpha").get<double>() << ">" << std::endl;
@@ -1219,10 +1219,14 @@ void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const G4in
 	if(surftab){
 		G4LogicalSurface* Surface = nullptr;
 		
-		for(size_t iSurf=0; iSurf<surftab->size(); iSurf++){
-			G4String name = surftab->at(iSurf)->GetName();
-			if(name == logsurfname){
-				Surface = surftab->at(iSurf);
+		for (const auto& entry : *surftab) {
+			G4LogicalBorderSurface* borderSurface = entry.second; // Access the value (G4LogicalBorderSurface*)
+			if (borderSurface) {
+				G4String name = borderSurface->GetName();
+				if (name == logsurfname) {
+					Surface = borderSurface;
+					break; // Exit loop once the surface is found
+				}
 			}
 		}
 		

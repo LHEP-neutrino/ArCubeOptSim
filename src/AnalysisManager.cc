@@ -741,7 +741,7 @@ void AnalysisManagerOptPh::DefineOptPhSensDet(G4String volList)
 	
 	for(set<G4String>::iterator pIt = candidatevolnames.begin(); pIt != candidatevolnames.end(); pIt++){
 		G4String hRequiredVolumeName = *pIt;
-		G4bool bMatch = (hRequiredVolumeName.last('*') != std::string::npos);
+		G4bool bMatch = (hRequiredVolumeName.find_last_of('*') != std::string::npos);
 		
 		if(bMatch) hRequiredVolumeName = hRequiredVolumeName.strip(G4String::trailing, '*');
 		
@@ -788,7 +788,7 @@ void AnalysisManagerOptPh::DefineOptPhAbsVols(G4String volList)
 	
 	for(set<G4String>::iterator pIt = candidatevolnames.begin(); pIt != candidatevolnames.end(); pIt++){
 		G4String hRequiredVolumeName = *pIt;
-		G4bool bMatch = (hRequiredVolumeName.last('*') != std::string::npos);
+		G4bool bMatch = (hRequiredVolumeName.find_last_of('*') != std::string::npos);
 		
 		if(bMatch) hRequiredVolumeName = hRequiredVolumeName.strip(G4String::trailing, '*');
 		
