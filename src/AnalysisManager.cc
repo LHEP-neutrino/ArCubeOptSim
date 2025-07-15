@@ -948,6 +948,7 @@ std::string AnalysisManagerOptPh::BuildProcsDict()
 		}
 		
 		dictstr = obj.dump();
+		return dictstr;
 	}
 }
 
