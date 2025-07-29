@@ -1219,14 +1219,10 @@ void OptPropManager::SetSurfReflectivity(const G4String& logsurfname, const G4in
 	if(surftab){
 		G4LogicalSurface* Surface = nullptr;
 		
-		for (const auto& entry : *surftab) {
-			G4LogicalBorderSurface* borderSurface = entry.second; // Access the value (G4LogicalBorderSurface*)
-			if (borderSurface) {
-				G4String name = borderSurface->GetName();
-				if (name == logsurfname) {
-					Surface = borderSurface;
-					break; // Exit loop once the surface is found
-				}
+		for(size_t iSurf=0; iSurf<surftab->size(); iSurf++){
+			G4String name = surftab->at(iSurf)->GetName();
+			if(name == logsurfname){
+				Surface = surftab->at(iSurf);
 			}
 		}
 		
